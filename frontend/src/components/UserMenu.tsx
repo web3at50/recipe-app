@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import { User as UserIcon, LogOut } from 'lucide-react'
 import { User } from '@supabase/supabase-js'
 
 interface UserMenuProps {
@@ -41,7 +43,16 @@ export function UserMenu({ user }: UserMenuProps) {
           <span className="text-xs text-muted-foreground">{user.email}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/settings">
+            <UserIcon className="mr-2 h-4 w-4" />
+            Profile & Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSignOut}>
+          <LogOut className="mr-2 h-4 w-4" />
+          Sign out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
