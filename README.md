@@ -1,96 +1,232 @@
-# Opensea MCP Chatbot
+# 🚀 SaaS Baseline Template
 
-> Chatbot to query NFT and Token data using Opensea MCP
+> A production-ready Next.js + Supabase template for building modern SaaS applications
 
-## Tech Stack
+**Start your next project in 30 minutes with authentication, database, and deployment ready to go.**
 
-- **Frontend:** Next.js 15.5+, React 19, TypeScript
-- **Styling:** Tailwind CSS v4, shadcn/ui (New York style)
-- **Authentication:** Supabase Auth (Email + Google OAuth)
-- **Database:** Supabase PostgreSQL with RLS
-- **Deployment:** Vercel
-- **AI:** OpenAI, Anthropic Claude
-- **MCP:** OpenSea MCP integration
+---
 
-## Project Structure
+## ✨ What's Included
+
+This template provides a complete baseline for SaaS applications:
+
+- ✅ **Next.js 15** with App Router + TypeScript
+- ✅ **React 19** with Server Components
+- ✅ **Tailwind CSS v4** with dark/light theme toggle (dark mode default)
+- ✅ **Supabase** authentication (Email + Google OAuth)
+- ✅ **PostgreSQL** database with Row Level Security (RLS)
+- ✅ **User profiles** auto-created on signup
+- ✅ **shadcn/ui** components (New York style, neutral palette)
+- ✅ **Geist** fonts (Sans + Mono)
+- ✅ **Vercel** deployment ready
+- ✅ **Responsive** design (mobile + desktop)
+
+---
+
+## 🎯 Tech Stack
+
+| Category | Technology |
+|----------|-----------|
+| **Framework** | Next.js 15.5.4, React 19.1.0 |
+| **Language** | TypeScript 5.x |
+| **Styling** | Tailwind CSS v4, shadcn/ui |
+| **Authentication** | Supabase Auth (Email + OAuth) |
+| **Database** | Supabase PostgreSQL + RLS |
+| **Deployment** | Vercel |
+| **Theme** | next-themes (dark/light toggle) |
+
+---
+
+## 🚀 Quick Start
+
+### **Option 1: Use This Template (Recommended)**
+
+1. Click the **"Use this template"** button at the top of this page
+2. Create your new repository
+3. Follow the complete setup guide: [TEMPLATE_USAGE_GUIDE.md](TEMPLATE_USAGE_GUIDE.md)
+
+### **Option 2: Clone Directly**
+
+```bash
+# Clone this repository
+git clone https://github.com/web3at50/SAAS-Template.git my-project
+cd my-project
+
+# Install dependencies
+cd frontend
+npm install
+
+# Set up environment variables
+# Create frontend/.env.local with your Supabase credentials
+
+# Run development server
+npm run dev
+```
+
+**Full setup instructions:** See [TEMPLATE_USAGE_GUIDE.md](TEMPLATE_USAGE_GUIDE.md)
+
+---
+
+## 📁 Project Structure
 
 ```
-osmcpbot/
-├── frontend/           # Next.js application
+saas-template/
+├── frontend/                    # Next.js application
 │   ├── src/
-│   │   ├── app/       # App Router pages
-│   │   ├── components/ # React components
-│   │   └── lib/       # Utilities & Supabase clients
-├── supabase/          # Database migrations
-│   └── migrations/
-└── setup/             # Setup files (gitignored)
+│   │   ├── app/                 # App Router pages
+│   │   │   ├── (auth)/          # Auth pages (login, signup)
+│   │   │   ├── auth/callback/   # OAuth callback
+│   │   │   ├── layout.tsx       # Root layout with theme
+│   │   │   ├── page.tsx         # Homepage
+│   │   │   └── globals.css      # Theme colors
+│   │   ├── components/
+│   │   │   ├── ui/              # shadcn/ui components
+│   │   │   ├── auth/            # Auth forms
+│   │   │   ├── ThemeToggle.tsx  # Theme toggle button
+│   │   │   └── theme-provider.tsx
+│   │   ├── lib/
+│   │   │   ├── supabase/        # Supabase clients
+│   │   │   └── utils.ts
+│   │   └── middleware.ts        # Auth middleware
+│   ├── .env.local               # Environment variables (create this)
+│   ├── package.json             # Dependencies
+│   └── components.json          # shadcn config
+├── supabase/
+│   ├── migrations/
+│   │   └── 001_create_profiles.sql  # Initial schema
+│   └── config.toml
+├── setup/                       # Setup guides (gitignored)
+├── TEMPLATE_USAGE_GUIDE.md      # 📖 Complete setup instructions
+└── README.md                    # This file
 ```
 
-## Getting Started
+---
 
-### Prerequisites
+## 🎨 Features Out of the Box
 
-- Node.js 18+
-- Supabase account
-- Vercel account
-- API keys: Anthropic, OpenAI
+### **Authentication**
+- Email signup/login with verification
+- Google OAuth (production)
+- Password reset flow
+- Protected routes with middleware
+- Automatic profile creation
 
-### Local Development
+### **Database**
+- User profiles table with RLS
+- Multi-tenant ready
+- Auto-create profile trigger
+- Migration system ready
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/web3at50/osmcpchatbot.git
-   cd osmcpbot
-   ```
+### **UI/UX**
+- Dark/light theme toggle (dark default)
+- Smooth theme transitions
+- Monochrome professional design
+- Responsive layout
+- shadcn/ui components pre-configured
 
-2. Install dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
+### **Developer Experience**
+- TypeScript throughout
+- ESLint configured
+- Hot reload
+- Vercel deployment ready
+- Environment variable management
 
-3. Set up environment variables:
-   - Copy `.env.example` to `.env.local`
-   - Fill in your Supabase credentials and API keys
+---
 
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
+## 📚 Documentation
 
-5. Open [http://localhost:3000](http://localhost:3000)
+- **[TEMPLATE_USAGE_GUIDE.md](TEMPLATE_USAGE_GUIDE.md)** - Complete step-by-step setup guide
+- **[setup/SAAS_BASELINE_SETUP_TEMPLATE.md](setup/SAAS_BASELINE_SETUP_TEMPLATE.md)** - Technical specifications
 
-### Database Setup
+---
 
-Link to your Supabase project:
+## 🛠️ Customization
+
+After setup, customize for your specific app:
+
+### **1. Update Branding**
+- Edit `frontend/src/app/layout.tsx` - Change app name in header
+- Edit `frontend/src/app/page.tsx` - Update welcome message and CTAs
+- Replace this README with your project description
+
+### **2. Add Database Tables**
 ```bash
-supabase link --project-ref srremctvztxsjsmjytcb
-```
+# Create new migration
+supabase migration new add_your_table
 
-Push migrations:
-```bash
+# Edit the SQL file in supabase/migrations/
+# Push to database
 supabase db push
 ```
 
-## Deployment
+### **3. Add Features**
+- Create pages in `frontend/src/app/`
+- Add components in `frontend/src/components/`
+- Update navigation in `layout.tsx`
 
-Deploy to Vercel:
+---
+
+## 🔐 Environment Variables
+
+Required variables (create `frontend/.env.local`):
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+ANTHROPIC_API_KEY=your_anthropic_key  # Optional
+OPENAI_API_KEY=your_openai_key        # Optional
+```
+
+---
+
+## 🚢 Deployment
+
+### **Vercel (Recommended)**
 
 1. Push to GitHub
 2. Import repository in Vercel
-3. Set root directory to `frontend/`
+3. Set **Root Directory** to `frontend/`
 4. Add environment variables
 5. Deploy!
 
-## Features
+**Detailed instructions:** [TEMPLATE_USAGE_GUIDE.md](TEMPLATE_USAGE_GUIDE.md#step-10-deploy-to-vercel)
 
-- ✅ Email authentication (local development)
-- ✅ Google OAuth (production)
-- ✅ User profiles with RLS
-- ✅ Monochrome design system
-- ✅ Responsive layout
-- 🚧 OpenSea MCP integration (coming soon)
+---
 
-## License
+## 📋 Prerequisites
 
-MIT
+- Node.js 18+
+- Git
+- Supabase account
+- Vercel account (for deployment)
+- GitHub account
+
+---
+
+## 🤝 Contributing
+
+This is a personal template, but feel free to:
+- Fork for your own use
+- Suggest improvements via issues
+- Share your projects built with this template
+
+---
+
+## 📝 License
+
+MIT License - feel free to use for personal or commercial projects.
+
+---
+
+## 🙏 Acknowledgments
+
+Built with:
+- [Next.js](https://nextjs.org)
+- [Supabase](https://supabase.com)
+- [Tailwind CSS](https://tailwindcss.com)
+- [shadcn/ui](https://ui.shadcn.com)
+- [next-themes](https://github.com/pacocoursey/next-themes)
+
+---
+
+**Ready to build? Start here:** [TEMPLATE_USAGE_GUIDE.md](TEMPLATE_USAGE_GUIDE.md)
