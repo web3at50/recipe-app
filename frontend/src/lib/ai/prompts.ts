@@ -73,6 +73,7 @@ interface ParsedRecipe {
   prep_time: number;
   cook_time: number;
   servings: number;
+  source?: 'ai_generated' | 'manual';
   ingredients: Array<{
     item: string;
     quantity: number;
