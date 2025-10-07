@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CupboardItemForm } from '@/components/pantry/cupboard-item-form';
@@ -10,7 +9,6 @@ import { AlwaysHaveList } from '@/components/pantry/always-have-list';
 import type { CupboardItem, AlwaysHaveItem } from '@/types/pantry';
 
 export default function PantryPage() {
-  const router = useRouter();
   const [cupboardItems, setCupboardItems] = useState<CupboardItem[]>([]);
   const [alwaysHaveItems, setAlwaysHaveItems] = useState<AlwaysHaveItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -138,13 +136,13 @@ export default function PantryPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Pantry Management</h1>
         <p className="text-muted-foreground mt-1">
-          Track what's in your cupboard and maintain your staples list
+          Track what&apos;s in your cupboard and maintain your staples list
         </p>
       </div>
 
       <Tabs defaultValue="cupboard" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="cupboard">What's in Cupboard</TabsTrigger>
+          <TabsTrigger value="cupboard">What&apos;s in Cupboard</TabsTrigger>
           <TabsTrigger value="always-have">Always Have</TabsTrigger>
         </TabsList>
 

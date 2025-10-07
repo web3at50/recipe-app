@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ChevronLeft, Clock, Users, Edit, Trash2, Heart } from 'lucide-react';
+import { ChevronLeft, Clock, Users, Edit } from 'lucide-react';
 import { RecipeDetailClient } from './recipe-detail-client';
 import type { RecipeWithDetails } from '@/types/recipe';
 
@@ -54,7 +54,15 @@ export default async function RecipeDetailPage({ params }: PageProps) {
     .select('category_id, categories(*)')
     .eq('recipe_id', id);
 
-  const categories = recipeCategories?.map((rc: any) => rc.categories) || [];
+  interface CategoryRecord {
+    categories: {
+      id: string;
+      name: string;
+      description?: string;
+    };
+  }
+
+  const categories = recipeCategories?.map((rc) => (rc as CategoryRecord).categories) || [];
 
   const recipeWithDetails: RecipeWithDetails = {
     ...recipe,

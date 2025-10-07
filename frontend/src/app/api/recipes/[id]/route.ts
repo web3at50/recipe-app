@@ -53,7 +53,15 @@ export async function GET(
       .select('category_id, categories(*)')
       .eq('recipe_id', id);
 
-    const categories = recipeCategories?.map((rc: any) => rc.categories) || [];
+    interface CategoryRecord {
+      categories: {
+        id: string;
+        name: string;
+        description?: string;
+      };
+    }
+
+    const categories = recipeCategories?.map((rc) => (rc as CategoryRecord).categories) || [];
 
     return NextResponse.json({
       ...recipe,

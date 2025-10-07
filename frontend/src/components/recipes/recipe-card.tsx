@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Clock, Users, Heart } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,10 +18,12 @@ export function RecipeCard({ recipe, onToggleFavorite }: RecipeCardProps) {
       <Link href={`/recipes/${recipe.id}`}>
         <div className="aspect-video bg-muted relative">
           {recipe.image_url ? (
-            <img
+            <Image
               src={recipe.image_url}
               alt={recipe.name}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground">

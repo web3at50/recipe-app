@@ -67,7 +67,25 @@ Important:
   return prompt;
 }
 
-export function parseRecipeFromAI(text: string): any {
+interface ParsedRecipe {
+  name: string;
+  description: string;
+  prep_time: number;
+  cook_time: number;
+  servings: number;
+  ingredients: Array<{
+    item: string;
+    quantity: number;
+    unit: string;
+    notes?: string;
+  }>;
+  instructions: Array<{
+    step_number: number;
+    instruction: string;
+  }>;
+}
+
+export function parseRecipeFromAI(text: string): ParsedRecipe {
   // Try to extract JSON from the response
   const jsonMatch = text.match(/\{[\s\S]*\}/);
 
@@ -76,7 +94,7 @@ export function parseRecipeFromAI(text: string): any {
   }
 
   try {
-    const recipe = JSON.parse(jsonMatch[0]);
+    const recipe = JSON.parse(jsonMatch[0]) as ParsedRecipe;
 
     // Validate required fields
     if (!recipe.name || !recipe.ingredients || !recipe.instructions) {

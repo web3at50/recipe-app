@@ -15,7 +15,25 @@ export default function GeneratePage() {
   const [ingredientsText, setIngredientsText] = useState('');
   const [servings, setServings] = useState(4);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedRecipe, setGeneratedRecipe] = useState<any>(null);
+  interface GeneratedRecipe {
+    name: string;
+    description: string;
+    prep_time: number;
+    cook_time: number;
+    servings: number;
+    ingredients: Array<{
+      item: string;
+      quantity: string;
+      unit: string;
+      notes?: string;
+    }>;
+    instructions: Array<{
+      step_number?: number;
+      instruction: string;
+    }>;
+  }
+
+  const [generatedRecipe, setGeneratedRecipe] = useState<GeneratedRecipe | null>(null);
   const [cupboardItems, setCupboardItems] = useState<CupboardItem[]>([]);
 
   useEffect(() => {
@@ -95,13 +113,13 @@ export default function GeneratePage() {
           prep_time: generatedRecipe.prep_time,
           cook_time: generatedRecipe.cook_time,
           servings: generatedRecipe.servings,
-          ingredients: generatedRecipe.ingredients.map((ing: any, index: number) => ({
+          ingredients: generatedRecipe.ingredients.map((ing) => ({
             item: ing.item,
             quantity: ing.quantity,
             unit: ing.unit,
             notes: ing.notes,
           })),
-          instructions: generatedRecipe.instructions.map((inst: any) => ({
+          instructions: generatedRecipe.instructions.map((inst) => ({
             instruction: inst.instruction,
           })),
         }),
@@ -221,7 +239,7 @@ export default function GeneratePage() {
                 <div>
                   <h3 className="font-semibold mb-3">Ingredients</h3>
                   <ul className="space-y-1">
-                    {generatedRecipe.ingredients.map((ing: any, index: number) => (
+                    {generatedRecipe.ingredients.map((ing, index) => (
                       <li key={index} className="text-sm">
                         • {ing.quantity} {ing.unit} {ing.item}
                         {ing.notes && ` (${ing.notes})`}
@@ -234,7 +252,7 @@ export default function GeneratePage() {
                 <div>
                   <h3 className="font-semibold mb-3">Instructions</h3>
                   <ol className="space-y-3">
-                    {generatedRecipe.instructions.map((inst: any, index: number) => (
+                    {generatedRecipe.instructions.map((inst, index) => (
                       <li key={index} className="flex gap-3">
                         <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                           {inst.step_number || index + 1}

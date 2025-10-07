@@ -31,7 +31,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Item not found' }, { status: 404 });
     }
 
-    const mealPlan = item.meal_plans as any;
+    interface MealPlanRecord {
+      user_id: string;
+    }
+
+    const mealPlan = item.meal_plans as MealPlanRecord;
     if (mealPlan.user_id !== user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

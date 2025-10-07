@@ -17,8 +17,16 @@ import type { MealPlanItemWithRecipe, MealType } from '@/types/meal-plan';
 import type { Recipe } from '@/types/recipe';
 
 export default function MealPlannerPage() {
+  interface MealPlan {
+    id: string;
+    user_id: string;
+    name: string;
+    start_date: string;
+    end_date: string;
+  }
+
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(getMonday(new Date()));
-  const [mealPlan, setMealPlan] = useState<any>(null);
+  const [mealPlan, setMealPlan] = useState<MealPlan | null>(null);
   const [items, setItems] = useState<MealPlanItemWithRecipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,6 +40,7 @@ export default function MealPlannerPage() {
   useEffect(() => {
     fetchMealPlan();
     fetchRecipes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWeekStart]);
 
   function getMonday(date: Date): Date {

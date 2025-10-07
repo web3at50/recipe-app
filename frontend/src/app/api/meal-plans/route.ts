@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     }
 
     // Check if meal plan exists for this date range
-    let { data: mealPlan, error } = await supabase
+    const { data: mealPlan, error } = await supabase
       .from('meal_plans')
       .select('*')
       .eq('user_id', user.id)
@@ -38,7 +38,8 @@ export async function GET(request: Request) {
     }
 
     // If no meal plan exists, create one
-    if (!mealPlan) {
+    let finalMealPlan = mealPlan;
+    if (!finalMealPlan) {
       const { data: newMealPlan, error: createError } = await supabase
         .from('meal_plans')
         .insert({
@@ -55,7 +56,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: createError.message }, { status: 500 });
       }
 
-      mealPlan = newMealPlan;
+      finalMealPlan = newMealPlan;
     }
 
     // Fetch meal plan items with recipes
@@ -65,7 +66,7 @@ export async function GET(request: Request) {
         *,
         recipes (*)
       `)
-      .eq('meal_plan_id', mealPlan.id)
+      .eq('meal_plan_id', finalMealPlan.id)
       .gte('date', startDate)
       .lte('date', endDate)
       .order('date', { ascending: true });
@@ -76,7 +77,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({
-      meal_plan: mealPlan,
+      meal_plan: finalMealPlan,
       items: items || [],
     });
   } catch (error) {
