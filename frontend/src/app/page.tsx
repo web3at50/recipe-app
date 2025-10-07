@@ -16,10 +16,10 @@ export default async function Home() {
         <div className="mx-auto max-w-4xl space-y-12">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              Welcome to Opensea MCP Chatbot
+              Welcome to Recipe App
             </h1>
             <p className="text-xl text-muted-foreground">
-              Chatbot powered by Opensea MCP
+              Your personal recipe manager and meal planner
             </p>
           </div>
 
@@ -30,7 +30,7 @@ export default async function Home() {
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Create your account and start querying NFT and token data with our AI-powered chatbot.
+                  Create your account and start managing your recipes, planning meals, and organizing your cooking.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -77,7 +77,7 @@ export default async function Home() {
       <div className="mx-auto max-w-4xl space-y-12">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Welcome back to Opensea MCP Chatbot
+            Welcome back to Recipe App
           </h1>
           <p className="text-xl text-muted-foreground">
             Your account is ready
@@ -95,10 +95,10 @@ export default async function Home() {
             <div className="rounded-lg border bg-muted/50 p-6">
               <h3 className="font-semibold mb-2">Next Steps:</h3>
               <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                <li>Customize this app for your specific needs</li>
-                <li>Integrate OpenSea MCP for NFT and token data queries</li>
-                <li>Build your chatbot interface</li>
-                <li>Add custom features and functionality</li>
+                <li>Create and manage your recipes</li>
+                <li>Plan your meals for the week</li>
+                <li>Generate shopping lists</li>
+                <li>Track your cupboard inventory</li>
               </ul>
             </div>
             <p className="text-sm text-muted-foreground">

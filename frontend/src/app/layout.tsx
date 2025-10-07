@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Opensea MCP Chatbot",
-  description: "Chatbot to query NFT and Token data using Opensea MCP",
+  title: "Recipe App",
+  description: "Your personal recipe manager and meal planner",
 }
 
 export default async function RootLayout({
@@ -42,7 +42,7 @@ export default async function RootLayout({
           <header className="border-b">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
               <Link href="/" className="text-xl font-semibold">
-                Opensea MCP Chatbot
+                Recipe App
               </Link>
               <nav className="flex items-center gap-2">
                 <ThemeToggle />
