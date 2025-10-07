@@ -63,7 +63,7 @@ export function WeekView({ startDate, items, onAddRecipe, onRemoveRecipe }: Week
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-1">
                         <p className="text-sm font-medium line-clamp-2">
-                          {item.recipes?.name || 'Unknown Recipe'}
+                          {item.recipe?.name || 'Unknown Recipe'}
                         </p>
                         <Button
                           variant="ghost"
