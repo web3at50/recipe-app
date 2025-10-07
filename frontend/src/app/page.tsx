@@ -92,18 +92,26 @@ export default async function Home() {
             <p className="text-muted-foreground">
               You&apos;re logged in as <span className="font-semibold">{user.email}</span>
             </p>
-            <div className="rounded-lg border bg-muted/50 p-6">
-              <h3 className="font-semibold mb-2">Next Steps:</h3>
-              <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                <li>Create and manage your recipes</li>
-                <li>Plan your meals for the week</li>
-                <li>Generate shopping lists</li>
-                <li>Track your cupboard inventory</li>
-              </ul>
+            <div className="space-y-4">
+              <h3 className="font-semibold">Get Started:</h3>
+              <div className="grid gap-3">
+                <Button asChild className="w-full justify-start" size="lg">
+                  <Link href="/recipes">📚 My Recipes - Create and manage your recipes</Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full justify-start" size="lg">
+                  <Link href="/generate">🤖 AI Generate - Generate recipes from ingredients</Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full justify-start" size="lg">
+                  <Link href="/pantry">📦 Pantry - Track your cupboard inventory</Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full justify-start" size="lg">
+                  <Link href="/meal-planner">📅 Meal Planner - Plan your meals for the week</Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full justify-start" size="lg">
+                  <Link href="/shopping-list">🛒 Shopping List - Generate and manage shopping lists</Link>
+                </Button>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              This is your baseline dashboard. The authentication system is fully functional with email and Google OAuth support.
-            </p>
           </CardContent>
         </Card>
       </div>
