@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ChevronLeft, Clock, Users, Edit } from 'lucide-react';
 import { RecipeDetailClient } from './recipe-detail-client';
-import type { RecipeWithDetails } from '@/types/recipe';
 
 type PageProps = {
   params: Promise<{ id: string }>;

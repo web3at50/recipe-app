@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       model: openai('gpt-4.1-2025-04-14'),
       prompt,
       temperature: 0.7,
-      maxTokens: 2000,
+      maxSteps: 1,
     });
 
     console.log('AI Response received');
