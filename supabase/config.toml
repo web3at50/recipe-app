@@ -1,0 +1,21 @@
+# Supabase configuration file
+# Project: Opensea MCP Chatbot
+
+# Project details
+project_id = "srremctvztxsjsmjytcb"
+
+[auth]
+# Email auth is enabled by default
+# Google OAuth is configured via Supabase Dashboard
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+
+[db]
+# Database port (local development)
+port = 54322
+
+[studio]
+# Studio port (local development)
+port = 54323
