@@ -62,14 +62,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
     };
   }
 
-  const categories = recipeCategories?.map((rc) => (rc as CategoryRecord).categories) || [];
-
-  const recipeWithDetails: RecipeWithDetails = {
-    ...recipe,
-    ingredients: ingredients || [],
-    instructions: instructions || [],
-    categories,
-  };
+  const categories = recipeCategories?.map((rc) => (rc as unknown as CategoryRecord).categories) || [];
 
   const totalTime = (recipe.prep_time || 0) + (recipe.cook_time || 0);
 

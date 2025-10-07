@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, X } from 'lucide-react';
 import type { MealPlanItemWithRecipe } from '@/types/meal-plan';
-import type { Recipe } from '@/types/recipe';
 
 interface WeekViewProps {
   startDate: Date;

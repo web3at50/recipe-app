@@ -61,7 +61,7 @@ export async function GET(
       };
     }
 
-    const categories = recipeCategories?.map((rc) => (rc as CategoryRecord).categories) || [];
+    const categories = recipeCategories?.map((rc) => (rc as unknown as CategoryRecord).categories) || [];
 
     return NextResponse.json({
       ...recipe,
