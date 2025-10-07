@@ -22,7 +22,7 @@ const recipeFormSchema = z.object({
   description: z.string().optional(),
   prep_time: z.number().min(0).optional(),
   cook_time: z.number().min(0).optional(),
-  servings: z.number().min(1, 'Must have at least 1 serving').default(4),
+  servings: z.number().min(1, 'Must have at least 1 serving'),
   ingredients: z.array(
     z.object({
       item: z.string().min(1, 'Ingredient name is required'),
