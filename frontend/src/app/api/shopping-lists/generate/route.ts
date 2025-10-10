@@ -3,6 +3,17 @@ import { createClient } from '@/lib/supabase/server';
 import type { Ingredient } from '@/types/recipe';
 import { normalizeUnit } from '@/lib/units';
 
+// Type for meal plan item with recipe
+interface MealPlanItemWithRecipe {
+  id: string;
+  recipe?: {
+    ingredients: Ingredient[];
+  };
+  recipes?: {
+    ingredients: Ingredient[];
+  };
+}
+
 // POST /api/shopping-lists/generate - Generate shopping list from meal plan
 export async function POST(request: Request) {
   try {
@@ -130,12 +141,12 @@ export async function POST(request: Request) {
 }
 
 // Helper function to consolidate ingredients
-function consolidateIngredients(mealPlanItems: any[]): Ingredient[] {
+function consolidateIngredients(mealPlanItems: MealPlanItemWithRecipe[]): Ingredient[] {
   const ingredientMap = new Map<string, Ingredient>();
 
   mealPlanItems.forEach(item => {
     // Access nested recipe data
-    const recipe = (item.recipes as any) || item.recipe;
+    const recipe = item.recipes || item.recipe;
     if (!recipe || !recipe.ingredients) return;
 
     const ingredients = recipe.ingredients as Ingredient[];

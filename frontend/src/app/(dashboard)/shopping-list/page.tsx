@@ -353,9 +353,10 @@ export default function ShoppingListPage() {
 
         await fetchUserPantryStaples();
         toast.success(`"${item.item_name}" will always be hidden in Shopping Mode`);
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error adding pantry staple:', error);
-        toast.error(error.message || 'Failed to update pantry staples');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update pantry staples';
+        toast.error(errorMessage);
       }
     }
   };
