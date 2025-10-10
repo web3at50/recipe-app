@@ -29,7 +29,6 @@ export async function GET(request: Request) {
       .select('*')
       .eq('user_id', user.id)
       .eq('start_date', startDate)
-      .eq('end_date', endDate)
       .maybeSingle();
 
     if (error) {
@@ -46,7 +45,7 @@ export async function GET(request: Request) {
           user_id: user.id,
           start_date: startDate,
           end_date: endDate,
-          name: `Week of ${startDate}`,
+          week_start_date: startDate, // Keep for backward compatibility
         })
         .select()
         .single();
@@ -76,9 +75,15 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: itemsError.message }, { status: 500 });
     }
 
+    // Transform the data to ensure recipe is properly nested
+    const transformedItems = (items || []).map(item => ({
+      ...item,
+      recipe: item.recipes || item.recipe || null
+    }));
+
     return NextResponse.json({
       meal_plan: finalMealPlan,
-      items: items || [],
+      items: transformedItems,
     });
   } catch (error) {
     console.error('Error in GET /api/meal-plans:', error);

@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { AlwaysHaveItemFormData } from '@/types/pantry';
 
-// GET /api/pantry/always-have - Get all user's always-have items
+// GET /api/user/pantry-staples - Get user's custom pantry staples
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -13,26 +12,26 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch always-have items
-    const { data: items, error } = await supabase
-      .from('always_have_items')
+    // Fetch user's pantry staples
+    const { data: staples, error } = await supabase
+      .from('user_pantry_staples')
       .select('*')
       .eq('user_id', user.id)
-      .order('item', { ascending: true });
+      .order('item_pattern');
 
     if (error) {
-      console.error('Error fetching always-have items:', error);
+      console.error('Error fetching pantry staples:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ items: items || [] });
+    return NextResponse.json({ staples });
   } catch (error) {
-    console.error('Error in GET /api/pantry/always-have:', error);
+    console.error('Error in GET /api/user/pantry-staples:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// POST /api/pantry/always-have - Add always-have item
+// POST /api/user/pantry-staples - Add a new pantry staple
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -43,32 +42,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body: AlwaysHaveItemFormData = await request.json();
+    const body = await request.json();
+    const { item_pattern } = body;
 
-    // Validate required fields
-    if (!body.item) {
-      return NextResponse.json({ error: 'Item name is required' }, { status: 400 });
+    if (!item_pattern || !item_pattern.trim()) {
+      return NextResponse.json(
+        { error: 'item_pattern is required' },
+        { status: 400 }
+      );
     }
 
-    // Insert item
-    const { data: item, error } = await supabase
-      .from('always_have_items')
+    // Insert pantry staple
+    const { data: staple, error } = await supabase
+      .from('user_pantry_staples')
       .insert({
         user_id: user.id,
-        item: body.item,
-        category: body.category || null,
+        item_pattern: item_pattern.trim().toLowerCase(),
       })
       .select()
       .single();
 
     if (error) {
-      console.error('Error adding always-have item:', error);
+      // Handle duplicate key error
+      if (error.code === '23505') {
+        return NextResponse.json(
+          { error: 'This item is already in your pantry staples' },
+          { status: 409 }
+        );
+      }
+      console.error('Error creating pantry staple:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ item }, { status: 201 });
+    return NextResponse.json({ staple }, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/pantry/always-have:', error);
+    console.error('Error in POST /api/user/pantry-staples:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

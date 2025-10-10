@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RecipeList } from '@/components/recipes/recipe-list';
 
@@ -25,6 +25,15 @@ export default async function RecipesPage() {
     console.error('Error fetching recipes:', error);
   }
 
+  // Fetch user allergens
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('preferences')
+    .eq('user_id', user.id)
+    .single();
+
+  const userAllergens = profile?.preferences?.allergies || [];
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex items-center justify-between mb-8">
@@ -34,15 +43,23 @@ export default async function RecipesPage() {
             Manage your recipe collection
           </p>
         </div>
-        <Link href="/recipes/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Recipe
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/generate">
+            <Button>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Generate with AI
+            </Button>
+          </Link>
+          <Link href="/recipes/new">
+            <Button variant="outline">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Manually
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <RecipeList initialRecipes={recipes || []} />
+      <RecipeList initialRecipes={recipes || []} userAllergens={userAllergens} />
     </div>
   );
 }

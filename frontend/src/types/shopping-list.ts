@@ -15,12 +15,12 @@ export interface ShoppingList {
 export interface ShoppingListItem {
   id: string;
   shopping_list_id: string;
-  item: string;
-  quantity: number | null;
-  unit: string | null;
+  item_name: string;
+  quantity: string | null;
   category: string | null;
-  is_checked: boolean;
+  checked: boolean;
   recipe_id: string | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -31,9 +31,8 @@ export interface ShoppingListWithItems extends ShoppingList {
 
 // Form types
 export interface ShoppingListItemFormData {
-  item: string;
-  quantity?: number;
-  unit?: string;
+  item_name: string;
+  quantity?: string;
   category?: string;
 }
 

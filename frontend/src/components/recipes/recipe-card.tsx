@@ -1,6 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, Users, Heart } from 'lucide-react';
+import { Clock, Users, Heart, AlertTriangle, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { Recipe } from '@/types/recipe';
@@ -8,10 +10,20 @@ import type { Recipe } from '@/types/recipe';
 interface RecipeCardProps {
   recipe: Recipe;
   onToggleFavorite?: (id: string, isFavorite: boolean) => void;
+  onDelete?: (id: string) => void;
+  userAllergens?: string[]; // Optional: pass from parent if available
 }
 
-export function RecipeCard({ recipe, onToggleFavorite }: RecipeCardProps) {
+export function RecipeCard({ recipe, onToggleFavorite, onDelete, userAllergens }: RecipeCardProps) {
   const totalTime = (recipe.prep_time || 0) + (recipe.cook_time || 0);
+
+  // Check if recipe contains user allergens
+  const hasAllergenConflict = userAllergens && userAllergens.length > 0 && recipe.ingredients
+    ? recipe.ingredients.some((ingredient) => {
+        const ingredientText = `${ingredient.item} ${ingredient.notes || ''}`.toLowerCase();
+        return userAllergens.some((allergen) => ingredientText.includes(allergen.toLowerCase()));
+      })
+    : false;
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -30,6 +42,13 @@ export function RecipeCard({ recipe, onToggleFavorite }: RecipeCardProps) {
               No image
             </div>
           )}
+          {/* Allergen Warning Badge */}
+          {hasAllergenConflict && (
+            <div className="absolute top-2 right-2 bg-amber-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+              <AlertTriangle className="h-3 w-3" />
+              Allergen
+            </div>
+          )}
         </div>
       </Link>
 
@@ -40,20 +59,31 @@ export function RecipeCard({ recipe, onToggleFavorite }: RecipeCardProps) {
               {recipe.name}
             </h3>
           </Link>
-          {onToggleFavorite && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onToggleFavorite(recipe.id, !recipe.is_favorite)}
-              className="flex-shrink-0"
-            >
-              <Heart
-                className={`h-5 w-5 ${
-                  recipe.is_favorite ? 'fill-red-500 text-red-500' : ''
-                }`}
-              />
-            </Button>
-          )}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {onToggleFavorite && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onToggleFavorite(recipe.id, !recipe.is_favorite)}
+              >
+                <Heart
+                  className={`h-5 w-5 ${
+                    recipe.is_favorite ? 'fill-red-500 text-red-500' : ''
+                  }`}
+                />
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(recipe.id)}
+                className="hover:text-red-500"
+              >
+                <Trash2 className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
 

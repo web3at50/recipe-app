@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { RecipeCard } from './recipe-card';
 import type { Recipe } from '@/types/recipe';
+import { toast } from 'sonner';
 
 interface RecipeListProps {
   initialRecipes: Recipe[];
+  userAllergens?: string[];
 }
 
-export function RecipeList({ initialRecipes }: RecipeListProps) {
+export function RecipeList({ initialRecipes, userAllergens }: RecipeListProps) {
   const [recipes, setRecipes] = useState(initialRecipes);
 
   const handleToggleFavorite = async (id: string, isFavorite: boolean) => {
@@ -29,7 +31,24 @@ export function RecipeList({ initialRecipes }: RecipeListProps) {
       );
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      alert('Failed to update favorite status');
+      toast.error('Failed to update favorite status');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/recipes/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete recipe');
+
+      // Remove from local state
+      setRecipes((prev) => prev.filter((recipe) => recipe.id !== id));
+      toast.success('Recipe deleted');
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+      toast.error('Failed to delete recipe');
     }
   };
 
@@ -51,6 +70,8 @@ export function RecipeList({ initialRecipes }: RecipeListProps) {
           key={recipe.id}
           recipe={recipe}
           onToggleFavorite={handleToggleFavorite}
+          onDelete={handleDelete}
+          userAllergens={userAllergens}
         />
       ))}
     </div>

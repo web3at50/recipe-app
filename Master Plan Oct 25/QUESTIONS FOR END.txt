@@ -1,0 +1,67 @@
+to do in recipe app
+
+1: How to use without needing to sign in? Saving preferences etc to database without a sign in ?  Then if and when do create account will saved data transfer over. Onboarding and prefrences infgo etc. Even if free to create account some people wont want to and want a nice simple free to use test on home page without account?
+
+2: When signed in user_profiles table from onboarding go to the account section
+
+3: Can we add pref for no dairy and keto etc somewhere 
+
+4: GDPR is mentioned in onboarding but d we need a page?
+
+5: Natasha allergy law - page for that to look professional and maybe mention in onboarding again to look pro
+
+6: Payment - one off how much? How to protect against nailing the AI too much. How to protect if users use forever and new ones stop coming In so paying maintenance forever with no new fees?  Annual subs? Ideas? I do like simplicity of non subscription model certainly monthly. One off fee is good for appeal to users but do I need some protection
+
+7: Make sure we have claude 4.5 sonnet memory game changer apparently. Mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md line 1161
+
+8: AI Gateway so users can try multiple LLM to see which best. Multiple LLM on free version and cost is based on which ones / how many subscribe to
+
+9: IMage in recipes - whats the plan here? How to add ?  AI / customer / remove ? Plan?
+
+10: From week 5 enhancements to add
+
+- [ ] Drag-and-drop to reorder meals between days
+- [ ] Duplicate meal to another day
+
+11: mobile !!!!
+
+12: Make all available without signin and navigate nicely.  Don't know how will work without sign in to save to persona databases etc ?
+
+13: Amend icons - hate sparkle from lucide react - better libraries?
+
+14: App name & logo
+
+15: What extras from p2 and p3 should we add for easy wins wins
+
+16: WhatsApp shopping list . Email to - email easy probably but WhatsApp if possible better. Or if we make the app mobile friendly they just use the app ! Male a whole mobile version of shopping ist page for mobile so super user friendly
+
+17: generate recipes and shopping ist in pdf to  print
+
+18: Recipes look great on mobile to read and use live in kitchen
+
+18: Investigate and sort pantry list option on shopping list screen
+
+
+
+
+
+🚀 Recommended Implementation Order
+Phase 1 (Core - Do Now):
+✅ Fix type mismatches (10 min)
+✅ Create generate API route (60 min)
+✅ Add button to meal planner (15 min)
+✅ Test end-to-end flow (30 min)
+Phase 2 (Polish - After Core Works):
+✅ Enhance shopping list UI (30 min)
+✅ Add "Clear Checked" feature (15 min)
+✅ Add toast notifications (15 min)
+✅ Better empty states (10 min)
+Total Time: ~3 hours
+🎯 This Completes the Core User Journey!
+User Signs Up → Onboarding → Create/Generate Recipes → 
+Plan Meals for Week → Generate Shopping List → 
+Check off Items While Shopping → Cook Planned Meals
+Week 6 is the final piece of the core MVP workflow! 🎉 After this, Phase 2 enhancements can be added based on user feedback.
+
+
+Add option to create shopping list for just some of the meals not just ALL

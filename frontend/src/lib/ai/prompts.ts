@@ -3,7 +3,12 @@ export interface RecipeGenerationParams {
   dietary_preferences?: string[];
   servings?: number;
   prepTimeMax?: number;
-  difficulty?: 'easy' | 'medium' | 'hard';
+  difficulty?: 'easy' | 'medium' | 'hard' | 'beginner' | 'intermediate' | 'advanced';
+  userPreferences?: {
+    allergies?: string[];
+    cuisines_liked?: string[];
+    spice_level?: 'mild' | 'medium' | 'hot';
+  };
 }
 
 export function createRecipeGenerationPrompt(params: RecipeGenerationParams): string {
@@ -13,25 +18,64 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
     servings = 4,
     prepTimeMax,
     difficulty,
+    userPreferences,
   } = params;
 
-  let prompt = `You are a professional chef assistant. Generate a delicious recipe based on the following ingredients:\n\n`;
-  prompt += `Available Ingredients:\n${ingredients.join('\n')}\n\n`;
+  let prompt = `You are a professional UK-based chef assistant helping a home cook. Generate a delicious, practical recipe.\n\n`;
 
-  prompt += `Requirements:\n`;
+  // User Context (personalization)
+  if (userPreferences) {
+    prompt += `USER PROFILE:\n`;
+
+    if (userPreferences.allergies && userPreferences.allergies.length > 0) {
+      prompt += `⚠️ CRITICAL - ALLERGENS TO AVOID: ${userPreferences.allergies.join(', ')}\n`;
+      prompt += `DO NOT include these ingredients or their derivatives under any circumstances.\n`;
+    }
+
+    if (userPreferences.cuisines_liked && userPreferences.cuisines_liked.length > 0) {
+      prompt += `- Preferred cuisines: ${userPreferences.cuisines_liked.join(', ')}\n`;
+    }
+
+    if (userPreferences.spice_level) {
+      const spiceGuidance = {
+        mild: 'Keep spices gentle - suitable for those who prefer less heat',
+        medium: 'Moderate spice level - balanced heat',
+        hot: 'Make it spicy - this cook enjoys bold, hot flavors'
+      };
+      prompt += `- Spice preference: ${spiceGuidance[userPreferences.spice_level]}\n`;
+    }
+
+    prompt += `\n`;
+  }
+
+  prompt += `AVAILABLE INGREDIENTS:\n${ingredients.join('\n')}\n\n`;
+
+  prompt += `REQUIREMENTS:\n`;
   prompt += `- Servings: ${servings}\n`;
 
   if (dietary_preferences.length > 0) {
-    prompt += `- Dietary Preferences: ${dietary_preferences.join(', ')}\n`;
+    prompt += `- Dietary Requirements: ${dietary_preferences.join(', ')}\n`;
   }
 
   if (prepTimeMax) {
-    prompt += `- Maximum Total Time: ${prepTimeMax} minutes\n`;
+    prompt += `- Maximum Total Time: ${prepTimeMax} minutes (including prep and cook)\n`;
   }
 
   if (difficulty) {
-    prompt += `- Difficulty Level: ${difficulty}\n`;
+    const difficultyMap = {
+      'beginner': 'Easy - suitable for beginners, simple techniques',
+      'easy': 'Easy - suitable for beginners, simple techniques',
+      'intermediate': 'Intermediate - moderate cooking skills required',
+      'medium': 'Intermediate - moderate cooking skills required',
+      'advanced': 'Advanced - complex techniques, experienced cook',
+      'hard': 'Advanced - complex techniques, experienced cook'
+    };
+    prompt += `- Difficulty: ${difficultyMap[difficulty as keyof typeof difficultyMap] || difficulty}\n`;
   }
+
+  prompt += `- Use UK measurements and terminology\n`;
+  prompt += `- Use ONLY these units: g, kg, ml, l, tsp, tbsp, whole, clove, tin, can, cube, slice, piece, pinch, handful, or 'to taste'\n`;
+  prompt += `- Suggest UK-available ingredients\n`;
 
   prompt += `\nPlease provide a complete recipe in the following JSON format:
 
@@ -44,14 +88,14 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
   "ingredients": [
     {
       "item": "ingredient name",
-      "quantity": 2,
-      "unit": "cups",
+      "quantity": "200",
+      "unit": "g",
       "notes": "optional notes like 'chopped' or 'diced'"
     }
   ],
   "instructions": [
     {
-      "step_number": 1,
+      "step": 1,
       "instruction": "Detailed step instruction"
     }
   ]
@@ -73,15 +117,16 @@ interface ParsedRecipe {
   prep_time: number;
   cook_time: number;
   servings: number;
-  source?: 'ai_generated' | 'manual';
+  source?: 'ai_generated' | 'user_created';
   ingredients: Array<{
     item: string;
-    quantity: number;
-    unit: string;
+    quantity?: string | number; // Accept both for compatibility
+    unit?: string;
     notes?: string;
   }>;
   instructions: Array<{
-    step_number: number;
+    step?: number;
+    step_number?: number; // Support old format temporarily
     instruction: string;
   }>;
 }
@@ -101,6 +146,20 @@ export function parseRecipeFromAI(text: string): ParsedRecipe {
     if (!recipe.name || !recipe.ingredients || !recipe.instructions) {
       throw new Error('Missing required recipe fields');
     }
+
+    // Normalize ingredients: convert quantity to string
+    recipe.ingredients = recipe.ingredients.map(ing => ({
+      item: ing.item,
+      quantity: ing.quantity !== undefined ? String(ing.quantity) : undefined,
+      unit: ing.unit,
+      notes: ing.notes
+    }));
+
+    // Normalize instructions: use 'step' field (support both step_number and step)
+    recipe.instructions = recipe.instructions.map((inst, index) => ({
+      step: inst.step || inst.step_number || index + 1,
+      instruction: inst.instruction
+    }));
 
     return recipe;
   } catch (error) {

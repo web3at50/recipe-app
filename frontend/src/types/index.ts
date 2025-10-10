@@ -10,6 +10,6 @@ export interface Profile {
 
 // Re-export all recipe app types
 export * from './recipe';
-export * from './pantry';
+export * from './user-profile';
 export * from './meal-plan';
 export * from './shopping-list';

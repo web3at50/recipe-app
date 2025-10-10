@@ -23,7 +23,11 @@
       "Bash(git push:*)",
       "Bash(dir:*)",
       "Bash(git checkout:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(Remove-Item -Path \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\app\\api\\pantry\" -Recurse -Force)",
+      "Bash(Remove-Item -Path \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\app\\api\\categories\" -Recurse -Force)",
+      "Bash(Remove-Item -Path \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\types\\pantry.ts\" -Force)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

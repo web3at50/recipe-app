@@ -6,13 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ChevronLeft, Clock, Users, Edit } from 'lucide-react';
 import { RecipeDetailClient } from './recipe-detail-client';
+import type { Ingredient, Instruction } from '@/types/recipe';
 
 type PageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default async function RecipeDetailPage({ params }: PageProps) {
+export default async function RecipeDetailPage({ params, searchParams }: PageProps) {
   const { id } = await params;
+  const search = await searchParams;
   const supabase = await createClient();
 
   // Check authentication
@@ -21,7 +24,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch recipe with details
+  // Fetch recipe (all data now in JSONB - no joins needed!)
   const { data: recipe, error: recipeError } = await supabase
     .from('recipes')
     .select('*')
@@ -33,46 +36,47 @@ export default async function RecipeDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Fetch ingredients
-  const { data: ingredients } = await supabase
-    .from('recipe_ingredients')
-    .select('*')
-    .eq('recipe_id', id)
-    .order('order_index', { ascending: true });
+  // Data is now in JSONB fields on recipe object
+  let ingredients = recipe.ingredients || [];
+  const instructions = recipe.instructions || [];
+  const tags = recipe.tags || [];
 
-  // Fetch instructions
-  const { data: instructions } = await supabase
-    .from('recipe_instructions')
-    .select('*')
-    .eq('recipe_id', id)
-    .order('step_number', { ascending: true });
+  // Check if servings parameter is provided (from meal planner)
+  const requestedServings = search.servings ? parseInt(search.servings as string) : null;
+  const originalServings = recipe.servings || 1;
+  const displayServings = requestedServings || originalServings;
 
-  // Fetch categories
-  const { data: recipeCategories } = await supabase
-    .from('recipe_categories')
-    .select('category_id, categories(*)')
-    .eq('recipe_id', id);
-
-  interface CategoryRecord {
-    categories: {
-      id: string;
-      name: string;
-      description?: string;
-    };
+  // Scale ingredients if servings are different
+  if (requestedServings && requestedServings !== originalServings) {
+    const scale = requestedServings / originalServings;
+    ingredients = ingredients.map((ing: Ingredient) => {
+      const quantity = ing.quantity ? parseFloat(ing.quantity) : null;
+      return {
+        ...ing,
+        quantity: quantity ? (quantity * scale).toFixed(1) : ing.quantity
+      };
+    });
   }
 
-  const categories = recipeCategories?.map((rc) => (rc as unknown as CategoryRecord).categories) || [];
-
   const totalTime = (recipe.prep_time || 0) + (recipe.cook_time || 0);
+  const fromMealPlanner = search.from === 'meal-planner';
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
-      <Link href="/recipes">
-        <Button variant="ghost" size="sm" className="mb-4">
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          Back to Recipes
-        </Button>
-      </Link>
+      <div className="flex gap-2 mb-4">
+        <Link href="/recipes">
+          <Button variant="ghost" size="sm">
+            <ChevronLeft className="h-4 w-4 mr-2" />
+            Back to Recipes
+          </Button>
+        </Link>
+        <Link href="/meal-planner">
+          <Button variant="outline" size="sm">
+            <ChevronLeft className="h-4 w-4 mr-2" />
+            Back to Meal Planner
+          </Button>
+        </Link>
+      </div>
 
       <div className="space-y-6">
         {/* Header */}
@@ -100,18 +104,23 @@ export default async function RecipeDetailPage({ params }: PageProps) {
             )}
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              <span>{recipe.servings} servings</span>
+              <span>{displayServings} servings</span>
+              {fromMealPlanner && requestedServings !== originalServings && (
+                <span className="text-xs text-muted-foreground">
+                  (scaled from {originalServings})
+                </span>
+              )}
             </div>
           </div>
 
-          {categories.length > 0 && (
+          {tags.length > 0 && (
             <div className="flex gap-2 mt-4">
-              {categories.map((cat) => (
+              {tags.map((tag: string, index: number) => (
                 <span
-                  key={cat.id}
+                  key={index}
                   className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm"
                 >
-                  {cat.name}
+                  {tag}
                 </span>
               ))}
             </div>
@@ -127,8 +136,8 @@ export default async function RecipeDetailPage({ params }: PageProps) {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {ingredients?.map((ingredient) => (
-                <li key={ingredient.id} className="flex items-start gap-2">
+              {ingredients?.map((ingredient: Ingredient, index: number) => (
+                <li key={index} className="flex items-start gap-2">
                   <span className="text-muted-foreground">•</span>
                   <span>
                     {ingredient.quantity && `${ingredient.quantity} `}
@@ -149,10 +158,10 @@ export default async function RecipeDetailPage({ params }: PageProps) {
           </CardHeader>
           <CardContent>
             <ol className="space-y-4">
-              {instructions?.map((instruction) => (
-                <li key={instruction.id} className="flex gap-4">
+              {instructions?.map((instruction: Instruction, index: number) => (
+                <li key={index} className="flex gap-4">
                   <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
-                    {instruction.step_number}
+                    {instruction.step || index + 1}
                   </span>
                   <p className="flex-1 pt-1">{instruction.instruction}</p>
                 </li>

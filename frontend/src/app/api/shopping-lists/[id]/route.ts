@@ -38,7 +38,7 @@ export async function GET(
       .select('*')
       .eq('shopping_list_id', id)
       .order('category', { ascending: true })
-      .order('item', { ascending: true });
+      .order('item_name', { ascending: true });
 
     if (itemsError) {
       console.error('Error fetching shopping list items:', itemsError);

@@ -1,80 +1,150 @@
-// Recipe-related TypeScript types
+// Recipe-related TypeScript types (Simplified JSONB Schema)
 
+// Ingredient stored as JSONB
+export interface Ingredient {
+  item: string;
+  quantity?: string; // Optional & flexible: "400g", "2 large", "1 cup"
+  unit?: string;
+  notes?: string;
+}
+
+// Instruction stored as JSONB
+export interface Instruction {
+  step?: number; // Optional - can be inferred from array index
+  instruction: string;
+}
+
+// Nutrition data stored as JSONB
+export interface Nutrition {
+  calories?: number;
+  protein?: number; // grams
+  carbs?: number; // grams
+  fat?: number; // grams
+}
+
+// Main Recipe interface (matches database schema)
 export interface Recipe {
   id: string;
   user_id: string;
+
+  // Basic info
   name: string;
   description: string | null;
-  image_url: string | null;
+  cuisine: string | null;
+  source: 'ai_generated' | 'user_created' | 'imported';
+
+  // Timing
   prep_time: number | null; // minutes
   cook_time: number | null; // minutes
   servings: number;
-  source: 'ai_generated' | 'manual';
+  difficulty: 'easy' | 'medium' | 'hard' | null;
+
+  // Core data as JSONB
+  ingredients: Ingredient[];
+  instructions: Instruction[];
+
+  // Simple arrays (no junction tables)
+  tags: string[]; // ['quick', 'vegetarian', 'batch-cooking']
+  allergens: string[]; // ['dairy', 'gluten', 'nuts']
+
+  // Nutrition as JSONB
+  nutrition: Nutrition | null;
+
+  // Additional
+  cost_per_serving: number | null;
+  image_url: string | null;
+
+  // Status flags
   is_favorite: boolean;
+  published: boolean;
+  flagged_for_review: boolean;
+
+  // Timestamps
   created_at: string;
   updated_at: string;
-}
-
-export interface RecipeIngredient {
-  id: string;
-  recipe_id: string;
-  item: string;
-  quantity: number | null;
-  unit: string | null;
-  notes: string | null;
-  order_index: number;
-  created_at: string;
-}
-
-export interface RecipeInstruction {
-  id: string;
-  recipe_id: string;
-  step_number: number;
-  instruction: string;
-  created_at: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  type: 'dietary' | 'meal_type' | 'other';
-  created_at: string;
-}
-
-export interface RecipeWithDetails extends Recipe {
-  ingredients: RecipeIngredient[];
-  instructions: RecipeInstruction[];
-  categories: Category[];
 }
 
 // Form types for creating/editing recipes
 export interface RecipeFormData {
   name: string;
   description?: string;
+  cuisine?: string;
   prep_time?: number;
   cook_time?: number;
   servings: number;
-  ingredients: {
-    item: string;
-    quantity?: number;
-    unit?: string;
-    notes?: string;
-  }[];
-  instructions: {
-    instruction: string;
-  }[];
-  category_ids?: string[];
+  difficulty?: 'easy' | 'medium' | 'hard';
+
+  ingredients: Ingredient[];
+  instructions: Instruction[];
+
+  tags?: string[];
+  allergens?: string[];
+
+  nutrition?: Nutrition;
+  cost_per_serving?: number;
+  image_url?: string;
 }
 
 // API response types
 export interface CreateRecipeResponse {
   recipe: Recipe;
-  ingredients: RecipeIngredient[];
-  instructions: RecipeInstruction[];
 }
 
 export interface RecipeListResponse {
-  recipes: RecipeWithDetails[];
+  recipes: Recipe[];
   total: number;
 }
+
+// UK Allergens (Natasha's Law - 14 major allergens)
+export const UK_ALLERGENS = [
+  'peanuts',
+  'tree_nuts',
+  'milk',
+  'eggs',
+  'fish',
+  'shellfish',
+  'soy',
+  'gluten',
+  'sesame',
+  'celery',
+  'mustard',
+  'lupin',
+  'sulphites',
+  'molluscs'
+] as const;
+
+export type UKAllergen = typeof UK_ALLERGENS[number];
+
+// Common tags
+export const COMMON_TAGS = [
+  'quick',
+  'vegetarian',
+  'vegan',
+  'gluten-free',
+  'dairy-free',
+  'low-carb',
+  'high-protein',
+  'batch-cooking',
+  'freezer-friendly',
+  'one-pot',
+  'budget-friendly',
+  'kid-friendly'
+] as const;
+
+// Cuisines
+export const CUISINES = [
+  'British',
+  'Italian',
+  'Indian',
+  'Chinese',
+  'Mexican',
+  'Thai',
+  'French',
+  'Greek',
+  'Spanish',
+  'Japanese',
+  'Middle Eastern',
+  'American',
+  'Caribbean',
+  'Other'
+] as const;

@@ -3,6 +3,7 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,38 +15,54 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Plus, Trash2 } from 'lucide-react';
-import type { RecipeFormData, RecipeWithDetails } from '@/types/recipe';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Plus, Trash2, AlertTriangle } from 'lucide-react';
+import type { RecipeFormData, Recipe } from '@/types/recipe';
+import { detectAllergensInIngredients, groupMatchesByAllergen, type AllergenMatch } from '@/lib/allergen-detector';
+import { UNIT_OPTIONS } from '@/lib/units';
 
 const recipeFormSchema = z.object({
   name: z.string().min(1, 'Recipe name is required').max(200),
   description: z.string().optional(),
+  cuisine: z.string().optional(),
   prep_time: z.number().min(0).optional(),
   cook_time: z.number().min(0).optional(),
   servings: z.number().min(1, 'Must have at least 1 serving'),
+  difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
   ingredients: z.array(
     z.object({
       item: z.string().min(1, 'Ingredient name is required'),
-      quantity: z.number().optional(),
+      quantity: z.string().optional(), // Optional - flexible: "400g", "2 large", etc.
       unit: z.string().optional(),
       notes: z.string().optional(),
     })
   ).min(1, 'At least one ingredient is required'),
   instructions: z.array(
     z.object({
+      step: z.number().optional(),
       instruction: z.string().min(1, 'Instruction cannot be empty'),
     })
   ).min(1, 'At least one instruction is required'),
-  category_ids: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  allergens: z.array(z.string()).optional(),
 });
 
 interface RecipeFormProps {
   onSubmit: (data: RecipeFormData) => Promise<void>;
-  defaultValues?: RecipeWithDetails;
+  defaultValues?: Recipe;
   isSubmitting?: boolean;
 }
 
 export function RecipeForm({ onSubmit, defaultValues, isSubmitting = false }: RecipeFormProps) {
+  const [userAllergens, setUserAllergens] = useState<string[]>([]);
+  const [allergenMatches, setAllergenMatches] = useState<AllergenMatch[]>([]);
+
   const form = useForm<RecipeFormData>({
     resolver: zodResolver(recipeFormSchema),
     defaultValues: defaultValues ? {
@@ -72,6 +89,36 @@ export function RecipeForm({ onSubmit, defaultValues, isSubmitting = false }: Re
     },
   });
 
+  // Fetch user allergens
+  useEffect(() => {
+    const fetchUserAllergens = async () => {
+      try {
+        const response = await fetch('/api/profile');
+        if (response.ok) {
+          const data = await response.json();
+          const allergies = data.profile?.preferences?.allergies || [];
+          setUserAllergens(allergies);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user allergens:', error);
+      }
+    };
+
+    fetchUserAllergens();
+  }, []);
+
+  // Watch ingredient changes and detect allergens
+  const ingredients = form.watch('ingredients');
+
+  useEffect(() => {
+    if (userAllergens.length > 0 && ingredients && ingredients.length > 0) {
+      const matches = detectAllergensInIngredients(ingredients, userAllergens);
+      setAllergenMatches(matches);
+    } else {
+      setAllergenMatches([]);
+    }
+  }, [ingredients, userAllergens]);
+
   const {
     fields: ingredientFields,
     append: appendIngredient,
@@ -90,9 +137,39 @@ export function RecipeForm({ onSubmit, defaultValues, isSubmitting = false }: Re
     name: 'instructions',
   });
 
+  const groupedAllergens = allergenMatches.length > 0
+    ? groupMatchesByAllergen(allergenMatches)
+    : {};
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Allergen Warning Banner */}
+        {allergenMatches.length > 0 && (
+          <div className="p-4 bg-amber-500/10 border-2 border-amber-500/50 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-semibold text-amber-500 mb-2">⚠️ Allergen Notice</p>
+                <p className="text-sm text-muted-foreground mb-3">
+                  This recipe contains ingredients that conflict with your allergen profile:
+                </p>
+                <div className="space-y-2">
+                  {Object.entries(groupedAllergens).map(([allergen, ingredients]) => (
+                    <div key={allergen} className="text-sm">
+                      <span className="font-medium text-amber-500">{allergen}:</span>{' '}
+                      <span className="text-muted-foreground">{ingredients.join(', ')}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  You can still save this recipe (e.g., if it&apos;s for someone else), but please be aware of these allergens.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Basic Information */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Basic Information</h3>
@@ -199,7 +276,7 @@ export function RecipeForm({ onSubmit, defaultValues, isSubmitting = false }: Re
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => appendIngredient({ item: '', quantity: undefined, unit: '', notes: '' })}
+              onClick={() => appendIngredient({ item: '', quantity: '', unit: '', notes: '' })}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Ingredient
@@ -234,11 +311,9 @@ export function RecipeForm({ onSubmit, defaultValues, isSubmitting = false }: Re
                         {index === 0 && <FormLabel>Qty</FormLabel>}
                         <FormControl>
                           <Input
-                            type="number"
-                            step="0.01"
-                            placeholder="2"
+                            type="text"
+                            placeholder="400"
                             {...field}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                             value={field.value || ''}
                           />
                         </FormControl>
@@ -255,9 +330,20 @@ export function RecipeForm({ onSubmit, defaultValues, isSubmitting = false }: Re
                     render={({ field }) => (
                       <FormItem>
                         {index === 0 && <FormLabel>Unit</FormLabel>}
-                        <FormControl>
-                          <Input placeholder="cups" {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value || undefined}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="None" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {UNIT_OPTIONS.filter(option => option.value !== '').map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -272,7 +358,7 @@ export function RecipeForm({ onSubmit, defaultValues, isSubmitting = false }: Re
                       <FormItem>
                         {index === 0 && <FormLabel>Notes</FormLabel>}
                         <FormControl>
-                          <Input placeholder="chopped" {...field} />
+                          <Input placeholder="chopped" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

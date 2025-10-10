@@ -21,9 +21,9 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { item, quantity, unit, category, recipe_id } = body;
+    const { item_name, quantity, category, recipe_id } = body;
 
-    if (!item) {
+    if (!item_name) {
       return NextResponse.json({ error: 'Item name is required' }, { status: 400 });
     }
 
@@ -32,12 +32,11 @@ export async function POST(
       .from('shopping_list_items')
       .insert({
         shopping_list_id: listId,
-        item,
+        item_name,
         quantity: quantity || null,
-        unit: unit || null,
         category: category || null,
         recipe_id: recipe_id || null,
-        is_checked: false,
+        checked: false,
       })
       .select()
       .single();

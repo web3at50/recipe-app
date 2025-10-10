@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, X } from 'lucide-react';
+import Link from 'next/link';
 import type { MealPlanItemWithRecipe } from '@/types/meal-plan';
 
 interface WeekViewProps {
@@ -62,9 +63,12 @@ export function WeekView({ startDate, items, onAddRecipe, onRemoveRecipe }: Week
                   {item ? (
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-1">
-                        <p className="text-sm font-medium line-clamp-2">
+                        <Link
+                          href={`/recipes/${item.recipe_id}?servings=${item.servings}&from=meal-planner`}
+                          className="text-sm font-medium line-clamp-2 hover:underline cursor-pointer flex-1"
+                        >
                           {item.recipe?.name || 'Unknown Recipe'}
-                        </p>
+                        </Link>
                         <Button
                           variant="ghost"
                           size="icon"

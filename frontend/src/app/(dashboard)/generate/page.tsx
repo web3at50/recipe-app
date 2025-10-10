@@ -7,59 +7,44 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChefHat, Loader2, Sparkles } from 'lucide-react';
-import type { CupboardItem } from '@/types/pantry';
+import { ChefHat, Loader2, AlertTriangle, Info } from 'lucide-react';
+import type { Recipe } from '@/types/recipe';
+import type { UserPreferences } from '@/types/user-profile';
 
 export default function GeneratePage() {
   const router = useRouter();
   const [ingredientsText, setIngredientsText] = useState('');
-  const [servings, setServings] = useState(4);
+  const [servings, setServings] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  interface GeneratedRecipe {
-    name: string;
-    description: string;
-    prep_time: number;
-    cook_time: number;
-    servings: number;
-    ingredients: Array<{
-      item: string;
-      quantity: string;
-      unit: string;
-      notes?: string;
-    }>;
-    instructions: Array<{
-      step_number?: number;
-      instruction: string;
-    }>;
-  }
+  const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
+  const [allergenWarnings, setAllergenWarnings] = useState<string[]>([]);
+  const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
+  const [isLoadingPreferences, setIsLoadingPreferences] = useState(true);
 
-  const [generatedRecipe, setGeneratedRecipe] = useState<GeneratedRecipe | null>(null);
-  const [cupboardItems, setCupboardItems] = useState<CupboardItem[]>([]);
-
+  // Fetch user preferences on mount
   useEffect(() => {
-    fetchCupboardItems();
-  }, []);
-
-  const fetchCupboardItems = async () => {
-    try {
-      const response = await fetch('/api/pantry/cupboard');
-      if (response.ok) {
-        const data = await response.json();
-        setCupboardItems(data.items);
+    const fetchPreferences = async () => {
+      try {
+        const response = await fetch('/api/profile');
+        if (response.ok) {
+          const data = await response.json();
+          const prefs = data.profile?.preferences;
+          setUserPreferences(prefs);
+          // Set default servings from user preferences
+          if (prefs?.household_size && servings === null) {
+            setServings(prefs.household_size);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch user preferences:', error);
+      } finally {
+        setIsLoadingPreferences(false);
       }
-    } catch (error) {
-      console.error('Error fetching cupboard items:', error);
-    }
-  };
+    };
 
-  const handleGenerateFromCupboard = () => {
-    if (cupboardItems.length === 0) {
-      alert('Your cupboard is empty. Add items to your cupboard first!');
-      return;
-    }
-    const ingredients = cupboardItems.map((item) => item.item).join('\n');
-    setIngredientsText(ingredients);
-  };
+    fetchPreferences();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleGenerate = async () => {
     if (!ingredientsText.trim()) {
@@ -69,6 +54,7 @@ export default function GeneratePage() {
 
     setIsGenerating(true);
     setGeneratedRecipe(null);
+    setAllergenWarnings([]);
 
     try {
       const ingredients = ingredientsText
@@ -81,17 +67,28 @@ export default function GeneratePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ingredients,
-          servings,
+          servings: servings || 4,
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
+        // Display allergen conflicts prominently
+        if (error.error === 'Safety Warning' && error.conflicts) {
+          alert(`⚠️ ALLERGEN WARNING:\n\n${error.message}\n\nPlease remove these ingredients and try again.`);
+          setIsGenerating(false);
+          return;
+        }
         throw new Error(error.error || 'Failed to generate recipe');
       }
 
       const data = await response.json();
       setGeneratedRecipe(data.recipe);
+
+      // Display post-generation allergen warnings if any
+      if (data.allergen_warnings && data.allergen_warnings.length > 0) {
+        setAllergenWarnings(data.allergen_warnings);
+      }
     } catch (error) {
       console.error('Error generating recipe:', error);
       alert(error instanceof Error ? error.message : 'Failed to generate recipe');
@@ -145,9 +142,54 @@ export default function GeneratePage() {
           AI Recipe Generator
         </h1>
         <p className="text-muted-foreground mt-1">
-          Enter ingredients and let AI create a delicious recipe for you
+          Enter ingredients and let AI create a personalized recipe for you
         </p>
       </div>
+
+      {/* User Preferences Summary */}
+      {!isLoadingPreferences && userPreferences && (
+        <Card className="mb-6 bg-primary/5 border-primary/20">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-primary" />
+              <CardTitle className="text-base">Your Profile</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground">Servings</p>
+                <p className="font-medium">{userPreferences.household_size || 2}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Skill Level</p>
+                <p className="font-medium capitalize">{userPreferences.cooking_skill || 'intermediate'}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Typical Time</p>
+                <p className="font-medium">{userPreferences.typical_cook_time || 30} mins</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Spice Level</p>
+                <p className="font-medium capitalize">{userPreferences.spice_level || 'medium'}</p>
+              </div>
+            </div>
+            {userPreferences.allergies && userPreferences.allergies.length > 0 && (
+              <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-amber-500">Active Allergen Protection</p>
+                    <p className="text-muted-foreground">
+                      Avoiding: {userPreferences.allergies.join(', ')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input Section */}
@@ -171,16 +213,6 @@ export default function GeneratePage() {
                 />
               </div>
 
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleGenerateFromCupboard}
-                disabled={cupboardItems.length === 0}
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Use My Cupboard Items ({cupboardItems.length})
-              </Button>
-
               <div className="space-y-2">
                 <Label htmlFor="servings">Number of Servings</Label>
                 <Input
@@ -188,7 +220,7 @@ export default function GeneratePage() {
                   type="number"
                   min="1"
                   max="20"
-                  value={servings}
+                  value={servings || 4}
                   onChange={(e) => setServings(parseInt(e.target.value))}
                 />
               </div>
@@ -233,6 +265,28 @@ export default function GeneratePage() {
                   <span>Cook: {generatedRecipe.cook_time}m</span>
                   <span>Servings: {generatedRecipe.servings}</span>
                 </div>
+
+                {/* Allergen Warnings */}
+                {allergenWarnings.length > 0 && (
+                  <div className="mt-4 p-4 bg-red-500/10 border-2 border-red-500/50 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-red-500 mb-2">⚠️ ALLERGEN WARNING</p>
+                        <ul className="space-y-1 text-sm">
+                          {allergenWarnings.map((warning, index) => (
+                            <li key={index} className="text-red-500">
+                              {warning}
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Please review ingredients carefully before proceeding.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Ingredients */}
@@ -255,7 +309,7 @@ export default function GeneratePage() {
                     {generatedRecipe.instructions.map((inst, index) => (
                       <li key={index} className="flex gap-3">
                         <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
-                          {inst.step_number || index + 1}
+                          {inst.step || index + 1}
                         </span>
                         <p className="text-sm flex-1">{inst.instruction}</p>
                       </li>

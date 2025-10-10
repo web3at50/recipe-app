@@ -6,13 +6,13 @@ import { RecipeForm } from '@/components/recipes/recipe-form';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import type { RecipeFormData, RecipeWithDetails } from '@/types/recipe';
+import type { RecipeFormData, Recipe } from '@/types/recipe';
 
 export default function EditRecipePage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
-  const [recipe, setRecipe] = useState<RecipeWithDetails | null>(null);
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

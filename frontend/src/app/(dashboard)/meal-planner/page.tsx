@@ -11,10 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, ShoppingCart } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { WeekView } from '@/components/meal-planner/week-view';
 import type { MealPlanItemWithRecipe, MealType } from '@/types/meal-plan';
 import type { Recipe } from '@/types/recipe';
+import { toast } from 'sonner';
 
 export default function MealPlannerPage() {
   interface MealPlan {
@@ -29,6 +31,7 @@ export default function MealPlannerPage() {
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null);
   const [items, setItems] = useState<MealPlanItemWithRecipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [householdSize, setHouseholdSize] = useState<number>(4); // Default to 4
 
   // Recipe selector dialog
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -36,10 +39,12 @@ export default function MealPlannerPage() {
   const [selectedMealType, setSelectedMealType] = useState<MealType | ''>('');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     fetchMealPlan();
     fetchRecipes();
+    fetchUserProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWeekStart]);
 
@@ -91,6 +96,19 @@ export default function MealPlannerPage() {
     }
   };
 
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch('/api/profile');
+      if (response.ok) {
+        const data = await response.json();
+        const size = data.profile?.preferences?.household_size || 4;
+        setHouseholdSize(size);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
+
   const handlePreviousWeek = () => {
     const newDate = new Date(currentWeekStart);
     newDate.setDate(newDate.getDate() - 7);
@@ -101,6 +119,11 @@ export default function MealPlannerPage() {
     const newDate = new Date(currentWeekStart);
     newDate.setDate(newDate.getDate() + 7);
     setCurrentWeekStart(getMonday(newDate));
+  };
+
+  const handleTodayClick = () => {
+    const today = new Date();
+    setCurrentWeekStart(getMonday(today));
   };
 
   const handleAddRecipe = (date: string, mealType: MealType) => {
@@ -121,7 +144,7 @@ export default function MealPlannerPage() {
           recipe_id: recipeId,
           date: selectedDate,
           meal_type: selectedMealType,
-          servings: 4,
+          servings: householdSize, // Auto-scale to household size
         }),
       });
 
@@ -130,9 +153,10 @@ export default function MealPlannerPage() {
       await fetchMealPlan();
       setIsDialogOpen(false);
       setSearchQuery('');
+      toast.success('Recipe added to meal plan!');
     } catch (error) {
       console.error('Error adding recipe:', error);
-      alert('Failed to add recipe to meal plan');
+      toast.error('Failed to add recipe to meal plan');
     }
   };
 
@@ -145,10 +169,44 @@ export default function MealPlannerPage() {
       if (!response.ok) throw new Error('Failed to remove recipe');
 
       await fetchMealPlan();
+      toast.success('Recipe removed from meal plan');
     } catch (error) {
       console.error('Error removing recipe:', error);
-      alert('Failed to remove recipe');
+      toast.error('Failed to remove recipe');
     }
+  };
+
+  const handleGenerateShoppingList = async () => {
+    if (!mealPlan) {
+      toast.error('No meal plan found');
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error('Add some recipes to your meal plan first');
+      return;
+    }
+
+    toast.promise(
+      fetch('/api/shopping-lists/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          meal_plan_id: mealPlan.id,
+        }),
+      })
+        .then(async (response) => {
+          if (!response.ok) throw new Error('Failed to generate shopping list');
+          const data = await response.json();
+          router.push('/shopping-list');
+          return data;
+        }),
+      {
+        loading: 'Generating shopping list...',
+        success: (data) => `Shopping list created with ${data.items_count} items!`,
+        error: 'Failed to generate shopping list',
+      }
+    );
   };
 
   const filteredRecipes = recipes.filter((recipe) =>
@@ -158,7 +216,12 @@ export default function MealPlannerPage() {
   if (isLoading) {
     return (
       <div className="container mx-auto py-8 px-4">
-        <p>Loading...</p>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading your meal plan...</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -178,6 +241,10 @@ export default function MealPlannerPage() {
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous Week
           </Button>
+          <Button variant="default" onClick={handleTodayClick}>
+            <Calendar className="h-4 w-4 mr-2" />
+            Today
+          </Button>
           <span className="text-sm font-medium">
             {currentWeekStart.toLocaleDateString()} -{' '}
             {getWeekEnd(currentWeekStart).toLocaleDateString()}
@@ -189,12 +256,35 @@ export default function MealPlannerPage() {
         </div>
       </div>
 
+      {items.length === 0 && (
+        <div className="text-center py-12 mb-8">
+          <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No meals planned yet</h3>
+          <p className="text-muted-foreground mb-4">
+            Click the &quot;+&quot; button on any day to add recipes to your meal plan
+          </p>
+        </div>
+      )}
+
       <WeekView
         startDate={currentWeekStart}
         items={items}
         onAddRecipe={handleAddRecipe}
         onRemoveRecipe={handleRemoveRecipe}
       />
+
+      {items.length > 0 && (
+        <div className="mt-8 flex justify-center">
+          <Button
+            size="lg"
+            onClick={handleGenerateShoppingList}
+            className="gap-2"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            Generate Shopping List ({items.length} {items.length === 1 ? 'recipe' : 'recipes'})
+          </Button>
+        </div>
+      )}
 
       {/* Recipe Selector Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

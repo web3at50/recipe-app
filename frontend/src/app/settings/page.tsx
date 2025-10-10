@@ -1,47 +1,71 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Calendar, Mail, LogOut } from "lucide-react"
-import { ChangePasswordDialog } from "@/components/ChangePasswordDialog"
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar, Mail, LogOut, Shield } from 'lucide-react';
+import { ChangePasswordDialog } from '@/components/ChangePasswordDialog';
+import { PreferencesForm } from '@/components/settings/preferences-form';
+import type { UserPreferences } from '@/types/user-profile';
 
 export default async function SettingsPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login")
+    redirect('/login');
   }
 
   // Get user's profile data
   const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single()
+    .from('user_profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  // Get user consents
+  const { data: consents } = await supabase
+    .from('user_consents')
+    .select('*')
+    .eq('user_id', user.id);
+
+  // Get recipe count
+  const { count: recipeCount } = await supabase
+    .from('recipes')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
 
   // Format member since date
-  const memberSince = profile?.created_at
-    ? new Date(profile.created_at).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
+  const memberSince = user.created_at
+    ? new Date(user.created_at).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
       })
-    : "N/A"
+    : 'N/A';
 
   // Get auth provider
-  const authProvider = user.app_metadata.provider || "email"
+  const authProvider = user.app_metadata.provider || 'email';
+
+  const preferences: UserPreferences = profile?.preferences || {
+    dietary_restrictions: [],
+    allergies: [],
+    cuisines_liked: [],
+    cooking_skill: 'intermediate',
+    household_size: 2,
+    typical_cook_time: 30,
+    spice_level: 'medium'
+  };
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="mx-auto max-w-4xl space-y-8">
+    <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto max-w-5xl space-y-8">
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Profile & Settings</h1>
           <p className="text-muted-foreground">
-            Manage your account and view your statistics
+            Manage your account, preferences, and privacy settings
           </p>
         </div>
 
@@ -79,7 +103,7 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Your Statistics */}
+        {/* Statistics */}
         <Card>
           <CardHeader>
             <CardTitle>Your Statistics</CardTitle>
@@ -89,28 +113,71 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
-              {/* Stat 1 - Customizable per project */}
               <div className="rounded-lg border bg-card p-6">
                 <div className="flex items-center gap-3">
-                  <div className="text-2xl">📄</div>
+                  <div className="text-2xl">📖</div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Items</p>
-                    <p className="text-2xl font-bold">0</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total Recipes</p>
+                    <p className="text-2xl font-bold">{recipeCount || 0}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Stat 2 - Customizable per project */}
               <div className="rounded-lg border bg-card p-6">
                 <div className="flex items-center gap-3">
-                  <div className="text-2xl">✨</div>
+                  <div className="text-2xl">✅</div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">AI Queries</p>
-                    <p className="text-2xl font-bold">0</p>
+                    <p className="text-sm font-medium text-muted-foreground">Onboarding</p>
+                    <p className="text-2xl font-bold">
+                      {profile?.onboarding_completed ? 'Complete' : 'Incomplete'}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Preferences */}
+        <PreferencesForm initialPreferences={preferences} />
+
+        {/* Privacy & Consents */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              <CardTitle>Privacy & Data</CardTitle>
+            </div>
+            <CardDescription>
+              Manage your data and privacy settings
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {consents && consents.length > 0 ? (
+              <div className="space-y-3">
+                {consents.map((consent) => (
+                  <div key={consent.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium capitalize">{consent.consent_type}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {consent.granted ? 'Granted' : 'Not granted'}
+                      </p>
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-sm ${
+                      consent.granted
+                        ? 'bg-green-500/10 text-green-500'
+                        : 'bg-muted text-muted-foreground'
+                    }`}>
+                      {consent.granted ? '✓ Active' : '○ Inactive'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No consent records found. Complete onboarding to set your preferences.
+              </p>
+            )}
           </CardContent>
         </Card>
 

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { RecipeFormData } from '@/types/recipe';
 
-// GET /api/recipes - List all user's recipes
+// GET /api/recipes - List all user's recipes (JSONB schema)
 export async function GET(request: Request) {
   try {
     const supabase = await createClient();
@@ -19,8 +19,10 @@ export async function GET(request: Request) {
     const offset = parseInt(searchParams.get('offset') || '0');
     const search = searchParams.get('search');
     const favorite = searchParams.get('favorite') === 'true';
+    const cuisine = searchParams.get('cuisine');
+    const tag = searchParams.get('tag');
 
-    // Build query
+    // Build query (single table, no joins!)
     let query = supabase
       .from('recipes')
       .select('*', { count: 'exact' })
@@ -34,6 +36,12 @@ export async function GET(request: Request) {
     }
     if (favorite) {
       query = query.eq('is_favorite', true);
+    }
+    if (cuisine) {
+      query = query.eq('cuisine', cuisine);
+    }
+    if (tag) {
+      query = query.contains('tags', [tag]); // Array contains operator
     }
 
     const { data: recipes, error, count } = await query;
@@ -53,7 +61,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POST /api/recipes - Create a new recipe
+// POST /api/recipes - Create a new recipe (JSONB schema - single insert!)
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -69,22 +77,37 @@ export async function POST(request: Request) {
     // Validate required fields
     if (!body.name || !body.ingredients?.length || !body.instructions?.length) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: name, ingredients, and instructions are required' },
         { status: 400 }
       );
     }
 
-    // Create recipe
+    // Add step numbers to instructions if not provided
+    const instructions = body.instructions.map((inst, index) => ({
+      step: inst.step || index + 1,
+      instruction: inst.instruction
+    }));
+
+    // Create recipe (everything in one insert!)
     const { data: recipe, error: recipeError } = await supabase
       .from('recipes')
       .insert({
         user_id: user.id,
         name: body.name,
         description: body.description || null,
+        cuisine: body.cuisine || null,
         prep_time: body.prep_time || null,
         cook_time: body.cook_time || null,
         servings: body.servings,
-        source: 'manual',
+        difficulty: body.difficulty || null,
+        source: 'user_created', // Changed from 'manual'
+        ingredients: body.ingredients, // JSONB array
+        instructions: instructions, // JSONB array
+        tags: body.tags || [], // Simple array
+        allergens: body.allergens || [], // Simple array
+        nutrition: body.nutrition || null, // JSONB object
+        cost_per_serving: body.cost_per_serving || null,
+        image_url: body.image_url || null,
       })
       .select()
       .single();
@@ -92,55 +115,6 @@ export async function POST(request: Request) {
     if (recipeError) {
       console.error('Error creating recipe:', recipeError);
       return NextResponse.json({ error: recipeError.message }, { status: 500 });
-    }
-
-    // Create ingredients
-    const ingredientsToInsert = body.ingredients.map((ing, index) => ({
-      recipe_id: recipe.id,
-      item: ing.item,
-      quantity: ing.quantity || null,
-      unit: ing.unit || null,
-      notes: ing.notes || null,
-      order_index: index,
-    }));
-
-    const { error: ingredientsError } = await supabase
-      .from('recipe_ingredients')
-      .insert(ingredientsToInsert);
-
-    if (ingredientsError) {
-      console.error('Error creating ingredients:', ingredientsError);
-      // Rollback recipe creation
-      await supabase.from('recipes').delete().eq('id', recipe.id);
-      return NextResponse.json({ error: ingredientsError.message }, { status: 500 });
-    }
-
-    // Create instructions
-    const instructionsToInsert = body.instructions.map((inst, index) => ({
-      recipe_id: recipe.id,
-      step_number: index + 1,
-      instruction: inst.instruction,
-    }));
-
-    const { error: instructionsError } = await supabase
-      .from('recipe_instructions')
-      .insert(instructionsToInsert);
-
-    if (instructionsError) {
-      console.error('Error creating instructions:', instructionsError);
-      // Rollback recipe creation
-      await supabase.from('recipes').delete().eq('id', recipe.id);
-      return NextResponse.json({ error: instructionsError.message }, { status: 500 });
-    }
-
-    // Add categories if provided
-    if (body.category_ids && body.category_ids.length > 0) {
-      const categoriesToInsert = body.category_ids.map((catId) => ({
-        recipe_id: recipe.id,
-        category_id: catId,
-      }));
-
-      await supabase.from('recipe_categories').insert(categoriesToInsert);
     }
 
     return NextResponse.json({ recipe }, { status: 201 });
