@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, ChefHat, Calendar, ShoppingCart, Sparkles } from "lucide-react"
 import AuthenticatedRedirect from "./(authenticated-redirect)/page"
 
+// Force dynamic rendering to support client-side Clerk auth check
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   // Show marketing landing page for unauthenticated users
   // Client component will handle redirect for authenticated users
