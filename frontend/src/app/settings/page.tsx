@@ -1,52 +1,53 @@
 import { createClient } from '@/lib/supabase/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Calendar, Mail, LogOut, Shield } from 'lucide-react';
-import { ChangePasswordDialog } from '@/components/ChangePasswordDialog';
+import { Calendar, Mail, Shield } from 'lucide-react';
 import { PreferencesForm } from '@/components/settings/preferences-form';
 import type { UserPreferences } from '@/types/user-profile';
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { userId } = await auth();
 
-  if (!user) {
-    redirect('/login');
+  if (!userId) {
+    redirect('/sign-in');
   }
+
+  const user = await currentUser();
+  const supabase = await createClient();
 
   // Get user's profile data
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .single();
 
   // Get user consents
   const { data: consents } = await supabase
     .from('user_consents')
     .select('*')
-    .eq('user_id', user.id);
+    .eq('user_id', userId);
 
   // Get recipe count
   const { count: recipeCount } = await supabase
     .from('recipes')
     .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
+    .eq('user_id', userId);
 
   // Format member since date
-  const memberSince = user.created_at
-    ? new Date(user.created_at).toLocaleDateString('en-GB', {
+  const memberSince = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
       })
     : 'N/A';
 
-  // Get auth provider
-  const authProvider = user.app_metadata.provider || 'email';
+  // Get primary email address
+  const primaryEmail = user?.emailAddresses.find(
+    (email) => email.id === user.primaryEmailAddressId
+  )?.emailAddress || 'No email';
 
   const preferences: UserPreferences = profile?.preferences || {
     dietary_restrictions: [],
@@ -79,7 +80,7 @@ export default async function SettingsPage() {
               <Mail className="h-5 w-5 mt-0.5 text-muted-foreground" />
               <div className="space-y-1">
                 <p className="text-sm font-medium text-muted-foreground">Email Address</p>
-                <p className="text-base font-semibold">{user.email}</p>
+                <p className="text-base font-semibold">{primaryEmail}</p>
               </div>
             </div>
 
@@ -90,16 +91,6 @@ export default async function SettingsPage() {
                 <p className="text-base font-semibold">{memberSince}</p>
               </div>
             </div>
-
-            {authProvider !== "email" && (
-              <div className="flex items-start gap-4">
-                <div className="h-5 w-5 mt-0.5 text-muted-foreground">🔗</div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Sign In Method</p>
-                  <p className="text-base font-semibold capitalize">{authProvider}</p>
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
 
@@ -185,23 +176,14 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Account Actions</CardTitle>
+            <CardDescription>
+              Manage your account security and preferences
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {authProvider === "email" && (
-              <ChangePasswordDialog />
-            )}
-
-            <form action="/auth/signout" method="post">
-              <Button
-                type="submit"
-                variant="destructive"
-                className="w-full justify-start"
-                size="lg"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
-              </Button>
-            </form>
+            <p className="text-sm text-muted-foreground">
+              To manage your password, email settings, or sign out, use the account menu in the top right corner.
+            </p>
           </CardContent>
         </Card>
       </div>

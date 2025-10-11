@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 type RouteContext = {
@@ -11,14 +12,14 @@ export async function POST(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id: listId } = await context.params;
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const body = await request.json();
     const { item_name, quantity, category, recipe_id } = body;

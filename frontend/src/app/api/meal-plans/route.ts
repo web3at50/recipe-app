@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 // GET /api/meal-plans - Get meal plans for a date range
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('start_date');
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
     const { data: mealPlan, error } = await supabase
       .from('meal_plans')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('start_date', startDate)
       .maybeSingle();
 
@@ -42,7 +43,7 @@ export async function GET(request: Request) {
       const { data: newMealPlan, error: createError } = await supabase
         .from('meal_plans')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           start_date: startDate,
           end_date: endDate,
           week_start_date: startDate, // Keep for backward compatibility

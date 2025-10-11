@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import type { RecipeFormData } from '@/types/recipe';
 
 // GET /api/recipes - List all user's recipes (JSONB schema)
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Get query parameters for filtering/pagination
     const { searchParams } = new URL(request.url);
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
     let query = supabase
       .from('recipes')
       .select('*', { count: 'exact' })
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -64,13 +65,13 @@ export async function GET(request: Request) {
 // POST /api/recipes - Create a new recipe (JSONB schema - single insert!)
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const body: RecipeFormData = await request.json();
 
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
     const { data: recipe, error: recipeError } = await supabase
       .from('recipes')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         name: body.name,
         description: body.description || null,
         cuisine: body.cuisine || null,

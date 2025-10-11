@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 type RouteContext = {
@@ -11,20 +12,20 @@ export async function DELETE(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const { error } = await supabase
       .from('user_pantry_staples')
       .delete()
       .eq('id', id)
-      .eq('user_id', user.id); // Ensure user owns this staple
+      .eq('user_id', userId); // Ensure user owns this staple
 
     if (error) {
       console.error('Error deleting pantry staple:', error);

@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 // GET /api/user/pantry-staples - Get user's custom pantry staples
 export async function GET() {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Fetch user's pantry staples
     const { data: staples, error } = await supabase
       .from('user_pantry_staples')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('item_pattern');
 
     if (error) {
@@ -34,13 +35,13 @@ export async function GET() {
 // POST /api/user/pantry-staples - Add a new pantry staple
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const body = await request.json();
     const { item_pattern } = body;
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
     const { data: staple, error } = await supabase
       .from('user_pantry_staples')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         item_pattern: item_pattern.trim().toLowerCase(),
       })
       .select()

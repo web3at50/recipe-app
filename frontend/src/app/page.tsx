@@ -2,12 +2,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ChefHat, Calendar, ShoppingCart, Sparkles } from "lucide-react"
+import AuthenticatedRedirect from "./(authenticated-redirect)/page"
 
 export default function Home() {
-  // Always show marketing landing page (public homepage)
-  // Authenticated users can access dashboard via navigation menu
+  // Show marketing landing page for unauthenticated users
+  // Client component will handle redirect for authenticated users
   return (
-    <div className="container mx-auto px-4 py-8 md:py-16">
+    <>
+      <AuthenticatedRedirect />
+      <div className="container mx-auto px-4 py-8 md:py-16">
         <div className="mx-auto max-w-6xl space-y-16">
           {/* Hero Section */}
           <div className="text-center space-y-6">
@@ -31,7 +34,7 @@ export default function Home() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="text-lg">
-                <Link href="/signup">
+                <Link href="/sign-up">
                   Create Account
                 </Link>
               </Button>
@@ -151,7 +154,7 @@ export default function Home() {
               </Button>
               <p className="text-sm text-muted-foreground mt-4">
                 Already have an account?{" "}
-                <Link href="/login" className="text-primary hover:underline font-medium">
+                <Link href="/sign-in" className="text-primary hover:underline font-medium">
                   Sign in
                 </Link>
               </p>
@@ -159,5 +162,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    )
+    </>
+  )
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import type { RecipeFormData } from '@/types/recipe';
 
@@ -12,21 +13,21 @@ export async function GET(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Get recipe (all data in one row now - no joins needed!)
     const { data: recipe, error: recipeError } = await supabase
       .from('recipes')
       .select('*')
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (recipeError || !recipe) {
@@ -46,22 +47,22 @@ export async function PUT(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
-    const body: RecipeFormData = await request.json();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
+    const body: RecipeFormData = await request.json();
 
     // Verify recipe belongs to user
     const { data: existingRecipe } = await supabase
       .from('recipes')
       .select('id')
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (!existingRecipe) {
@@ -109,22 +110,22 @@ export async function PATCH(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
-    const body = await request.json();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
+    const body = await request.json();
 
     // Verify recipe belongs to user
     const { data: existingRecipe } = await supabase
       .from('recipes')
       .select('id')
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (!existingRecipe) {
@@ -162,21 +163,21 @@ export async function DELETE(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Delete recipe (CASCADE will handle related data)
     const { error: deleteError } = await supabase
       .from('recipes')
       .delete()
       .eq('id', id)
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     if (deleteError) {
       console.error('Error deleting recipe:', deleteError);

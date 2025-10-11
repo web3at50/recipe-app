@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import type { OnboardingFormData } from '@/types/user-profile';
 
 // POST /api/profile/onboarding - Complete user onboarding
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const body: OnboardingFormData = await request.json();
 
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .upsert({
-        user_id: user.id,
+        user_id: userId,
         preferences,
         onboarding_completed: true,
         updated_at: new Date().toISOString()
@@ -60,19 +61,19 @@ export async function POST(request: Request) {
     const timestamp = new Date().toISOString();
     const consents = [
       {
-        user_id: user.id,
+        user_id: userId,
         consent_type: 'essential',
         granted: true, // Always true
         granted_at: timestamp
       },
       {
-        user_id: user.id,
+        user_id: userId,
         consent_type: 'personalization',
         granted: body.consents.personalization,
         granted_at: timestamp
       },
       {
-        user_id: user.id,
+        user_id: userId,
         consent_type: 'analytics',
         granted: body.consents.analytics,
         granted_at: timestamp

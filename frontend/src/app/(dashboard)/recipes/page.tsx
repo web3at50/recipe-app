@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Sparkles } from 'lucide-react';
@@ -6,19 +7,19 @@ import { Button } from '@/components/ui/button';
 import { RecipeList } from '@/components/recipes/recipe-list';
 
 export default async function RecipesPage() {
-  const supabase = await createClient();
+  const { userId } = await auth();
 
-  // Check authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    redirect('/login');
+  if (!userId) {
+    redirect('/sign-in');
   }
+
+  const supabase = await createClient();
 
   // Fetch recipes
   const { data: recipes, error } = await supabase
     .from('recipes')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -29,7 +30,7 @@ export default async function RecipesPage() {
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('preferences')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .single();
 
   const userAllergens = profile?.preferences?.allergies || [];

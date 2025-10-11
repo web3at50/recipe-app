@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 type RouteContext = {
@@ -11,14 +12,14 @@ export async function DELETE(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Verify ownership through meal_plan
     const { data: item, error: itemError } = await supabase
@@ -36,7 +37,7 @@ export async function DELETE(
     }
 
     const mealPlan = item.meal_plans as unknown as MealPlanRecord;
-    if (mealPlan.user_id !== user.id) {
+    if (mealPlan.user_id !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -64,14 +65,14 @@ export async function PUT(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const body = await request.json();
     const { servings, notes } = body;

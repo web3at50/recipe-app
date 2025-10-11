@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 // GET /api/profile - Get user profile with preferences and consents
 export async function GET() {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (profileError) {
@@ -39,7 +40,7 @@ export async function GET() {
     const { data: consents, error: consentsError } = await supabase
       .from('user_consents')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     if (consentsError) {
       console.error('Error fetching consents:', consentsError);
@@ -63,14 +64,13 @@ export async function GET() {
 // PUT /api/profile - Update user profile preferences
 export async function PUT(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const supabase = await createClient();
     const body = await request.json();
 
     // Validate preferences structure if provided
@@ -105,7 +105,7 @@ export async function PUT(request: Request) {
     const { data: profile, error: updateError } = await supabase
       .from('user_profiles')
       .update(updateData)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .select()
       .single();
 
@@ -120,7 +120,7 @@ export async function PUT(request: Request) {
     // Update consents if provided
     if (body.consents) {
       const consentUpdates = Object.entries(body.consents).map(([type, granted]) => ({
-        user_id: user.id,
+        user_id: userId,
         consent_type: type,
         granted: granted as boolean,
         granted_at: (granted as boolean) ? new Date().toISOString() : null

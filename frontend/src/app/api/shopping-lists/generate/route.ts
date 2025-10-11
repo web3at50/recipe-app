@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import type { Ingredient } from '@/types/recipe';
 import { normalizeUnit } from '@/lib/units';
@@ -17,13 +18,13 @@ interface MealPlanItemWithRecipe {
 // POST /api/shopping-lists/generate - Generate shopping list from meal plan
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const body = await request.json();
     const { meal_plan_id } = body;
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
       .from('meal_plans')
       .select('id, start_date, end_date')
       .eq('id', meal_plan_id)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (planError || !mealPlan) {
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
     const { data: shoppingList, error: listError } = await supabase
       .from('shopping_lists')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         meal_plan_id: meal_plan_id,
         name: `Shopping List - Week of ${mealPlan.start_date}`,
         status: 'active',

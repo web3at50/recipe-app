@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 // POST /api/meal-plans/items - Add recipe to meal plan
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const body = await request.json();
     const { meal_plan_id, recipe_id, date, meal_type, servings = 4, notes } = body;
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
       .from('meal_plans')
       .select('id')
       .eq('id', meal_plan_id)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (planError || !mealPlan) {

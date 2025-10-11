@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 type RouteContext = {
@@ -11,21 +12,21 @@ export async function GET(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Get shopping list
     const { data: list, error: listError } = await supabase
       .from('shopping_lists')
       .select('*')
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (listError || !list) {
@@ -61,20 +62,20 @@ export async function DELETE(
   context: RouteContext
 ) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
     const { id } = await context.params;
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const { error } = await supabase
       .from('shopping_lists')
       .delete()
       .eq('id', id)
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     if (error) {
       console.error('Error deleting shopping list:', error);

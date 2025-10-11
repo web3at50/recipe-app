@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
@@ -6,21 +7,21 @@ import { createRecipeGenerationPrompt, parseRecipeFromAI } from '@/lib/ai/prompt
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
     const body = await request.json();
 
     // Get authenticated user (optional - playground users won't have one)
-    const { data: { user } } = await supabase.auth.getUser();
+    const { userId } = await auth();
 
     // Load preferences from database (authenticated) or request body (playground)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let userPreferences: any = {};
-    if (user) {
+    if (userId) {
       // Authenticated user - fetch from database
+      const supabase = await createClient();
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('preferences')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .single();
 
       userPreferences = profile?.preferences || {};

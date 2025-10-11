@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
 // GET /api/shopping-lists - Get user's shopping lists
 export async function GET() {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Fetch active shopping lists
     const { data: lists, error } = await supabase
       .from('shopping_lists')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('status', 'active')
       .order('created_at', { ascending: false });
 
@@ -35,13 +36,13 @@ export async function GET() {
 // POST /api/shopping-lists - Create new shopping list
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    const { userId } = await auth();
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const body = await request.json();
     const { name = 'Shopping List', meal_plan_id } = body;
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
     const { data: list, error } = await supabase
       .from('shopping_lists')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         name,
         meal_plan_id: meal_plan_id || null,
         status: 'active',

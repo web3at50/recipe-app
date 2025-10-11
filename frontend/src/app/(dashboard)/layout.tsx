@@ -1,8 +1,9 @@
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { BookOpen, ChefHat, Calendar, ShoppingCart } from 'lucide-react';
 import { Toaster } from 'sonner';
+import { createClient } from '@/lib/supabase/server';
 
 const navigation = [
   { name: 'My Recipes', href: '/recipes', icon: BookOpen },
@@ -16,24 +17,22 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  const { userId } = await auth();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
+  if (!userId) {
+    redirect('/sign-in');
   }
 
-  // Check if user has completed onboarding
+  // Check if user has completed onboarding (using Supabase for DB query)
+  const supabase = await createClient();
+
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('onboarding_completed')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .single();
 
-  // Redirect to onboarding if not completed (except if already on onboarding page)
+  // Redirect to onboarding if not completed
   if (!profile?.onboarding_completed) {
     redirect('/onboarding');
   }

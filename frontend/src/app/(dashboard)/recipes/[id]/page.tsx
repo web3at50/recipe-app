@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { auth } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -16,20 +17,21 @@ type PageProps = {
 export default async function RecipeDetailPage({ params, searchParams }: PageProps) {
   const { id } = await params;
   const search = await searchParams;
-  const supabase = await createClient();
 
-  // Check authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    redirect('/login');
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect('/sign-in');
   }
+
+  const supabase = await createClient();
 
   // Fetch recipe (all data now in JSONB - no joins needed!)
   const { data: recipe, error: recipeError } = await supabase
     .from('recipes')
     .select('*')
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .single();
 
   if (recipeError || !recipe) {
