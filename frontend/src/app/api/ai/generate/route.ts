@@ -7,23 +7,27 @@ import { createRecipeGenerationPrompt, parseRecipeFromAI } from '@/lib/ai/prompt
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get user profile with preferences
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('preferences')
-      .eq('user_id', user.id)
-      .single();
-
-    const userPreferences = profile?.preferences || {};
-
     const body = await request.json();
+
+    // Get authenticated user (optional - playground users won't have one)
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Load preferences from database (authenticated) or request body (playground)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let userPreferences: any = {};
+    if (user) {
+      // Authenticated user - fetch from database
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('preferences')
+        .eq('user_id', user.id)
+        .single();
+
+      userPreferences = profile?.preferences || {};
+    } else {
+      // Playground user - use preferences from request body
+      userPreferences = body.preferences || {};
+    }
     const { ingredients, dietary_preferences, servings, prepTimeMax, difficulty } = body;
 
     // Validate inputs

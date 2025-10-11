@@ -1,120 +1,163 @@
-import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { ArrowRight, ChefHat, Calendar, ShoppingCart, Sparkles } from "lucide-react"
 
-export default async function Home() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    // Unauthenticated state
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-4xl space-y-12">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              Welcome to Recipe App
+export default function Home() {
+  // Always show marketing landing page (public homepage)
+  // Authenticated users can access dashboard via navigation menu
+  return (
+    <div className="container mx-auto px-4 py-8 md:py-16">
+        <div className="mx-auto max-w-6xl space-y-16">
+          {/* Hero Section */}
+          <div className="text-center space-y-6">
+            <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary mb-4">
+              UK-Focused AI Recipe Platform
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              What&apos;s for dinner?
             </h1>
-            <p className="text-xl text-muted-foreground">
-              Your personal recipe manager and meal planner
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Generate personalized recipes from ingredients you already have. Plan meals for the week. Auto-generate shopping lists. All with AI.
+            </p>
+
+            {/* Primary CTAs */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+              <Button size="lg" asChild className="text-lg">
+                <Link href="/playground">
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Try It Free - No Signup
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="text-lg">
+                <Link href="/signup">
+                  Create Account
+                </Link>
+              </Button>
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              ✨ Full access in playground mode • 💾 Sign up to save your work • 🇬🇧 Built for UK home cooks
             </p>
           </div>
 
+          {/* Features Grid */}
           <div className="grid gap-6 md:grid-cols-3">
-            <Card>
+            <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardHeader>
-                <CardTitle>Sign up to get started</CardTitle>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <ChefHat className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle>AI Recipe Generation</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Create your account and start managing your recipes, planning meals, and organizing your cooking.
+                <CardDescription className="text-base">
+                  Tell AI what ingredients you have. Get personalized recipes in seconds. UK measurements, British ingredients.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardHeader>
-                <CardTitle>Secure authentication</CardTitle>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <Calendar className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle>Weekly Meal Planning</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Sign in with email or Google. Your credentials are protected with enterprise-grade security.
+                <CardDescription className="text-base">
+                  Plan your meals for the week. Drag and drop recipes. Adjust servings. Save time and reduce decision fatigue.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-2 hover:border-primary/50 transition-colors">
               <CardHeader>
-                <CardTitle>Your data, protected</CardTitle>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <ShoppingCart className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle>Smart Shopping Lists</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Your conversations and data are private and secure. We never share your information.
+                <CardDescription className="text-base">
+                  Auto-generate shopping lists from meal plans. Ingredients consolidate automatically. Organized by aisle.
                 </CardDescription>
               </CardContent>
             </Card>
           </div>
 
-          <div className="flex justify-center gap-4">
-            <Button size="lg" asChild>
-              <Link href="/signup">Get Started</Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/login">Sign In</Link>
-            </Button>
+          {/* How It Works */}
+          <div className="bg-muted/30 rounded-2xl p-8 md:p-12">
+            <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
+            <div className="grid gap-8 md:grid-cols-3">
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
+                  1
+                </div>
+                <h3 className="text-xl font-semibold">Try the Playground</h3>
+                <p className="text-muted-foreground">
+                  Generate recipes, create meal plans, and explore all features without signing up. Everything works—just can&apos;t save yet.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
+                  2
+                </div>
+                <h3 className="text-xl font-semibold">Love What You See?</h3>
+                <p className="text-muted-foreground">
+                  When you&apos;re ready to save your recipes and meal plans permanently, create a free account in seconds.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
+                  3
+                </div>
+                <h3 className="text-xl font-semibold">Unlock Full Access</h3>
+                <p className="text-muted-foreground">
+                  One-off payment of £9.99-£14.99. No subscription. Unlimited recipes, saved meal plans, multi-device sync.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Proof / Trust Signals */}
+          <div className="text-center space-y-6">
+            <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="text-green-600">✓</span> UK-focused (metric, British ingredients)
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-600">✓</span> Dietary restrictions & allergens
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-600">✓</span> GDPR compliant
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-600">✓</span> No subscription required
+              </div>
+            </div>
+
+            {/* Final CTA */}
+            <div className="pt-8">
+              <Button size="lg" asChild className="text-lg">
+                <Link href="/playground">
+                  <Sparkles className="mr-2 h-5 w-5" />
+                  Start Cooking Smarter Today
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <p className="text-sm text-muted-foreground mt-4">
+                Already have an account?{" "}
+                <Link href="/login" className="text-primary hover:underline font-medium">
+                  Sign in
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
     )
-  }
-
-  // Authenticated state
-  return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="mx-auto max-w-4xl space-y-12">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Welcome back to Recipe App
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Your account is ready
-          </p>
-        </div>
-
-        <Card className="mx-auto max-w-2xl">
-          <CardHeader>
-            <CardTitle>Your account is set up and ready</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              You&apos;re logged in as <span className="font-semibold">{user.email}</span>
-            </p>
-            <div className="space-y-4">
-              <h3 className="font-semibold">Get Started:</h3>
-              <div className="grid gap-3">
-                <Button asChild className="w-full justify-start" size="lg">
-                  <Link href="/recipes">📚 My Recipes - Create and manage your recipes</Link>
-                </Button>
-                <Button asChild variant="outline" className="w-full justify-start" size="lg">
-                  <Link href="/generate">🤖 AI Generate - Generate recipes from ingredients</Link>
-                </Button>
-                <Button asChild variant="outline" className="w-full justify-start" size="lg">
-                  <Link href="/pantry">📦 Pantry - Track your cupboard inventory</Link>
-                </Button>
-                <Button asChild variant="outline" className="w-full justify-start" size="lg">
-                  <Link href="/meal-planner">📅 Meal Planner - Plan your meals for the week</Link>
-                </Button>
-                <Button asChild variant="outline" className="w-full justify-start" size="lg">
-                  <Link href="/shopping-list">🛒 Shopping List - Generate and manage shopping lists</Link>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  )
 }
