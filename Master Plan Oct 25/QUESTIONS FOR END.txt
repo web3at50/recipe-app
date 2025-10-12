@@ -1,10 +1,12 @@
-to do in recipe app
+.6to do in recipe app
 
-1: How to use without needing to sign in? Saving preferences etc to database without a sign in ?  Then if and when do create account will saved data transfer over. Onboarding and prefrences infgo etc. Even if free to create account some people wont want to and want a nice simple free to use test on home page without account?
+1: We need this on the home page before auth. Users need to be able to try for free first (within limits). I believe this was in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md   Can you please review?  Can you assign a specialist agent to research and investigate and plan how we could implement this. Including how we allow users to have a good opportunity to use our app for free but not so good that they don't need to ever pay the one off purchase price (whatever that is we agree on). Remember our model is not subscription but instead a one off fee of £9.99 to £14.99 (undecided). This was part of our original plan to be different from others and avoid the subscription fee. How will be deal with natasha law and preferences on free to use pre auth version? What features other than ai recipe generation do we enable on the free pre auth version.  The agent needs to be a specialist research agent   in the field of app development like ours
+
+Natasha law on testing
 
 2: When signed in user_profiles table from onboarding go to the account section
 
-3: Can we add pref for no dairy and keto etc somewhere 
+3: Can we add pref for no dairy and keto etc somewhere (later phase
 
 4: GDPR is mentioned in onboarding but d we need a page?
 
@@ -41,7 +43,32 @@ to do in recipe app
 
 18: Investigate and sort pantry list option on shopping list screen
 
+19: Add C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25 to gitignore and then delete from githb
 
+20: Doesn't need to incoude all ingredients
+
+
+20: AI Gateway
+
+We already usng the AI SDK
+
+
+https://vercel.com/docs/ai-gateway.md
+https://vercel.com/docs/ai-gateway/getting-started.md
+https://vercel.com/docs/ai-gateway/models-and-providers.md
+https://vercel.com/ai-gateway/models?page=14
+https://vercel.com/docs/ai-gateway/observability.md
+https://vercel.com/docs/ai-gateway/pricing.md
+https://vercel.com/docs/ai-gateway/provider-options.md
+https://vercel.com/docs/ai-gateway/openai-compat.md
+https://vercel.com/docs/ai-gateway/authentication.md
+https://vercel.com/docs/ai-gateway/byok.md
+https://vercel.com/docs/ai-gateway/framework-integrations.md
+https://vercel.com/docs/ai-gateway/app-attribution.md
+https://vercel.com/docs/ai-gateway/image-generation.md  (possibly for recipe image generatrion?)
+https://vercel.com/docs/ai-gateway/model-variants.md
+https://vercel.com/docs/ai/adding-a-provider.md
+https://vercel.com/docs/ai/adding-a-model.md
 
 
 
