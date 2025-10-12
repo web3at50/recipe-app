@@ -9,6 +9,7 @@ import { ChefHat } from 'lucide-react';
 import { AllergyStep } from '@/components/onboarding/allergy-step';
 import { DietaryStep } from '@/components/onboarding/dietary-step';
 import { PreferencesStep } from '@/components/onboarding/preferences-step';
+import { PantryStep } from '@/components/onboarding/pantry-step';
 import { ConsentStep } from '@/components/onboarding/consent-step';
 import { CompletionStep } from '@/components/onboarding/completion-step';
 import type { OnboardingFormData } from '@/types/user-profile';
@@ -17,8 +18,9 @@ const STEPS = [
   { id: 1, title: 'Allergies & Restrictions', description: 'Help us keep you safe' },
   { id: 2, title: 'Dietary Preferences', description: 'What do you like to eat?' },
   { id: 3, title: 'Cooking Profile', description: 'Tell us about your cooking style' },
-  { id: 4, title: 'Privacy & Data', description: 'Your data, your choice' },
-  { id: 5, title: 'All Set!', description: "You&apos;re ready to cook" }
+  { id: 4, title: 'Pantry Staples', description: 'What do you keep at home?' },
+  { id: 5, title: 'Privacy & Data', description: 'Your data, your choice' },
+  { id: 6, title: 'All Set!', description: "You&apos;re ready to cook" }
 ];
 
 export default function OnboardingPage() {
@@ -33,6 +35,7 @@ export default function OnboardingPage() {
     cooking_skill: 'intermediate',
     typical_cook_time: 30,
     household_size: 2,
+    pantry_staples: [],
     cuisines_liked: [],
     spice_level: 'medium',
     consents: {
@@ -150,13 +153,20 @@ export default function OnboardingPage() {
             )}
 
             {currentStep === 4 && (
+              <PantryStep
+                selected={formData.pantry_staples || []}
+                onChange={(pantry_staples) => updateFormData({ pantry_staples })}
+              />
+            )}
+
+            {currentStep === 5 && (
               <ConsentStep
                 consents={formData.consents}
                 onChange={(consents) => updateFormData({ consents })}
               />
             )}
 
-            {currentStep === 5 && (
+            {currentStep === 6 && (
               <CompletionStep formData={formData} />
             )}
           </CardContent>

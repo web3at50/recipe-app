@@ -44,11 +44,19 @@ export async function POST(request: Request) {
     const supabase = await createClient();
 
     const body = await request.json();
-    const { item_pattern } = body;
+    const { item_pattern, preference_state = 'auto' } = body;
 
     if (!item_pattern || !item_pattern.trim()) {
       return NextResponse.json(
         { error: 'item_pattern is required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate preference_state
+    if (!['hide', 'show', 'auto'].includes(preference_state)) {
+      return NextResponse.json(
+        { error: 'preference_state must be "hide", "show", or "auto"' },
         { status: 400 }
       );
     }
@@ -59,6 +67,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: userId,
         item_pattern: item_pattern.trim().toLowerCase(),
+        preference_state,
       })
       .select()
       .single();

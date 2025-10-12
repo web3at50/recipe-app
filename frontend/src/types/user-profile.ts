@@ -58,12 +58,15 @@ export interface OnboardingFormData {
   typical_cook_time: number; // minutes
   household_size: number;
 
-  // Step 4: Optional preferences
+  // Step 4: Pantry staples (optional)
+  pantry_staples?: string[]; // Array of standard pantry item IDs
+
+  // Step 5: Optional preferences
   cuisines_liked?: string[];
   budget_per_meal?: number;
   spice_level?: 'mild' | 'medium' | 'hot';
 
-  // Step 5: GDPR consents
+  // Step 6: GDPR consents
   consents: {
     essential: boolean; // Always true (required)
     personalization: boolean; // Optional

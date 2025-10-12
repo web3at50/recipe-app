@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { BookOpen, ChefHat, Calendar, ShoppingCart } from 'lucide-react';
+import { BookOpen, ChefHat, Calendar, ShoppingCart, Package } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { createClient } from '@/lib/supabase/server';
 
@@ -10,6 +10,7 @@ const navigation = [
   { name: 'AI Generate', href: '/generate', icon: ChefHat },
   { name: 'Meal Planner', href: '/meal-planner', icon: Calendar },
   { name: 'Shopping List', href: '/shopping-list', icon: ShoppingCart },
+  { name: 'My Pantry', href: '/settings/pantry-staples', icon: Package },
 ];
 
 export default async function DashboardLayout({

@@ -91,6 +91,43 @@ export async function POST(request: Request) {
       // Don't fail the whole request if consents fail, just log it
     }
 
+    // Save pantry staples if provided
+    if (body.pantry_staples && body.pantry_staples.length > 0) {
+      try {
+        // Import standard pantry items to get the names
+        const { STANDARD_UK_PANTRY_ITEMS } = await import('@/types/pantry');
+
+        // Convert item IDs to item patterns
+        const pantryItems = body.pantry_staples
+          .map((id: string) => {
+            const item = STANDARD_UK_PANTRY_ITEMS.find(i => i.id === id);
+            return item ? {
+              user_id: userId,
+              item_pattern: item.name.toLowerCase(),
+              preference_state: 'hide' // Default to hide for onboarding selections
+            } : null;
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null);
+
+        if (pantryItems.length > 0) {
+          const { error: pantryError } = await supabase
+            .from('user_pantry_staples')
+            .upsert(pantryItems, {
+              onConflict: 'user_id,item_pattern',
+              ignoreDuplicates: false
+            });
+
+          if (pantryError) {
+            console.error('Error saving pantry staples:', pantryError);
+            // Don't fail the whole onboarding, just log it
+          }
+        }
+      } catch (pantryError) {
+        console.error('Error processing pantry staples:', pantryError);
+        // Don't fail the whole onboarding, just log it
+      }
+    }
+
     return NextResponse.json({
       success: true,
       profile

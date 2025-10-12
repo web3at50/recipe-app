@@ -13,3 +13,4 @@ export * from './recipe';
 export * from './user-profile';
 export * from './meal-plan';
 export * from './shopping-list';
+export * from './pantry';

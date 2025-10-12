@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -19,36 +21,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Trash2, Calendar, Filter, Pencil, Check, X, MoreVertical, EyeOff, Eye } from 'lucide-react';
+import { Plus, Trash2, Calendar, Filter, Pencil, Check, X, MoreVertical, EyeOff, Eye, Settings2 } from 'lucide-react';
 import type { ShoppingListWithItems, ShoppingListItem, GroupedShoppingItems } from '@/types/shopping-list';
+import type { PantryStaple, PantryPreferenceState } from '@/types/pantry';
 import { UNIT_OPTIONS } from '@/lib/units';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
-interface UserPantryStaple {
-  id: string;
-  user_id: string;
-  item_pattern: string;
-  created_at: string;
-}
+type DisplayMode = 'shopping' | 'complete' | 'pantry';
 
-type DisplayMode = 'shopping' | 'complete';
-
-// Helper function to detect pantry staple items
-function isPantryStaple(item: ShoppingListItem, userStaples: UserPantryStaple[] = []): boolean {
+// Helper function to check if item matches user's preference
+function getItemPantryStatus(
+  item: ShoppingListItem,
+  userStaples: PantryStaple[] = []
+): { isPantry: boolean; preference?: PantryStaple; isOverridden: boolean } {
   const itemName = item.item_name.toLowerCase();
   const quantity = item.quantity?.toLowerCase() || '';
 
   // 1. Check user's custom pantry staples first (highest priority)
-  const isInCustomList = userStaples.some(staple =>
+  const userStaple = userStaples.find(staple =>
     itemName.includes(staple.item_pattern.toLowerCase())
   );
-  if (isInCustomList) return true;
 
-  // Define pantry staples with small quantity thresholds
+  if (userStaple) {
+    // User has explicit preference
+    if (userStaple.preference_state === 'hide') {
+      return { isPantry: true, preference: userStaple, isOverridden: true };
+    } else if (userStaple.preference_state === 'show') {
+      return { isPantry: false, preference: userStaple, isOverridden: true };
+    }
+    // If 'auto', fall through to auto-detection
+  }
+
+  // 2. Auto-detection based on quantity/pattern
+  const autoDetected = isPantryStapleAutoDetect(itemName, quantity);
+
+  return {
+    isPantry: autoDetected,
+    preference: userStaple,
+    isOverridden: false,
+  };
+}
+
+// Auto-detection logic (16 hardcoded rules from Agent 1's audit)
+function isPantryStapleAutoDetect(itemName: string, quantity: string): boolean {
   const staplePatterns = [
     // Oils & fats
-    { pattern: /olive oil|vegetable oil|cooking oil|oil/, threshold: 100, unit: 'ml' },
+    { pattern: /olive oil|vegetable oil|cooking oil|sunflower oil|oil/, threshold: 100, unit: 'ml' },
     { pattern: /butter/, threshold: 50, unit: 'g' },
 
     // Seasonings & condiments
@@ -56,29 +75,25 @@ function isPantryStaple(item: ShoppingListItem, userStaples: UserPantryStaple[] 
     { pattern: /stock cube|bouillon|stock/, threshold: 2, unit: 'whole' },
 
     // Dried herbs & spices (any quantity)
-    { pattern: /dried|herb|spice|cumin|paprika|oregano|basil|thyme|cinnamon|turmeric|coriander|ginger powder/, threshold: Infinity, unit: 'any' },
+    { pattern: /dried|herb|spice|cumin|paprika|oregano|basil|thyme|cinnamon|turmeric|coriander|ginger powder|mixed herbs|chilli flakes/, threshold: Infinity, unit: 'any' },
 
     // Cooking wine/alcohol in small quantities
     { pattern: /wine|sherry|brandy|cognac/, threshold: 200, unit: 'ml' },
 
     // Small condiments
     { pattern: /vinegar|soy sauce|worcestershire/, threshold: 50, unit: 'ml' },
+    { pattern: /tomato purée|tomato puree|tomato paste/, threshold: 50, unit: 'g' },
   ];
 
-  // Check each pattern
   for (const { pattern, threshold, unit } of staplePatterns) {
     if (pattern.test(itemName)) {
-      // Extract numeric quantity
       const numMatch = quantity.match(/^(\d+\.?\d*)/);
       if (!numMatch) {
-        // No quantity specified, treat as staple for herbs/spices
         if (unit === 'any') return true;
         continue;
       }
 
       const numQuantity = parseFloat(numMatch[1]);
-
-      // Check if below threshold
       if (unit === 'any' || numQuantity <= threshold) {
         return true;
       }
@@ -100,8 +115,8 @@ export default function ShoppingListPage() {
   const [editingQuantityNumber, setEditingQuantityNumber] = useState('');
   const [editingUnit, setEditingUnit] = useState<string>('');
 
-  // User pantry staples state
-  const [userPantryStaples, setUserPantryStaples] = useState<UserPantryStaple[]>([]);
+  // User pantry staples state (now with preference_state)
+  const [userPantryStaples, setUserPantryStaples] = useState<PantryStaple[]>([]);
 
   useEffect(() => {
     fetchActiveList();
@@ -123,21 +138,18 @@ export default function ShoppingListPage() {
   const fetchActiveList = async () => {
     try {
       setIsLoading(true);
-      // Get all lists
       const response = await fetch('/api/shopping-lists');
       if (!response.ok) throw new Error('Failed to fetch lists');
 
       const { lists } = await response.json();
 
       if (lists.length > 0) {
-        // Get items for the first list
         const listResponse = await fetch(`/api/shopping-lists/${lists[0].id}`);
         if (listResponse.ok) {
           const data = await listResponse.json();
           setActiveList({ ...data.list, items: data.items });
         }
       } else {
-        // Create a new list if none exist
         const createResponse = await fetch('/api/shopping-lists', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -225,7 +237,6 @@ export default function ShoppingListPage() {
     }
 
     try {
-      // Delete all checked items
       await Promise.all(
         checkedItems.map(item =>
           fetch(`/api/shopping-lists/items/${item.id}`, { method: 'DELETE' })
@@ -244,18 +255,12 @@ export default function ShoppingListPage() {
   const handleStartEdit = (item: ShoppingListItem) => {
     setEditingItemId(item.id);
 
-    // Parse quantity string into number and unit
-    // Examples: "400g" → {number: "400", unit: "g"}, "2 litres" → {number: "2", unit: "l"}
     const quantityStr = item.quantity || '';
-
-    // Try to extract number from start of string
     const numberMatch = quantityStr.match(/^(\d+\.?\d*)/);
     const extractedNumber = numberMatch ? numberMatch[1] : '';
 
-    // Extract unit by removing the number part
     const remainingStr = quantityStr.replace(/^(\d+\.?\d*)\s*/, '').trim();
 
-    // Try to match against known units
     let matchedUnit = '';
     if (remainingStr) {
       const unitOption = UNIT_OPTIONS.find(opt =>
@@ -275,7 +280,6 @@ export default function ShoppingListPage() {
   };
 
   const handleSaveEdit = async (itemId: string) => {
-    // Recombine quantity number and unit
     let combinedQuantity = '';
     if (editingQuantityNumber.trim()) {
       combinedQuantity = editingUnit
@@ -313,61 +317,70 @@ export default function ShoppingListPage() {
     }
   };
 
-  // Pantry staples handlers
-  const handleTogglePantryStaple = async (item: ShoppingListItem) => {
+  // 3-State Pantry Preference Handlers
+  const handleSetPreference = async (item: ShoppingListItem, newState: PantryPreferenceState) => {
     const itemName = item.item_name.toLowerCase();
 
-    // Check if item is already in user's pantry staples
+    // Check if item exists in user's pantry staples
     const existingStaple = userPantryStaples.find(staple =>
       itemName.includes(staple.item_pattern.toLowerCase())
     );
 
-    if (existingStaple) {
-      // Remove from pantry staples
-      try {
+    try {
+      if (existingStaple) {
+        // Update existing staple
         const response = await fetch(`/api/user/pantry-staples/${existingStaple.id}`, {
-          method: 'DELETE',
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ preference_state: newState }),
         });
 
-        if (!response.ok) throw new Error('Failed to remove pantry staple');
+        if (!response.ok) throw new Error('Failed to update preference');
 
-        await fetchUserPantryStaples();
-        toast.success(`"${item.item_name}" will always be shown`);
-      } catch (error) {
-        console.error('Error removing pantry staple:', error);
-        toast.error('Failed to update pantry staples');
-      }
-    } else {
-      // Add to pantry staples
-      try {
+        toast.success(`"${item.item_name}" preference set to ${newState}`);
+      } else {
+        // Create new staple with preference
         const response = await fetch('/api/user/pantry-staples', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ item_pattern: itemName }),
+          body: JSON.stringify({
+            item_pattern: itemName,
+            preference_state: newState,
+          }),
         });
 
         if (!response.ok) {
           const data = await response.json();
-          throw new Error(data.error || 'Failed to add pantry staple');
+          throw new Error(data.error || 'Failed to add preference');
         }
 
-        await fetchUserPantryStaples();
-        toast.success(`"${item.item_name}" will always be hidden in Shopping Mode`);
-      } catch (error) {
-        console.error('Error adding pantry staple:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Failed to update pantry staples';
-        toast.error(errorMessage);
+        toast.success(`"${item.item_name}" preference set to ${newState}`);
       }
+
+      await fetchUserPantryStaples();
+    } catch (error) {
+      console.error('Error setting preference:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update preference';
+      toast.error(errorMessage);
     }
   };
 
   // Filter items based on display mode
   const filteredItems = activeList?.items.filter(item => {
+    const status = getItemPantryStatus(item, userPantryStaples);
+
     if (displayMode === 'complete') return true;
-    return !isPantryStaple(item, userPantryStaples);
+    if (displayMode === 'pantry') return status.isPantry;
+    if (displayMode === 'shopping') return !status.isPantry;
+
+    return true;
   }) || [];
 
-  const hiddenStaplesCount = (activeList?.items.length || 0) - filteredItems.length;
+  const pantryCount = activeList?.items.filter(item =>
+    getItemPantryStatus(item, userPantryStaples).isPantry
+  ).length || 0;
+
+  const regularCount = (activeList?.items.length || 0) - pantryCount;
 
   // Group items by category
   const groupedItems: GroupedShoppingItems[] = [];
@@ -422,12 +435,18 @@ export default function ShoppingListPage() {
                 Clear Checked ({checkedCount})
               </Button>
             )}
+            <Link href="/settings/pantry-staples">
+              <Button variant="outline" size="sm">
+                <Settings2 className="h-4 w-4 mr-2" />
+                Manage Pantry
+              </Button>
+            </Link>
           </div>
         </div>
 
-        {/* Display Mode Toggle */}
+        {/* Display Mode Toggle - 3 MODES */}
         {activeList && activeList.items.length > 0 && (
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-4 flex items-center gap-3 flex-wrap">
             <Filter className="h-4 w-4 text-muted-foreground" />
             <div className="flex gap-2">
               <Button
@@ -436,9 +455,9 @@ export default function ShoppingListPage() {
                 onClick={() => setDisplayMode('shopping')}
               >
                 Shopping Mode
-                {displayMode === 'shopping' && hiddenStaplesCount > 0 && (
+                {displayMode === 'shopping' && pantryCount > 0 && (
                   <span className="ml-1.5 text-xs opacity-80">
-                    ({hiddenStaplesCount} hidden)
+                    ({pantryCount} hidden)
                   </span>
                 )}
               </Button>
@@ -449,12 +468,22 @@ export default function ShoppingListPage() {
               >
                 Complete List
               </Button>
+              <Button
+                variant={displayMode === 'pantry' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setDisplayMode('pantry')}
+              >
+                Pantry Only
+                {displayMode === 'pantry' && (
+                  <span className="ml-1.5 text-xs opacity-80">
+                    ({pantryCount})
+                  </span>
+                )}
+              </Button>
             </div>
-            {displayMode === 'shopping' && hiddenStaplesCount > 0 && (
-              <p className="text-xs text-muted-foreground">
-                {hiddenStaplesCount} pantry staple{hiddenStaplesCount !== 1 ? 's' : ''} hidden
-              </p>
-            )}
+            <div className="text-xs text-muted-foreground">
+              {regularCount} regular • {pantryCount} pantry
+            </div>
           </div>
         )}
       </div>
@@ -484,7 +513,7 @@ export default function ShoppingListPage() {
                     id="quantity"
                     value={newQuantity}
                     onChange={(e) => setNewQuantity(e.target.value)}
-                    placeholder="2 liters"
+                    placeholder="2 litres"
                   />
                 </div>
               </div>
@@ -501,7 +530,7 @@ export default function ShoppingListPage() {
           <CardHeader>
             <CardTitle>
               Items ({filteredItems.length})
-              {displayMode === 'shopping' && hiddenStaplesCount > 0 && (
+              {displayMode !== 'complete' && (
                 <span className="text-sm font-normal text-muted-foreground ml-2">
                   ({activeList?.items.length || 0} total)
                 </span>
@@ -519,11 +548,21 @@ export default function ShoppingListPage() {
                     <div className="space-y-2">
                       {group.items.map((item) => {
                         const isEditing = editingItemId === item.id;
+                        const status = getItemPantryStatus(item, userPantryStaples);
+                        const currentPreference = status.preference?.preference_state;
 
                         return (
                           <div
                             key={item.id}
-                            className="flex items-center gap-3 p-3 rounded-lg border bg-card"
+                            className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                              status.isPantry && displayMode === 'complete'
+                                ? 'bg-gray-50/50 dark:bg-gray-900/20'
+                                : 'bg-card'
+                            } ${
+                              status.isOverridden && displayMode === 'complete'
+                                ? 'border-blue-200 dark:border-blue-900'
+                                : ''
+                            }`}
                           >
                             {!isEditing && (
                               <Checkbox
@@ -534,16 +573,13 @@ export default function ShoppingListPage() {
                             )}
 
                             {isEditing ? (
-                              // Edit mode: Show quantity editor only (name stays fixed)
                               <div className="flex-1 grid grid-cols-12 gap-2 items-center">
-                                {/* Static name (not editable) */}
                                 <div className="col-span-7">
                                   <span className="font-medium text-muted-foreground">
                                     {item.item_name}
                                   </span>
                                 </div>
 
-                                {/* Quantity number input */}
                                 <Input
                                   className="col-span-3"
                                   type="number"
@@ -554,7 +590,6 @@ export default function ShoppingListPage() {
                                   autoFocus
                                 />
 
-                                {/* Unit selector */}
                                 <Select
                                   value={editingUnit}
                                   onValueChange={setEditingUnit}
@@ -572,18 +607,23 @@ export default function ShoppingListPage() {
                                 </Select>
                               </div>
                             ) : (
-                              // View mode: Show static text
                               <label
                                 htmlFor={`item-${item.id}`}
-                                className={`flex-1 cursor-pointer ${
+                                className={`flex-1 cursor-pointer flex items-center gap-2 ${
                                   item.checked ? 'line-through text-muted-foreground' : ''
                                 }`}
                               >
                                 <span className="font-medium">{item.item_name}</span>
                                 {item.quantity && (
-                                  <span className="text-sm text-muted-foreground ml-2">
+                                  <span className="text-sm text-muted-foreground">
                                     ({item.quantity})
                                   </span>
+                                )}
+                                {/* Visual Indicators */}
+                                {displayMode === 'complete' && status.isPantry && (
+                                  <Badge variant="secondary" className="text-[10px] h-5 px-1.5">
+                                    P
+                                  </Badge>
                                 )}
                               </label>
                             )}
@@ -625,7 +665,7 @@ export default function ShoppingListPage() {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
 
-                                {/* Dropdown menu for pantry staples */}
+                                {/* 3-State Dropdown Menu */}
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -636,19 +676,31 @@ export default function ShoppingListPage() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    {userPantryStaples.some(staple =>
-                                      item.item_name.toLowerCase().includes(staple.item_pattern.toLowerCase())
-                                    ) ? (
-                                      <DropdownMenuItem onClick={() => handleTogglePantryStaple(item)}>
-                                        <Eye className="h-4 w-4 mr-2" />
-                                        Always show this item
-                                      </DropdownMenuItem>
-                                    ) : (
-                                      <DropdownMenuItem onClick={() => handleTogglePantryStaple(item)}>
-                                        <EyeOff className="h-4 w-4 mr-2" />
-                                        Always hide this item
-                                      </DropdownMenuItem>
-                                    )}
+                                    <DropdownMenuItem
+                                      onClick={() => handleSetPreference(item, 'hide')}
+                                      className={currentPreference === 'hide' ? 'bg-accent' : ''}
+                                    >
+                                      <EyeOff className="h-4 w-4 mr-2" />
+                                      Always hide this
+                                      {currentPreference === 'hide' && ' ✓'}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => handleSetPreference(item, 'show')}
+                                      className={currentPreference === 'show' ? 'bg-accent' : ''}
+                                    >
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      Always show this
+                                      {currentPreference === 'show' && ' ✓'}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      onClick={() => handleSetPreference(item, 'auto')}
+                                      className={currentPreference === 'auto' ? 'bg-accent' : ''}
+                                    >
+                                      <Settings2 className="h-4 w-4 mr-2" />
+                                      Let system decide
+                                      {currentPreference === 'auto' && ' ✓'}
+                                    </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </>
@@ -662,12 +714,44 @@ export default function ShoppingListPage() {
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
-                <p>Your shopping list is empty</p>
-                <p className="text-sm mt-1">Add items above to get started</p>
+                {displayMode === 'pantry' ? (
+                  <>
+                    <p>No pantry items in this list</p>
+                    <p className="text-sm mt-1">Switch to Complete List to see all items</p>
+                  </>
+                ) : displayMode === 'shopping' && pantryCount > 0 ? (
+                  <>
+                    <p>No regular items to buy</p>
+                    <p className="text-sm mt-1">{pantryCount} pantry items are hidden</p>
+                  </>
+                ) : (
+                  <>
+                    <p>Your shopping list is empty</p>
+                    <p className="text-sm mt-1">Add items above to get started</p>
+                  </>
+                )}
               </div>
             )}
           </CardContent>
         </Card>
+
+        {/* Help Card */}
+        {activeList && activeList.items.length > 0 && (
+          <Card className="bg-muted/30 border-primary/20">
+            <CardContent className="pt-6">
+              <div className="text-sm space-y-2">
+                <div className="font-medium flex items-center gap-2">
+                  <Badge variant="secondary" className="text-[10px] h-5 px-1.5">P</Badge>
+                  = Pantry item
+                </div>
+                <p className="text-muted-foreground">
+                  <strong>Customize any item:</strong> Click the <strong>⋮ menu</strong> to always show/hide it, or let the system decide.
+                  View all your pantry preferences in <Link href="/settings/pantry-staples" className="underline hover:underline-offset-4">My Pantry</Link>.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
