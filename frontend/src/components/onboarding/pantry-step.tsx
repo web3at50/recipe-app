@@ -14,7 +14,7 @@ export function PantryStep({ selected, onChange }: PantryStepProps) {
       <div className="mb-6">
         <p className="text-sm text-muted-foreground">
           Pantry staples are items you typically keep at home (like olive oil, salt, or spices).
-          We'll hide these from your shopping lists by default to keep them clean and focused.
+          We&apos;ll hide these from your shopping lists by default to keep them clean and focused.
         </p>
         <p className="text-sm text-muted-foreground mt-2">
           <strong>This step is optional</strong> - you can always set this up later in Settings,

@@ -87,7 +87,7 @@ export function isSessionStorageAvailable(): boolean {
     sessionStorage.setItem(test, test);
     sessionStorage.removeItem(test);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }

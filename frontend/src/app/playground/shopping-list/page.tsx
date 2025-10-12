@@ -13,11 +13,9 @@ import {
   savePlaygroundShoppingList,
   getPlaygroundMealPlan,
   getPlaygroundRecipes,
-  addItemToPlaygroundShoppingList,
   removeItemFromPlaygroundShoppingList,
   updatePlaygroundShoppingListItem,
   generatePlaygroundId,
-  type PlaygroundRecipe,
 } from '@/lib/session-storage';
 import { toast } from 'sonner';
 

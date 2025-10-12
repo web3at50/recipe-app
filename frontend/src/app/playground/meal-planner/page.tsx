@@ -16,8 +16,6 @@ import Link from 'next/link';
 import {
   getPlaygroundRecipes,
   getPlaygroundMealPlan,
-  savePlaygroundMealPlan,
-  updatePlaygroundMealPlan,
   addRecipeToPlaygroundMealPlan,
   removeRecipeFromPlaygroundMealPlan,
   type PlaygroundRecipe,

@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Search, Plus, Trash2, Eye, EyeOff, Settings2, Loader2 } from 'lucide-react';
 import { PantryOnboarding } from './pantry-onboarding';
-import { STANDARD_UK_PANTRY_ITEMS, type PantryStaple, type PantryPreferenceState } from '@/types/pantry';
+import { type PantryStaple, type PantryPreferenceState } from '@/types/pantry';
 
 interface PantryManagementProps {
   initialStaples: PantryStaple[];

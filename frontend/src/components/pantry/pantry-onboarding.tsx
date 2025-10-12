@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  STANDARD_UK_PANTRY_ITEMS,
   PANTRY_CATEGORY_LABELS,
   type PantryCategory,
   getPantryItemsByCategory,
@@ -71,7 +70,6 @@ export function PantryOnboarding({
   selected,
   onChange,
   maxItems,
-  isDialog = false,
 }: PantryOnboardingProps) {
   const [activeCategory, setActiveCategory] = useState<PantryCategory>('oils-fats');
   const itemsByCategory = getPantryItemsByCategory();
