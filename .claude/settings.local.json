@@ -33,7 +33,9 @@
       "Bash(for file in \"meal-plans/items/[id]/route.ts\" \"shopping-lists/items/[id]/route.ts\" \"shopping-lists/[id]/items/route.ts\" \"shopping-lists/[id]/route.ts\" \"user/pantry-staples/[id]/route.ts\" \"ai/generate/route.ts\")",
       "Bash(do echo \"Processing $file\")",
       "Bash(done)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git restore:*)",
+      "Bash(Remove-Item \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\components\\pantry\\pantry-modal-playground.tsx\" -Force)"
     ],
     "deny": [],
     "ask": []

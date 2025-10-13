@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',        // Clerk sign-up pages
   '/playground(.*)',     // Playground routes (pre-auth trial)
   '/api/webhooks(.*)',   // Webhook routes
+  '/api/ai/generate',    // AI recipe generation (supports both auth and playground)
 ])
 
 export default clerkMiddleware(async (auth, request) => {
