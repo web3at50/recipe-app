@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       // Playground user - use preferences from request body
       userPreferences = body.preferences || {};
     }
-    const { ingredients, dietary_preferences, servings, prepTimeMax, difficulty } = body;
+    const { ingredients, description, dietary_preferences, servings, prepTimeMax, difficulty, model = 'openai' } = body;
 
     // Validate inputs
     if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
@@ -74,6 +74,7 @@ export async function POST(request: Request) {
     // Generate recipe prompt with user context
     const prompt = createRecipeGenerationPrompt({
       ingredients,
+      description,
       dietary_preferences: mergedDietaryPrefs,
       servings: finalServings,
       prepTimeMax: finalPrepTimeMax,
@@ -85,15 +86,73 @@ export async function POST(request: Request) {
       },
     });
 
-    console.log('Generating recipe with OpenAI GPT-4.1...');
-
-    // Call OpenAI GPT-4.1
-    const { text } = await generateText({
-      model: openai('gpt-4.1-2025-04-14'),
-      prompt,
-      temperature: 0.7,
-      maxOutputTokens: 2000,
+    // Calculate complexity score for OpenAI model selection
+    const complexityScore = calculateComplexityScore({
+      ingredientCount: ingredients.length,
+      allergenCount: userAllergens.length,
+      dietaryRestrictionCount: mergedDietaryPrefs.length,
+      descriptionLength: description?.trim().length || 0,
     });
+
+    console.log(`Complexity score: ${complexityScore} (threshold: 8)`);
+
+    // Multi-model routing
+    let text: string;
+
+    if (model === 'openai') {
+      // OpenAI: Use mini for simple, full for complex
+      const openaiModel = complexityScore > 8
+        ? 'gpt-4.1-2025-04-14'  // Complex: Use full GPT-4.1
+        : 'gpt-4.1-mini-2025-04-14';  // Simple: Use GPT-4.1 mini
+
+      console.log(`Generating recipe with OpenAI ${openaiModel}...`);
+
+      const result = await generateText({
+        model: openai(openaiModel),
+        prompt,
+        temperature: 0.7,
+        maxOutputTokens: 2000,
+      });
+      text = result.text;
+
+    } else if (model === 'claude') {
+      // Claude Sonnet 4.5
+      console.log('Generating recipe with Claude Sonnet 4.5...');
+
+      const Anthropic = (await import('@anthropic-ai/sdk')).default;
+      const anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+
+      const message = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 2000,
+        temperature: 0.7,
+        system: "You are a professional UK-based chef assistant. Generate recipes in the exact JSON format requested.",
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      // Extract text from Claude response
+      const contentBlock = message.content[0];
+      text = contentBlock.type === 'text' ? contentBlock.text : '';
+
+    } else if (model === 'gemini') {
+      // Gemini 2.5 Flash (FREE TIER)
+      console.log('Generating recipe with Gemini 2.5 Flash (free tier)...');
+
+      const { GoogleGenAI } = await import('@google/genai');
+      const genai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_FREE_API_KEY! });
+
+      const result = await genai.models.generateContent({
+        model: 'gemini-2.0-flash-exp',
+        contents: prompt,
+      });
+
+      text = result.text || '';
+
+    } else {
+      throw new Error('Invalid model specified');
+    }
 
     console.log('AI Response received');
 
@@ -155,4 +214,35 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Calculate complexity score for recipe generation
+ * Score > 8 triggers GPT-4.1 instead of GPT-4.1 mini
+ */
+function calculateComplexityScore(params: {
+  ingredientCount: number;
+  allergenCount: number;
+  dietaryRestrictionCount: number;
+  descriptionLength: number;
+}): number {
+  let score = 0;
+
+  // Ingredient complexity (0.5 points per ingredient)
+  score += params.ingredientCount * 0.5;
+
+  // Allergen complexity (3 points per allergen - safety critical)
+  score += params.allergenCount * 3;
+
+  // Dietary restriction complexity (2 points per restriction)
+  score += params.dietaryRestrictionCount * 2;
+
+  // Description complexity (enhanced: +2 if >50 chars, +1 otherwise)
+  if (params.descriptionLength > 50) {
+    score += 2;
+  } else if (params.descriptionLength > 0) {
+    score += 1;
+  }
+
+  return score;
 }

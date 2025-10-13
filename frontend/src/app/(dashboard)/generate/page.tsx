@@ -14,6 +14,8 @@ import type { UserPreferences } from '@/types/user-profile';
 export default function GeneratePage() {
   const router = useRouter();
   const [ingredientsText, setIngredientsText] = useState('');
+  const [descriptionText, setDescriptionText] = useState('');
+  const [selectedModel, setSelectedModel] = useState<'openai' | 'claude' | 'gemini'>('openai');
   const [servings, setServings] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
@@ -67,7 +69,9 @@ export default function GeneratePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ingredients,
+          description: descriptionText.trim() || undefined,
           servings: servings || 4,
+          model: selectedModel,
         }),
       });
 
@@ -214,6 +218,23 @@ export default function GeneratePage() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="description">
+                  What kind of dish? (Optional)
+                  <span className="text-xs text-muted-foreground ml-2">Describe the style or mood</span>
+                </Label>
+                <Textarea
+                  id="description"
+                  value={descriptionText}
+                  onChange={(e) => setDescriptionText(e.target.value)}
+                  placeholder="E.g., Something creamy and comforting, Italian-style, not too spicy..."
+                  className="min-h-[80px]"
+                />
+                <p className="text-xs text-muted-foreground">
+                  This helps the AI understand what kind of recipe you&apos;re looking for
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="servings">Number of Servings</Label>
                 <Input
                   id="servings"
@@ -225,6 +246,42 @@ export default function GeneratePage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label>Choose AI Model</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    type="button"
+                    variant={selectedModel === 'openai' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('openai')}
+                    className="w-full"
+                  >
+                    OpenAI
+                    <span className="text-xs ml-1">(GPT-4.1)</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={selectedModel === 'claude' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('claude')}
+                    className="w-full"
+                  >
+                    Claude
+                    <span className="text-xs ml-1">(Sonnet 4.5)</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={selectedModel === 'gemini' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('gemini')}
+                    className="w-full"
+                  >
+                    Gemini
+                    <span className="text-xs ml-1">(2.5 Flash)</span>
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Test different AI models to see which generates the best recipes for you
+                </p>
+              </div>
+
               <Button
                 className="w-full"
                 size="lg"
@@ -234,12 +291,12 @@ export default function GeneratePage() {
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Generating Recipe...
+                    Generating with {selectedModel.charAt(0).toUpperCase() + selectedModel.slice(1)}...
                   </>
                 ) : (
                   <>
                     <ChefHat className="h-5 w-5 mr-2" />
-                    Generate Recipe
+                    Generate Recipe with {selectedModel.charAt(0).toUpperCase() + selectedModel.slice(1)}
                   </>
                 )}
               </Button>

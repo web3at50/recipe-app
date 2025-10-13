@@ -1,5 +1,6 @@
 export interface RecipeGenerationParams {
   ingredients: string[];
+  description?: string; // Optional natural language description of desired dish
   dietary_preferences?: string[];
   servings?: number;
   prepTimeMax?: number;
@@ -14,6 +15,7 @@ export interface RecipeGenerationParams {
 export function createRecipeGenerationPrompt(params: RecipeGenerationParams): string {
   const {
     ingredients,
+    description,
     dietary_preferences = [],
     servings = 4,
     prepTimeMax,
@@ -49,6 +51,12 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
   }
 
   prompt += `AVAILABLE INGREDIENTS:\n${ingredients.join('\n')}\n\n`;
+
+  // Add user's vision/description if provided
+  if (description && description.trim().length > 0) {
+    prompt += `USER'S VISION:\n${description.trim()}\n\n`;
+    prompt += `Create a recipe that uses the available ingredients and matches the user's vision for the dish.\n\n`;
+  }
 
   prompt += `REQUIREMENTS:\n`;
   prompt += `- Servings: ${servings}\n`;
@@ -102,7 +110,8 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
 }
 
 Important:
-- Use ONLY the ingredients I provided, or common pantry staples (salt, pepper, oil, etc.)
+- Use the available ingredients to create a recipe that ${description ? 'matches the user\'s vision described above' : 'is delicious and practical'}
+- You may use common pantry staples (salt, pepper, oil, etc.) in addition to listed ingredients
 - Include specific quantities and units
 - Provide clear, step-by-step instructions
 - Make it practical and achievable
