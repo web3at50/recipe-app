@@ -18,8 +18,12 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Recipe App",
+  title: "Plate Wise",
   description: "Your personal recipe manager and meal planner",
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export default function RootLayout({
@@ -37,7 +41,7 @@ export default function RootLayout({
             <header className="border-b">
               <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 <Link href="/" className="text-xl font-semibold">
-                  Recipe App
+                  Plate Wise
                 </Link>
                 <nav className="flex items-center gap-2">
                   <ThemeToggle />

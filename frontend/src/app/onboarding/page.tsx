@@ -103,7 +103,7 @@ export default function OnboardingPage() {
               <ChefHat className="h-12 w-12 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Welcome to Recipe App</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome to Plate Wise</h1>
           <p className="text-muted-foreground">
             Let&apos;s personalize your cooking experience
           </p>
