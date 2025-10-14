@@ -2,7 +2,7 @@ export interface Profile {
   id: string
   email: string
   display_name?: string
-  preferred_ai_model?: 'anthropic' | 'openai'
+  preferred_ai_model?: 'anthropic' | 'openai' | 'gemini' | 'grok'
   dietary_preferences?: string[]
   created_at: string
   updated_at: string

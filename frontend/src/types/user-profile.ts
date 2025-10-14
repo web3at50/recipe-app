@@ -12,7 +12,7 @@ export interface UserPreferences {
   budget_per_meal: number | null; // GBP
   typical_cook_time: number; // minutes
   spice_level: 'mild' | 'medium' | 'hot';
-  preferred_ai_model: 'anthropic' | 'openai';
+  preferred_ai_model: 'anthropic' | 'openai' | 'gemini' | 'grok';
 }
 
 // User profile interface (matches database)

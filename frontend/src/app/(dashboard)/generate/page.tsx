@@ -15,7 +15,7 @@ export default function GeneratePage() {
   const router = useRouter();
   const [ingredientsText, setIngredientsText] = useState('');
   const [descriptionText, setDescriptionText] = useState('');
-  const [selectedModel, setSelectedModel] = useState<'openai' | 'claude' | 'gemini'>('openai');
+  const [selectedModel, setSelectedModel] = useState<'openai' | 'claude' | 'gemini' | 'grok'>('openai');
   const [servings, setServings] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
@@ -248,7 +248,7 @@ export default function GeneratePage() {
 
               <div className="space-y-2">
                 <Label>Choose AI Model</Label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   <Button
                     type="button"
                     variant={selectedModel === 'openai' ? 'default' : 'outline'}
@@ -276,9 +276,18 @@ export default function GeneratePage() {
                     Gemini
                     <span className="text-xs ml-1">(2.5 Flash)</span>
                   </Button>
+                  <Button
+                    type="button"
+                    variant={selectedModel === 'grok' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('grok')}
+                    className="w-full"
+                  >
+                    Grok
+                    <span className="text-xs ml-1">(4 Fast)</span>
+                  </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Test different AI models to see which generates the best recipes for you
+                  Test different AI models to see which generates the best recipes. Grok offers excellent reasoning at 67% lower cost.
                 </p>
               </div>
 

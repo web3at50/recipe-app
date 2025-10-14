@@ -150,6 +150,41 @@ export async function POST(request: Request) {
 
       text = result.text || '';
 
+    } else if (model === 'grok') {
+      // XAI Grok 4 Fast Reasoning
+      console.log('Generating recipe with XAI Grok 4 Fast Reasoning...');
+
+      // Verify API key is configured
+      if (!process.env.XAI_API_KEY) {
+        throw new Error('XAI API key not configured');
+      }
+
+      // Use OpenAI SDK with XAI base URL
+      const OpenAI = (await import('openai')).default;
+      const xai = new OpenAI({
+        apiKey: process.env.XAI_API_KEY,
+        baseURL: 'https://api.x.ai/v1',
+      });
+
+      const completion = await xai.chat.completions.create({
+        model: 'grok-4-fast-reasoning',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a professional UK-based chef assistant. Generate recipes in the exact JSON format requested. Use your reasoning capabilities to ensure allergen safety and dietary compliance.'
+          },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
+      });
+
+      text = completion.choices[0]?.message?.content || '';
+
+      if (!text) {
+        throw new Error('Empty response from Grok API');
+      }
+
     } else {
       throw new Error('Invalid model specified');
     }

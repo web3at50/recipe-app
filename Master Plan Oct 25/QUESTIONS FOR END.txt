@@ -1,148 +1,112 @@
-.6to do in recipe app
-
-1: We need this on the home page before auth. Users need to be able to try for free first (within limits). I believe this was in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md   Can you please review?  Can you assign a specialist agent to research and investigate and plan how we could implement this. Including how we allow users to have a good opportunity to use our app for free but not so good that they don't need to ever pay the one off purchase price (whatever that is we agree on). Remember our model is not subscription but instead a one off fee of £9.99 to £14.99 (undecided). This was part of our original plan to be different from others and avoid the subscription fee. How will be deal with natasha law and preferences on free to use pre auth version? What features other than ai recipe generation do we enable on the free pre auth version.  The agent needs to be a specialist research agent   in the field of app development like ours
-
-Natasha law on testing
-
-2: When signed in user_profiles table from onboarding go to the account section
-
-3: Can we add pref for no dairy and keto etc somewhere (later phase
-
-4: GDPR is mentioned in onboarding but d we need a page?
-
-5: Natasha allergy law - page for that to look professional and maybe mention in onboarding again to look pro
-
-New:  In account section or somewhere need settings so user can amend onboarding preference s?
-
-6: Payment - one off how much? How to protect against nailing the AI too much. How to protect if users use forever and new ones stop coming In so paying maintenance forever with no new fees?  Annual subs? Ideas? I do like simplicity of non subscription model certainly monthly. One off fee is good for appeal to users but do I need some protection
-
-7: Make sure we have claude 4.5 sonnet memory game changer apparently. Mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md line 1161
-
-8: AI Gateway so users can try multiple LLM to see which best. Multiple LLM on free version and cost is based on which ones / how many subscribe to
-
-9: IMage in recipes - whats the plan here? How to add ?  AI / customer / remove ? Plan?
-
-10: From week 5 enhancements to add
-
-- [ ] Drag-and-drop to reorder meals between days
-- [ ] Duplicate meal to another day
-
-11: mobile !!!!
-
-12: Make all available without signin and navigate nicely.  Don't know how will work without sign in to save to persona databases etc ?
-
-13: Amend icons - hate sparkle from lucide react - better libraries?
-
-14: App name & logo
-
-15: 
-
-15: What extras from p2 and p3 should we add for easy wins wins
-
-16: WhatsApp shopping list . Email to - email easy probably but WhatsApp if possible better. Or if we make the app mobile friendly they just use the app ! Male a whole mobile version of shopping ist page for mobile so super user friendly
-
-17: generate recipes and shopping ist in pdf to  print
-
-18: Recipes look great on mobile to read and use live in kitchen
-
-18: Investigate and sort pantry list option on shopping list screen
-
-19: Add C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25 to gitignore and then delete from githb
-
-20: Doesn't need to incoude all ingredients
-
-21 Delete
-
-C:\Users\bryn\Documents\recipeapp\update-api-auth.sh
-C:\Users\bryn\Documents\recipeapp\frontend\update-api-routes.ps1
-C:\Users\bryn\Documents\recipeapp\frontend\update-routes.js
 
 
-22: What clerk keys in vercel?
+ - Make mobile friendly as this is where most will use. Some bits are some bits aren't. Should be do this as we go or all at the end ?  Pages but also recipes and meal planners and shopping lists as will all mainly be used on mobile
 
-23: I have added GOOGLE_GEMINI_API_KEY to vercel
+ - Natasha law page and link to from onboarding flow. Need to create page and write content and link to from onboarding flow
 
-24: What does personalized recommendations do on the onboard process? Active yet?
+ - Need to understand where preferences of users are being saved and how can I check are correct.  We started with supabase auth and migrated to Clerk auth so need to make sure all is working.  How can we test?  Should we delete all user information from (its only my test data anyway) and start again so I an gain understanding of whats going where and make sure works?  We also need to add preferences to the users front end account in the auth sde so they can view/edit/delete/amend etc . These are in supabase as I have checked. I just need to know how to get user_if in website to match against supabase user_341353sZs3wpmTkPzxGPb5qiEAd in user_id column in user_profiles table
 
-25: Need to sort google search console and sitemap and bing etc
+- Preferences editable on recipe creation  page and in setting above
+
+ - Need to add additional diet preferences facility into onboarding and  like low carb, keto, no dairy (other ?). Step 2 in onboarding Dietary Preferences. So they get put into ai generation prompts etc too
+
+- Existing logic include pantry items?  Add a togglr for what ingredients are and are not included in logig (prompt)
+
+-  We need Privacy/GDPR page and link to from onboarding (just create holding page for now)
 
 
-20: AI Gateway
+- Pricing plan to be decided
 
-We already usng the AI SDK
+- What plan with the image section in the my recipe page  Was there one? We could maybe use below. See if any good before decide if and how to add
 
-
-https://vercel.com/docs/ai-gateway.md
-https://vercel.com/docs/ai-gateway/getting-started.md
-https://vercel.com/docs/ai-gateway/models-and-providers.md
-https://vercel.com/ai-gateway/models?page=14
-https://vercel.com/docs/ai-gateway/observability.md
-https://vercel.com/docs/ai-gateway/pricing.md
-https://vercel.com/docs/ai-gateway/provider-options.md
-https://vercel.com/docs/ai-gateway/openai-compat.md
-https://vercel.com/docs/ai-gateway/authentication.md
-https://vercel.com/docs/ai-gateway/byok.md
-https://vercel.com/docs/ai-gateway/framework-integrations.md
-https://vercel.com/docs/ai-gateway/app-attribution.md
-https://vercel.com/docs/ai-gateway/image-generation.md  (possibly for recipe image generatrion?)
-https://vercel.com/docs/ai-gateway/model-variants.md
-https://vercel.com/docs/ai/adding-a-provider.md
-https://vercel.com/docs/ai/adding-a-model.md
+Gemini 2.5 Flash Image - mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Multiple AI\Google_Gemini_Analysis.md 
+page - https://ai.google.dev/gemini-api/docs/image-generation
 
 
 
-🚀 Recommended Implementation Order
-Phase 1 (Core - Do Now):
-✅ Fix type mismatches (10 min)
-✅ Create generate API route (60 min)
-✅ Add button to meal planner (15 min)
-✅ Test end-to-end flow (30 min)
-Phase 2 (Polish - After Core Works):
-✅ Enhance shopping list UI (30 min)
-✅ Add "Clear Checked" feature (15 min)
-✅ Add toast notifications (15 min)
-✅ Better empty states (10 min)
-Total Time: ~3 hours
-🎯 This Completes the Core User Journey!
-User Signs Up → Onboarding → Create/Generate Recipes → 
-Plan Meals for Week → Generate Shopping List → 
-Check off Items While Shopping → Cook Planned Meals
-Week 6 is the final piece of the core MVP workflow! 🎉 After this, Phase 2 enhancements can be added based on user feedback.
+- Create 3 recipes at once - one per model - display in a way user can scroll through to see which model they prefer
 
 
-Add option to create shopping list for just some of the meals not just ALL
+- Maybe later enhacements to meal plan
+
+[ ] Drag-and-drop to reorder meals between days
+[ ] Duplicate meal to another day
 
 
-What Remains (15%):
-Pre-auth preview (20-item limit with sessionStorage)
-Signup migration script
-End-to-end testing
-Mobile testing
-Polish & accessibility
+
+- Work on pre auth side - do last I think
+
+- Amend icons - hate sparkle from lucide react - better libraries?
+
+- App logo. Favicon okay but main logo didn't really work so look at again
+
+- Add pdf shift for pdf generation in the recipe page - have already added PDF_SHIFT_API_KEY to local.env and vercel env variables
+
+https://docs.pdfshift.io/#introduction
+
+
+
+- What are user_recipe_interactions table in supabase as only table with 0
+
+
+
+- What extras from p2 and p3 from C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md should we add for easy  wins
+
+- Send shopping list to someone by WhatsApp - if easy and / or cheap. Main thing to do though is make it super user friendly to read on mobile version of our app
+
+
+
+- Add C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25 to gitignore and then delete from githb
+
+- Double check logic in ai recipe generation isn't forcing recipe to include ALL ingredients given by user. Can just use some as the end meal result is most important not using all the selected ingredients
+
+
+- Add grok 4 fast reasoning 
+
+https://docs.x.ai/docs/overview 
+
+C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Ad Hoc 13 Oct 2025\Alternative_LLM_Research.md
+
+
+ - We are using textarea for natural language input in the optional Description field in the ai recipe generation. Could we use something from vercel ai sdk instead as we have it installed already I believe? (give screenshot of docs) . Maybe even something from openAI latest announcements? Isnt textarea quite very basic?
+
+
+- What does personalized recommendations do on the onboard process? Active yet or just as precaution should be add
+
+ - Need to sort google search console and sitemap and bing etc
+
+
+Will be adding this in later phase 
+
+NOTES
+
+1: Memory
+
+Make sure we have claude 4.5 sonnet memory game changer apparently. Mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md line 1161
+
+
+
+2: Add other LLM - Grok is cheap by XAI
+
+
+curl https://api.x.ai/v1/chat/completions \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $XAI_API_KEY" \
+-d '{
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the meaning of life, the universe, and everything?"
+    }
+  ],
+  "model": "grok-4",
+  "stream": false,
+  "temperature": 0.7
+}'
 
 
 
 
-What is modal 
 
-6. Testing & Polish
-What to test:
-✅ Pre-auth user can select pantry items from modal
-✅ Shopping mode hides pantry items correctly
-✅ 20-item limit enforced with helpful toast
-✅ Data persists across page navigation (but not tab close)
-✅ Sign up banner appears and links work
-✅ Mobile responsive on playground pages
-✅ No console errors
-✅ Signup migration transfers pantry preferences
-Time: 1-2 hours
-Total Time Estimate: 6-9 hours
-Implementation Order
-Session storage infrastructure (30 min)
-Simple pantry modal component (1-2 hrs)
-Shopping list integration (2-3 hrs)
-First-time onboarding modal (1 hr)
-Signup migration enhancement (30 min)
-Testing & polish (1-2 hrs)
-Key Decisions for MVP
-✅ Keep it simple - Modal instead of full page for pre-auth ✅ 15 items max in onboarding (vs 45 for auth users) ✅ 20-item limit enforced (prevents sessionStorage bloat) ✅ No search/categories in pre-auth modal (auth has full features) ✅ Prominent signup prompts to encourage conversion Ready to implement? 🚀
+
+
