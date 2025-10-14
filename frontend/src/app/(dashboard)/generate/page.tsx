@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle } from 'lucide-react';
+import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf } from 'lucide-react';
 import type { Recipe } from '@/types/recipe';
 import type { UserPreferences } from '@/types/user-profile';
 import type { IngredientMode } from '@/types';
@@ -47,6 +47,7 @@ export default function GeneratePage() {
   const [skillLevel, setSkillLevel] = useState<string | null>(null);
   const [maxCookTime, setMaxCookTime] = useState<number | null>(null);
   const [spiceLevel, setSpiceLevel] = useState<string | null>(null);
+  const [favouriteCuisine, setFavouriteCuisine] = useState<string | null>(null);
 
   // State for "All 4" feature
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
@@ -125,6 +126,7 @@ export default function GeneratePage() {
         prepTimeMax: maxCookTime || undefined,
         difficulty: skillLevel || undefined,
         spice_level: spiceLevel || undefined,
+        favourite_cuisine: favouriteCuisine && favouriteCuisine !== 'any' ? favouriteCuisine : undefined,
         model: apiModel,
       }),
     });
@@ -327,6 +329,25 @@ export default function GeneratePage() {
                 <p className="font-medium capitalize">{userPreferences.spice_level || 'medium'}</p>
               </div>
             </div>
+            {userPreferences.cuisines_liked && userPreferences.cuisines_liked.length > 0 && (
+              <div className="mt-4">
+                <p className="text-muted-foreground text-sm">Favourite Cuisines</p>
+                <p className="font-medium">{userPreferences.cuisines_liked.join(', ')}</p>
+              </div>
+            )}
+            {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
+              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <Leaf className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-blue-500">Dietary Preferences</p>
+                    <p className="text-muted-foreground capitalize">
+                      {userPreferences.dietary_restrictions.join(', ')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             {userPreferences.allergies && userPreferences.allergies.length > 0 && (
               <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                 <div className="flex items-start gap-2">
@@ -443,7 +464,7 @@ export default function GeneratePage() {
               </div>
 
               {/* Cooking Parameters */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="servings">Servings</Label>
                   <Input
@@ -499,6 +520,29 @@ export default function GeneratePage() {
                       <SelectItem value="mild">Mild</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="hot">Hot</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="favouriteCuisine">Favourite Cuisine</Label>
+                  <Select
+                    value={favouriteCuisine || (userPreferences?.cuisines_liked?.[0] || 'any')}
+                    onValueChange={setFavouriteCuisine}
+                  >
+                    <SelectTrigger id="favouriteCuisine">
+                      <SelectValue placeholder="Select cuisine..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any Cuisine</SelectItem>
+                      <SelectItem value="British">British</SelectItem>
+                      <SelectItem value="Italian">Italian</SelectItem>
+                      <SelectItem value="Indian">Indian</SelectItem>
+                      <SelectItem value="Chinese">Chinese</SelectItem>
+                      <SelectItem value="Mexican">Mexican</SelectItem>
+                      <SelectItem value="Thai">Thai</SelectItem>
+                      <SelectItem value="Japanese">Japanese</SelectItem>
+                      <SelectItem value="French">French</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
