@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Mail, Shield } from 'lucide-react';
 import { PreferencesForm } from '@/components/settings/preferences-form';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import type { UserPreferences } from '@/types/user-profile';
 
 export default async function SettingsPage() {
@@ -62,6 +63,12 @@ export default async function SettingsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto max-w-5xl space-y-8">
+        {/* Breadcrumb */}
+        <Breadcrumb items={[
+          { label: 'Dashboard', href: '/recipes' },
+          { label: 'Settings' }
+        ]} />
+
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Profile & Settings</h1>

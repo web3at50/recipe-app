@@ -1,11 +1,12 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
-import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut } from '@clerk/nextjs'
 import { ThemeProvider } from "@/components/theme-provider"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { UserButtonWithLinks } from "@/components/user-button-with-links"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,7 +47,7 @@ export default function RootLayout({
                 <nav className="flex items-center gap-2">
                   <ThemeToggle />
                   <SignedIn>
-                    <UserButton afterSignOutUrl="/" />
+                    <UserButtonWithLinks />
                   </SignedIn>
                   <SignedOut>
                     <SignInButton mode="modal">
