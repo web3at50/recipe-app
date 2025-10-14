@@ -22,6 +22,9 @@ export interface Nutrition {
   fat?: number; // grams
 }
 
+// AI Model type for recipe generation
+export type AIModel = 'model_1' | 'model_2' | 'model_3' | 'model_4';
+
 // Main Recipe interface (matches database schema)
 export interface Recipe {
   id: string;
@@ -32,6 +35,7 @@ export interface Recipe {
   description: string | null;
   cuisine: string | null;
   source: 'ai_generated' | 'user_created' | 'imported';
+  ai_model: AIModel | null; // Which AI model generated this recipe
 
   // Timing
   prep_time: number | null; // minutes

@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     }));
 
     // Create recipe (everything in one insert!)
-    const { data: recipe, error: recipeError } = await supabase
+    const { data: recipe, error: recipeError} = await supabase
       .from('recipes')
       .insert({
         user_id: userId,
@@ -101,7 +101,8 @@ export async function POST(request: Request) {
         cook_time: body.cook_time || null,
         servings: body.servings,
         difficulty: body.difficulty || null,
-        source: 'user_created', // Changed from 'manual'
+        source: (body as any).source || 'user_created', // Accept source from body or default
+        ai_model: (body as any).ai_model || null, // Store AI model if provided
         ingredients: body.ingredients, // JSONB array
         instructions: instructions, // JSONB array
         tags: body.tags || [], // Simple array

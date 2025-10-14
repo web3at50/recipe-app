@@ -2,26 +2,65 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChefHat, Loader2, AlertTriangle, Info } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle } from 'lucide-react';
 import type { Recipe } from '@/types/recipe';
 import type { UserPreferences } from '@/types/user-profile';
+import type { IngredientMode } from '@/types';
+
+// Helper function to map model numbers to API model keys
+const getAPIModelKey = (model: 'model_1' | 'model_2' | 'model_3' | 'model_4'): 'openai' | 'claude' | 'gemini' | 'grok' => {
+  const mapping = {
+    model_1: 'openai',
+    model_2: 'claude',
+    model_3: 'gemini',
+    model_4: 'grok',
+  } as const;
+  return mapping[model];
+};
 
 export default function GeneratePage() {
   const router = useRouter();
   const [ingredientsText, setIngredientsText] = useState('');
   const [descriptionText, setDescriptionText] = useState('');
-  const [selectedModel, setSelectedModel] = useState<'openai' | 'claude' | 'gemini' | 'grok'>('openai');
+  const [selectedModel, setSelectedModel] = useState<'model_1' | 'model_2' | 'model_3' | 'model_4' | 'all'>('model_1');
   const [servings, setServings] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
   const [allergenWarnings, setAllergenWarnings] = useState<string[]>([]);
   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
   const [isLoadingPreferences, setIsLoadingPreferences] = useState(true);
+
+  // New state for enhanced features
+  const [ingredientMode, setIngredientMode] = useState<IngredientMode>('flexible');
+  const [pantryStaples, setPantryStaples] = useState<string[]>([]);
+  const [skillLevel, setSkillLevel] = useState<string | null>(null);
+  const [maxCookTime, setMaxCookTime] = useState<number | null>(null);
+  const [spiceLevel, setSpiceLevel] = useState<string | null>(null);
+
+  // State for "All 4" feature
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [generatedRecipes, setGeneratedRecipes] = useState<{
+    model_1: Recipe | null;
+    model_2: Recipe | null;
+    model_3: Recipe | null;
+    model_4: Recipe | null;
+  }>({ model_1: null, model_2: null, model_3: null, model_4: null });
+  const [generationProgress, setGenerationProgress] = useState<{
+    current: number;
+    total: number;
+    currentModel: string;
+  } | null>(null);
 
   // Fetch user preferences on mount
   useEffect(() => {
@@ -48,79 +87,156 @@ export default function GeneratePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Fetch pantry staples on mount
+  useEffect(() => {
+    const fetchPantryStaples = async () => {
+      try {
+        const response = await fetch('/api/user/pantry-staples');
+        if (response.ok) {
+          const data = await response.json();
+          const items = data.staples?.map((s: { item_pattern: string }) => s.item_pattern) || [];
+          setPantryStaples(items);
+        }
+      } catch (error) {
+        console.error('Failed to fetch pantry staples:', error);
+      }
+    };
+
+    fetchPantryStaples();
+  }, []);
+
+  // Generate recipe with a single model
+  const generateSingleRecipe = async (model: 'model_1' | 'model_2' | 'model_3' | 'model_4') => {
+    const ingredients = ingredientsText
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    const apiModel = getAPIModelKey(model);
+
+    const response = await fetch('/api/ai/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ingredients,
+        description: descriptionText.trim() || undefined,
+        ingredient_mode: ingredientMode,
+        servings: servings || 4,
+        prepTimeMax: maxCookTime || undefined,
+        difficulty: skillLevel || undefined,
+        spice_level: spiceLevel || undefined,
+        model: apiModel,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      if (error.error === 'Safety Warning' && error.conflicts) {
+        throw new Error(`⚠️ ALLERGEN WARNING:\n\n${error.message}\n\nPlease remove these ingredients and try again.`);
+      }
+      throw new Error(error.error || 'Failed to generate recipe');
+    }
+
+    const data = await response.json();
+    return {
+      recipe: { ...data.recipe, ai_model: model },
+      allergen_warnings: data.allergen_warnings || [],
+    };
+  };
+
   const handleGenerate = async () => {
     if (!ingredientsText.trim()) {
       alert('Please enter at least one ingredient');
       return;
     }
 
-    setIsGenerating(true);
-    setGeneratedRecipe(null);
-    setAllergenWarnings([]);
+    // Check if generating all 4 models
+    if (selectedModel === 'all') {
+      setIsGeneratingAll(true);
+      setGeneratedRecipes({ model_1: null, model_2: null, model_3: null, model_4: null });
+      setGenerationProgress({ current: 0, total: 4, currentModel: 'Model 1' });
 
-    try {
-      const ingredients = ingredientsText
-        .split('\n')
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0);
+      const models: Array<'model_1' | 'model_2' | 'model_3' | 'model_4'> = ['model_1', 'model_2', 'model_3', 'model_4'];
+      const results: typeof generatedRecipes = { model_1: null, model_2: null, model_3: null, model_4: null };
 
-      const response = await fetch('/api/ai/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ingredients,
-          description: descriptionText.trim() || undefined,
-          servings: servings || 4,
-          model: selectedModel,
-        }),
-      });
+      try {
+        for (let i = 0; i < models.length; i++) {
+          const model = models[i];
+          const modelNum = i + 1;
 
-      if (!response.ok) {
-        const error = await response.json();
-        // Display allergen conflicts prominently
-        if (error.error === 'Safety Warning' && error.conflicts) {
-          alert(`⚠️ ALLERGEN WARNING:\n\n${error.message}\n\nPlease remove these ingredients and try again.`);
-          setIsGenerating(false);
-          return;
+          setGenerationProgress({
+            current: i,
+            total: 4,
+            currentModel: `Model ${modelNum}`,
+          });
+
+          try {
+            const startTime = Date.now();
+            const { recipe } = await generateSingleRecipe(model);
+            const duration = ((Date.now() - startTime) / 1000).toFixed(0);
+
+            results[model] = recipe;
+            setGeneratedRecipes({ ...results });
+
+            console.log(`Model ${modelNum} completed in ${duration}s`);
+          } catch (error) {
+            console.error(`Error generating with ${model}:`, error);
+            // Continue with other models even if one fails
+          }
         }
-        throw new Error(error.error || 'Failed to generate recipe');
-      }
 
-      const data = await response.json();
-      setGeneratedRecipe(data.recipe);
-
-      // Display post-generation allergen warnings if any
-      if (data.allergen_warnings && data.allergen_warnings.length > 0) {
-        setAllergenWarnings(data.allergen_warnings);
+        setGenerationProgress({ current: 4, total: 4, currentModel: 'Complete!' });
+      } catch (error) {
+        console.error('Error in multi-model generation:', error);
+        alert(error instanceof Error ? error.message : 'Failed to generate recipes');
+      } finally {
+        setIsGeneratingAll(false);
+        setTimeout(() => setGenerationProgress(null), 2000);
       }
-    } catch (error) {
-      console.error('Error generating recipe:', error);
-      alert(error instanceof Error ? error.message : 'Failed to generate recipe');
-    } finally {
-      setIsGenerating(false);
+    } else {
+      // Single model generation
+      setIsGenerating(true);
+      setGeneratedRecipe(null);
+      setAllergenWarnings([]);
+
+      try {
+        const { recipe, allergen_warnings } = await generateSingleRecipe(selectedModel as 'model_1' | 'model_2' | 'model_3' | 'model_4');
+        setGeneratedRecipe(recipe);
+        setAllergenWarnings(allergen_warnings);
+      } catch (error) {
+        console.error('Error generating recipe:', error);
+        alert(error instanceof Error ? error.message : 'Failed to generate recipe');
+      } finally {
+        setIsGenerating(false);
+      }
     }
   };
 
-  const handleSaveRecipe = async () => {
-    if (!generatedRecipe) return;
+  const handleSaveRecipe = async (recipe: Recipe, modelOverride?: 'model_1' | 'model_2' | 'model_3' | 'model_4') => {
+    if (!recipe) return;
+
+    const aiModel = modelOverride || recipe.ai_model;
+    const modelLabel = aiModel ? ` (${aiModel.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())})` : '';
 
     try {
       const response = await fetch('/api/recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: generatedRecipe.name,
-          description: generatedRecipe.description,
-          prep_time: generatedRecipe.prep_time,
-          cook_time: generatedRecipe.cook_time,
-          servings: generatedRecipe.servings,
-          ingredients: generatedRecipe.ingredients.map((ing) => ({
+          name: `${recipe.name}${modelLabel}`,
+          description: recipe.description,
+          prep_time: recipe.prep_time,
+          cook_time: recipe.cook_time,
+          servings: recipe.servings,
+          ai_model: aiModel,
+          source: 'ai_generated',
+          ingredients: recipe.ingredients.map((ing) => ({
             item: ing.item,
             quantity: ing.quantity,
             unit: ing.unit,
             notes: ing.notes,
           })),
-          instructions: generatedRecipe.instructions.map((inst) => ({
+          instructions: recipe.instructions.map((inst) => ({
             instruction: inst.instruction,
           })),
         }),
@@ -130,11 +246,44 @@ export default function GeneratePage() {
         throw new Error('Failed to save recipe');
       }
 
-      const { recipe } = await response.json();
-      router.push(`/recipes/${recipe.id}`);
+      const { recipe: savedRecipe } = await response.json();
+      return savedRecipe;
     } catch (error) {
       console.error('Error saving recipe:', error);
+      throw error;
+    }
+  };
+
+  const handleSaveSingleRecipe = async () => {
+    if (!generatedRecipe) return;
+
+    try {
+      const savedRecipe = await handleSaveRecipe(generatedRecipe);
+      router.push(`/recipes/${savedRecipe.id}`);
+    } catch (error) {
       alert('Failed to save recipe');
+    }
+  };
+
+  const handleSaveAllRecipes = async () => {
+    const recipesToSave = Object.entries(generatedRecipes).filter(([_, recipe]) => recipe !== null);
+
+    if (recipesToSave.length === 0) {
+      alert('No recipes to save');
+      return;
+    }
+
+    try {
+      const savePromises = recipesToSave.map(([model, recipe]) =>
+        handleSaveRecipe(recipe as Recipe, model as 'model_1' | 'model_2' | 'model_3' | 'model_4')
+      );
+
+      await Promise.all(savePromises);
+      alert(`Successfully saved ${recipesToSave.length} recipes to your collection!`);
+      router.push('/recipes');
+    } catch (error) {
+      console.error('Error saving recipes:', error);
+      alert('Failed to save some recipes');
     }
   };
 
@@ -198,6 +347,35 @@ export default function GeneratePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input Section */}
         <div className="space-y-6">
+          {/* Pantry Staples Display */}
+          {pantryStaples.length > 0 && (
+            <Card className="bg-secondary/10 border-secondary/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-5 w-5 text-secondary-foreground" />
+                    <CardTitle className="text-base">Your Pantry Staples</CardTitle>
+                  </div>
+                  <Button variant="link" size="sm" asChild className="h-auto p-0">
+                    <Link href="/settings/pantry-staples">Edit Pantry →</Link>
+                  </Button>
+                </div>
+                <CardDescription>
+                  Items you have at home (used in recipe generation)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {pantryStaples.map((item, index) => (
+                    <Badge key={index} variant="secondary" className="capitalize">
+                      {item}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>Ingredients</CardTitle>
@@ -234,60 +412,144 @@ export default function GeneratePage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="servings">Number of Servings</Label>
-                <Input
-                  id="servings"
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={servings || 4}
-                  onChange={(e) => setServings(parseInt(e.target.value))}
-                />
+              {/* Ingredient Mode Toggle */}
+              <div className="space-y-3 p-4 bg-muted rounded-lg border-2 border-muted">
+                <Label className="text-base font-semibold">Ingredient Mode</Label>
+                <RadioGroup value={ingredientMode} onValueChange={(v) => setIngredientMode(v as IngredientMode)}>
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <RadioGroupItem value="strict" id="strict" className="mt-1" />
+                      <Label htmlFor="strict" className="font-normal cursor-pointer flex-1">
+                        <div className="font-medium">🔒 No Shop</div>
+                        <div className="text-xs text-muted-foreground">Use only what I have</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <RadioGroupItem value="flexible" id="flexible" className="mt-1" />
+                      <Label htmlFor="flexible" className="font-normal cursor-pointer flex-1">
+                        <div className="font-medium">🧑‍🍳 Flexible (Default)</div>
+                        <div className="text-xs text-muted-foreground">Use what I have + pantry basics</div>
+                      </Label>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <RadioGroupItem value="creative" id="creative" className="mt-1" />
+                      <Label htmlFor="creative" className="font-normal cursor-pointer flex-1">
+                        <div className="font-medium">✨ Creative</div>
+                        <div className="text-xs text-muted-foreground">Inspire me with new ingredients</div>
+                      </Label>
+                    </div>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {/* Cooking Parameters */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="servings">Servings</Label>
+                  <Input
+                    id="servings"
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={servings || userPreferences?.household_size || 4}
+                    onChange={(e) => setServings(parseInt(e.target.value))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="maxTime">Max Time (mins)</Label>
+                  <Input
+                    id="maxTime"
+                    type="number"
+                    min="10"
+                    max="180"
+                    step="5"
+                    value={maxCookTime || userPreferences?.typical_cook_time || 30}
+                    onChange={(e) => setMaxCookTime(parseInt(e.target.value))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="skillLevel">Skill Level</Label>
+                  <Select
+                    value={skillLevel || userPreferences?.cooking_skill || 'intermediate'}
+                    onValueChange={setSkillLevel}
+                  >
+                    <SelectTrigger id="skillLevel">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="spiceLevel">Spice Level</Label>
+                  <Select
+                    value={spiceLevel || userPreferences?.spice_level || 'medium'}
+                    onValueChange={setSpiceLevel}
+                  >
+                    <SelectTrigger id="spiceLevel">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mild">Mild</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hot">Hot</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label>Choose AI Model</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   <Button
                     type="button"
-                    variant={selectedModel === 'openai' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('openai')}
+                    variant={selectedModel === 'model_1' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('model_1')}
                     className="w-full"
                   >
-                    OpenAI
-                    <span className="text-xs ml-1">(GPT-4.1)</span>
+                    Model 1
                   </Button>
                   <Button
                     type="button"
-                    variant={selectedModel === 'claude' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('claude')}
+                    variant={selectedModel === 'model_2' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('model_2')}
                     className="w-full"
                   >
-                    Claude
-                    <span className="text-xs ml-1">(Sonnet 4.5)</span>
+                    Model 2
                   </Button>
                   <Button
                     type="button"
-                    variant={selectedModel === 'gemini' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('gemini')}
+                    variant={selectedModel === 'model_3' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('model_3')}
                     className="w-full"
                   >
-                    Gemini
-                    <span className="text-xs ml-1">(2.5 Flash)</span>
+                    Model 3
                   </Button>
                   <Button
                     type="button"
-                    variant={selectedModel === 'grok' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('grok')}
+                    variant={selectedModel === 'model_4' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('model_4')}
                     className="w-full"
                   >
-                    Grok
-                    <span className="text-xs ml-1">(4 Fast)</span>
+                    Model 4
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={selectedModel === 'all' ? 'default' : 'outline'}
+                    onClick={() => setSelectedModel('all')}
+                    className="w-full md:col-span-1 col-span-2"
+                  >
+                    All 4 Models
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Test different AI models to see which generates the best recipes. Grok offers excellent reasoning at 67% lower cost.
+                  Test different AI models to compare recipe quality. "All 4 Models" generates recipes from all models at once.
                 </p>
               </div>
 
@@ -295,17 +557,17 @@ export default function GeneratePage() {
                 className="w-full"
                 size="lg"
                 onClick={handleGenerate}
-                disabled={isGenerating || !ingredientsText.trim()}
+                disabled={isGenerating || isGeneratingAll || !ingredientsText.trim()}
               >
-                {isGenerating ? (
+                {(isGenerating || isGeneratingAll) ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Generating with {selectedModel.charAt(0).toUpperCase() + selectedModel.slice(1)}...
+                    {isGeneratingAll ? 'Generating All Models...' : `Generating with ${selectedModel.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}...`}
                   </>
                 ) : (
                   <>
                     <ChefHat className="h-5 w-5 mr-2" />
-                    Generate Recipe with {selectedModel.charAt(0).toUpperCase() + selectedModel.slice(1)}
+                    {selectedModel === 'all' ? 'Generate with All 4 Models' : `Generate Recipe with ${selectedModel.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`}
                   </>
                 )}
               </Button>
@@ -315,7 +577,42 @@ export default function GeneratePage() {
 
         {/* Output Section */}
         <div>
-          {generatedRecipe ? (
+          {/* Progress Indicator for "All 4" */}
+          {generationProgress && (
+            <Card className="mb-4 bg-primary/5 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">Generating recipes...</span>
+                    <span className="text-muted-foreground">{generationProgress.current}/{generationProgress.total}</span>
+                  </div>
+                  <Progress value={(generationProgress.current / generationProgress.total) * 100} className="h-2" />
+                  <div className="space-y-2 text-sm">
+                    {['Model 1', 'Model 2', 'Model 3', 'Model 4'].map((modelName, index) => {
+                      const modelNum = index + 1;
+                      const isComplete = generationProgress.current > index;
+                      const isCurrent = generationProgress.current === index;
+                      const isWaiting = generationProgress.current < index;
+
+                      return (
+                        <div key={modelName} className="flex items-center gap-2">
+                          {isComplete && <CheckCircle className="h-4 w-4 text-green-500" />}
+                          {isCurrent && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+                          {isWaiting && <Circle className="h-4 w-4 text-muted-foreground" />}
+                          <span className={isComplete ? 'text-green-500' : isCurrent ? 'text-primary font-medium' : 'text-muted-foreground'}>
+                            {modelName} {isComplete ? 'complete' : isCurrent ? 'generating...' : 'waiting'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Single Recipe View */}
+          {generatedRecipe && !isGeneratingAll && (
             <Card>
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -332,7 +629,6 @@ export default function GeneratePage() {
                   <span>Servings: {generatedRecipe.servings}</span>
                 </div>
 
-                {/* Allergen Warnings */}
                 {allergenWarnings.length > 0 && (
                   <div className="mt-4 p-4 bg-red-500/10 border-2 border-red-500/50 rounded-lg">
                     <div className="flex items-start gap-3">
@@ -341,9 +637,7 @@ export default function GeneratePage() {
                         <p className="font-semibold text-red-500 mb-2">⚠️ ALLERGEN WARNING</p>
                         <ul className="space-y-1 text-sm">
                           {allergenWarnings.map((warning, index) => (
-                            <li key={index} className="text-red-500">
-                              {warning}
-                            </li>
+                            <li key={index} className="text-red-500">{warning}</li>
                           ))}
                         </ul>
                         <p className="text-sm text-muted-foreground mt-2">
@@ -355,7 +649,6 @@ export default function GeneratePage() {
                 )}
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Ingredients */}
                 <div>
                   <h3 className="font-semibold mb-3">Ingredients</h3>
                   <ul className="space-y-1">
@@ -368,7 +661,6 @@ export default function GeneratePage() {
                   </ul>
                 </div>
 
-                {/* Instructions */}
                 <div>
                   <h3 className="font-semibold mb-3">Instructions</h3>
                   <ol className="space-y-3">
@@ -383,21 +675,107 @@ export default function GeneratePage() {
                   </ol>
                 </div>
 
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handleSaveRecipe}
-                >
+                <Button className="w-full" size="lg" onClick={handleSaveSingleRecipe}>
                   Save Recipe to Collection
                 </Button>
               </CardContent>
             </Card>
-          ) : (
+          )}
+
+          {/* Multiple Recipes View (Tabs) */}
+          {Object.values(generatedRecipes).some(r => r !== null) && !generatedRecipe && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Generated Recipes (4 Models)</CardTitle>
+                <CardDescription>
+                  Compare recipes from different AI models
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="model_1" className="w-full">
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="model_1">Model 1</TabsTrigger>
+                    <TabsTrigger value="model_2">Model 2</TabsTrigger>
+                    <TabsTrigger value="model_3">Model 3</TabsTrigger>
+                    <TabsTrigger value="model_4">Model 4</TabsTrigger>
+                  </TabsList>
+
+                  {(['model_1', 'model_2', 'model_3', 'model_4'] as const).map((modelKey) => {
+                    const recipe = generatedRecipes[modelKey];
+                    return (
+                      <TabsContent key={modelKey} value={modelKey} className="space-y-4 mt-4">
+                        {recipe ? (
+                          <>
+                            <div>
+                              <h3 className="text-lg font-semibold">{recipe.name}</h3>
+                              <p className="text-sm text-muted-foreground mt-1">{recipe.description}</p>
+                              <div className="flex gap-4 text-sm text-muted-foreground mt-2">
+                                <span>Prep: {recipe.prep_time}m</span>
+                                <span>Cook: {recipe.cook_time}m</span>
+                                <span>Servings: {recipe.servings}</span>
+                              </div>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-2">Ingredients</h4>
+                              <ul className="space-y-1">
+                                {recipe.ingredients.map((ing, index) => (
+                                  <li key={index} className="text-sm">
+                                    • {ing.quantity} {ing.unit} {ing.item}
+                                    {ing.notes && ` (${ing.notes})`}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-2">Instructions</h4>
+                              <ol className="space-y-2">
+                                {recipe.instructions.map((inst, index) => (
+                                  <li key={index} className="flex gap-2 text-sm">
+                                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
+                                      {inst.step || index + 1}
+                                    </span>
+                                    <p className="flex-1">{inst.instruction}</p>
+                                  </li>
+                                ))}
+                              </ol>
+                            </div>
+
+                            <Button
+                              className="w-full"
+                              variant="outline"
+                              onClick={() => handleSaveRecipe(recipe, modelKey)}
+                            >
+                              Save This Recipe
+                            </Button>
+                          </>
+                        ) : (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <p>No recipe generated for this model</p>
+                          </div>
+                        )}
+                      </TabsContent>
+                    );
+                  })}
+                </Tabs>
+
+                <div className="mt-4 pt-4 border-t">
+                  <Button className="w-full" size="lg" onClick={handleSaveAllRecipes}>
+                    Save All {Object.values(generatedRecipes).filter(r => r !== null).length} Recipes
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Empty State */}
+          {!generatedRecipe && !Object.values(generatedRecipes).some(r => r !== null) && !generationProgress && (
             <Card className="border-dashed">
               <CardContent className="flex flex-col items-center justify-center py-16 text-center">
                 <ChefHat className="h-16 w-16 text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  {isGenerating
+                  {(isGenerating || isGeneratingAll)
                     ? 'AI is cooking up something delicious...'
                     : 'Your generated recipe will appear here'}
                 </p>

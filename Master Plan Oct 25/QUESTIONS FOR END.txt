@@ -45,16 +45,18 @@ page - https://ai.google.dev/gemini-api/docs/image-generation
 https://docs.pdfshift.io/#introduction
 
 
+- Security review - is AI having direct access to use info? If so which and how 
+
 
 - What are user_recipe_interactions table in supabase as only table with 0
 
-
+- Write doc with current recipe generation logic
 
 - What extras from p2 and p3 from C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md should we add for easy  wins
 
 - Send shopping list to someone by WhatsApp - if easy and / or cheap. Main thing to do though is make it super user friendly to read on mobile version of our app
 
-
+- Add user prefernces to account section. Currently saved in supabase but account section powered by Clerk.  Say now on Pro account. Clerk docs for features
 
 - Add C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25 to gitignore and then delete from githb
 

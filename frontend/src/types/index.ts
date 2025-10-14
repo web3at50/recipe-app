@@ -8,6 +8,9 @@ export interface Profile {
   updated_at: string
 }
 
+// Ingredient mode for AI recipe generation
+export type IngredientMode = 'strict' | 'flexible' | 'creative';
+
 // Re-export all recipe app types
 export * from './recipe';
 export * from './user-profile';

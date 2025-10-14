@@ -1,25 +1,32 @@
+export type IngredientMode = 'strict' | 'flexible' | 'creative';
+
 export interface RecipeGenerationParams {
   ingredients: string[];
+  pantryStaples?: string[]; // User's selected pantry items
+  ingredientMode?: IngredientMode; // How strictly to use available ingredients
   description?: string; // Optional natural language description of desired dish
   dietary_preferences?: string[];
   servings?: number;
   prepTimeMax?: number;
   difficulty?: 'easy' | 'medium' | 'hard' | 'beginner' | 'intermediate' | 'advanced';
+  spiceLevel?: 'mild' | 'medium' | 'hot'; // Elevated from nested object
   userPreferences?: {
     allergies?: string[];
     cuisines_liked?: string[];
-    spice_level?: 'mild' | 'medium' | 'hot';
   };
 }
 
 export function createRecipeGenerationPrompt(params: RecipeGenerationParams): string {
   const {
     ingredients,
+    pantryStaples,
+    ingredientMode = 'flexible',
     description,
     dietary_preferences = [],
     servings = 4,
     prepTimeMax,
     difficulty,
+    spiceLevel,
     userPreferences,
   } = params;
 
@@ -38,19 +45,32 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
       prompt += `- Preferred cuisines: ${userPreferences.cuisines_liked.join(', ')}\n`;
     }
 
-    if (userPreferences.spice_level) {
-      const spiceGuidance = {
-        mild: 'Keep spices gentle - suitable for those who prefer less heat',
-        medium: 'Moderate spice level - balanced heat',
-        hot: 'Make it spicy - this cook enjoys bold, hot flavors'
-      };
-      prompt += `- Spice preference: ${spiceGuidance[userPreferences.spice_level]}\n`;
-    }
-
     prompt += `\n`;
   }
 
+  // Pantry staples section
+  if (pantryStaples && pantryStaples.length > 0) {
+    prompt += `PANTRY STAPLES AVAILABLE:\n${pantryStaples.join(', ')}\n\n`;
+  }
+
   prompt += `AVAILABLE INGREDIENTS:\n${ingredients.join('\n')}\n\n`;
+
+  // Ingredient mode instructions
+  if (ingredientMode === 'strict') {
+    prompt += `⚠️ IMPORTANT - INGREDIENT CONSTRAINT:\n`;
+    prompt += `You MUST only use ingredients from the available ingredients and pantry staples listed above. `;
+    prompt += `Do not add any additional ingredients under any circumstances. `;
+    prompt += `The cook does not want to go shopping and only wants to use what they have at home.\n\n`;
+  } else if (ingredientMode === 'flexible') {
+    prompt += `INGREDIENT GUIDANCE:\n`;
+    prompt += `Primarily use the available ingredients and pantry staples listed above. `;
+    prompt += `You may add common UK pantry basics (salt, pepper, oil, butter, stock cubes) if needed, but keep additions minimal.\n\n`;
+  } else if (ingredientMode === 'creative') {
+    prompt += `CREATIVE MODE:\n`;
+    prompt += `Use the available ingredients as inspiration. Feel free to suggest additional complementary ingredients that would elevate this dish. `;
+    prompt += `Be creative and don't be afraid to recommend 2-3 special ingredients that would make this recipe exceptional. `;
+    prompt += `The cook is happy to go shopping for quality ingredients.\n\n`;
+  }
 
   // Add user's vision/description if provided
   if (description && description.trim().length > 0) {
@@ -79,6 +99,15 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
       'hard': 'Advanced - complex techniques, experienced cook'
     };
     prompt += `- Difficulty: ${difficultyMap[difficulty as keyof typeof difficultyMap] || difficulty}\n`;
+  }
+
+  if (spiceLevel) {
+    const spiceGuidance = {
+      mild: 'Mild - Keep spices gentle, suitable for those who prefer less heat',
+      medium: 'Medium - Moderate spice level with balanced heat',
+      hot: 'Hot - Make it spicy with bold, hot flavors'
+    };
+    prompt += `- Spice Level: ${spiceGuidance[spiceLevel]}\n`;
   }
 
   prompt += `- Use UK measurements and terminology\n`;

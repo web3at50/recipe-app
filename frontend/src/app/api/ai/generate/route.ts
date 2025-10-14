@@ -29,7 +29,17 @@ export async function POST(request: Request) {
       // Playground user - use preferences from request body
       userPreferences = body.preferences || {};
     }
-    const { ingredients, description, dietary_preferences, servings, prepTimeMax, difficulty, model = 'openai' } = body;
+    const {
+      ingredients,
+      description,
+      ingredient_mode = 'flexible',
+      dietary_preferences,
+      servings,
+      prepTimeMax,
+      difficulty,
+      spice_level,
+      model = 'openai'
+    } = body;
 
     // Validate inputs
     if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
@@ -60,6 +70,18 @@ export async function POST(request: Request) {
       }
     }
 
+    // Fetch user's pantry staples (authenticated users only)
+    let pantryStaples: string[] = [];
+    if (userId) {
+      const supabase = await createClient();
+      const { data: pantryData } = await supabase
+        .from('user_pantry_staples')
+        .select('item_pattern')
+        .eq('user_id', userId);
+
+      pantryStaples = pantryData?.map((item) => item.item_pattern) || [];
+    }
+
     // Merge user dietary preferences with request preferences
     const mergedDietaryPrefs = [
       ...(userPreferences.dietary_restrictions || []),
@@ -70,19 +92,22 @@ export async function POST(request: Request) {
     const finalServings = servings || userPreferences.household_size || 2;
     const finalPrepTimeMax = prepTimeMax || userPreferences.typical_cook_time || 30;
     const finalDifficulty = difficulty || userPreferences.cooking_skill || 'intermediate';
+    const finalSpiceLevel = spice_level || userPreferences.spice_level || 'medium';
 
     // Generate recipe prompt with user context
     const prompt = createRecipeGenerationPrompt({
       ingredients,
+      pantryStaples,
+      ingredientMode: ingredient_mode as 'strict' | 'flexible' | 'creative',
       description,
       dietary_preferences: mergedDietaryPrefs,
       servings: finalServings,
       prepTimeMax: finalPrepTimeMax,
       difficulty: finalDifficulty,
+      spiceLevel: finalSpiceLevel,
       userPreferences: {
         allergies: userAllergens,
         cuisines_liked: userPreferences.cuisines_liked || [],
-        spice_level: userPreferences.spice_level || 'medium',
       },
     });
 
