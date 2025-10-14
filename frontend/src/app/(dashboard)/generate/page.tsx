@@ -260,13 +260,13 @@ export default function GeneratePage() {
     try {
       const savedRecipe = await handleSaveRecipe(generatedRecipe);
       router.push(`/recipes/${savedRecipe.id}`);
-    } catch (error) {
+    } catch {
       alert('Failed to save recipe');
     }
   };
 
   const handleSaveAllRecipes = async () => {
-    const recipesToSave = Object.entries(generatedRecipes).filter(([_, recipe]) => recipe !== null);
+    const recipesToSave = Object.entries(generatedRecipes).filter(([, recipe]) => recipe !== null);
 
     if (recipesToSave.length === 0) {
       alert('No recipes to save');
@@ -549,7 +549,7 @@ export default function GeneratePage() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Test different AI models to compare recipe quality. "All 4 Models" generates recipes from all models at once.
+                  Test different AI models to compare recipe quality. &quot;All 4 Models&quot; generates recipes from all models at once.
                 </p>
               </div>
 
@@ -589,7 +589,6 @@ export default function GeneratePage() {
                   <Progress value={(generationProgress.current / generationProgress.total) * 100} className="h-2" />
                   <div className="space-y-2 text-sm">
                     {['Model 1', 'Model 2', 'Model 3', 'Model 4'].map((modelName, index) => {
-                      const modelNum = index + 1;
                       const isComplete = generationProgress.current > index;
                       const isCurrent = generationProgress.current === index;
                       const isWaiting = generationProgress.current < index;

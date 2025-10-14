@@ -101,8 +101,8 @@ export async function POST(request: Request) {
         cook_time: body.cook_time || null,
         servings: body.servings,
         difficulty: body.difficulty || null,
-        source: (body as any).source || 'user_created', // Accept source from body or default
-        ai_model: (body as any).ai_model || null, // Store AI model if provided
+        source: (body as { source?: string }).source || 'user_created', // Accept source from body or default
+        ai_model: (body as { ai_model?: string }).ai_model || null, // Store AI model if provided
         ingredients: body.ingredients, // JSONB array
         instructions: instructions, // JSONB array
         tags: body.tags || [], // Simple array
