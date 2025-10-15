@@ -35,7 +35,8 @@
       "Bash(done)",
       "Bash(cat:*)",
       "Bash(git restore:*)",
-      "Bash(Remove-Item \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\components\\pantry\\pantry-modal-playground.tsx\" -Force)"
+      "Bash(Remove-Item \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\components\\pantry\\pantry-modal-playground.tsx\" -Force)",
+      "Bash(git diff:*)"
     ],
     "deny": [],
     "ask": []

@@ -228,7 +228,7 @@ export default function MealPlannerPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 space-y-4">
         <div>
           <h1 className="text-3xl font-bold">Meal Planner</h1>
           <p className="text-muted-foreground mt-1">
@@ -236,21 +236,25 @@ export default function MealPlannerPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={handlePreviousWeek}>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-wrap">
+          <Button variant="outline" onClick={handlePreviousWeek} className="sm:w-auto">
             <ChevronLeft className="h-4 w-4 mr-2" />
-            Previous Week
+            <span className="hidden xs:inline">Previous Week</span>
+            <span className="xs:hidden">Prev</span>
           </Button>
-          <Button variant="default" onClick={handleTodayClick}>
+          <Button variant="default" onClick={handleTodayClick} className="sm:w-auto">
             <Calendar className="h-4 w-4 mr-2" />
             Today
           </Button>
-          <span className="text-sm font-medium">
-            {currentWeekStart.toLocaleDateString()} -{' '}
-            {getWeekEnd(currentWeekStart).toLocaleDateString()}
-          </span>
-          <Button variant="outline" onClick={handleNextWeek}>
-            Next Week
+          <div className="flex items-center justify-center px-3 py-2 text-sm font-medium bg-muted rounded-md min-w-0">
+            <span className="truncate">
+              {currentWeekStart.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} -{' '}
+              {getWeekEnd(currentWeekStart).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </span>
+          </div>
+          <Button variant="outline" onClick={handleNextWeek} className="sm:w-auto">
+            <span className="hidden xs:inline">Next Week</span>
+            <span className="xs:hidden">Next</span>
             <ChevronRight className="h-4 w-4 ml-2" />
           </Button>
         </div>

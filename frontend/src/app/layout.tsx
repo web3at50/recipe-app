@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ThemeToggle"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { UserButtonWithLinks } from "@/components/user-button-with-links"
+import { MobileNavWrapper } from "@/components/navigation/mobile-nav-wrapper"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,16 +35,21 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning className="h-full">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased h-full flex flex-col`}
         >
           <ThemeProvider>
-            <header className="border-b">
+            <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
               <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                <Link href="/" className="text-xl font-semibold">
-                  Plate Wise
-                </Link>
+                <div className="flex items-center gap-3">
+                  <SignedIn>
+                    <MobileNavWrapper />
+                  </SignedIn>
+                  <Link href="/" className="text-xl font-semibold">
+                    Plate Wise
+                  </Link>
+                </div>
                 <nav className="flex items-center gap-2">
                   <ThemeToggle />
                   <SignedIn>
@@ -64,7 +70,7 @@ export default function RootLayout({
                 </nav>
               </div>
             </header>
-            <main>{children}</main>
+            <main className="flex-1 overflow-y-auto">{children}</main>
           </ThemeProvider>
         </body>
       </html>

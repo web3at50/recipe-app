@@ -4,13 +4,12 @@
 
  - Natasha law page and link to from onboarding flow. Need to create page and write content and link to from onboarding flow
 
- - Need to understand where preferences of users are being saved and how can I check are correct.  We started with supabase auth and migrated to Clerk auth so need to make sure all is working.  How can we test?  Should we delete all user information from (its only my test data anyway) and start again so I an gain understanding of whats going where and make sure works?  We also need to add preferences to the users front end account in the auth sde so they can view/edit/delete/amend etc . These are in supabase as I have checked. I just need to know how to get user_if in website to match against supabase user_341353sZs3wpmTkPzxGPb5qiEAd in user_id column in user_profiles table
+ - Breadcrumbs and navigation for whole site review
 
-- Preferences editable on recipe creation  page and in setting above
+ - Implement PDF SHift
 
  - Need to add additional diet preferences facility into onboarding and  like low carb, keto, no dairy (other ?). Step 2 in onboarding Dietary Preferences. So they get put into ai generation prompts etc too
 
-- Existing logic include pantry items?  Add a togglr for what ingredients are and are not included in logig (prompt)
 
 -  We need Privacy/GDPR page and link to from onboarding (just create holding page for now)
 
@@ -22,9 +21,7 @@
 Gemini 2.5 Flash Image - mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Multiple AI\Google_Gemini_Analysis.md 
 page - https://ai.google.dev/gemini-api/docs/image-generation
 
-
-
-- Create 3 recipes at once - one per model - display in a way user can scroll through to see which model they prefer
+ - Safety disclaimer, emergency info page created. Natahas page created. need to update privacy policy page when we have it - read C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Ad Hoc\Natasha_Law_Research_Report.md
 
 
 - Maybe later enhacements to meal plan
@@ -47,6 +44,7 @@ https://docs.pdfshift.io/#introduction
 
 - Security review - is AI having direct access to use info? If so which and how 
 
+- Edit /add pantry items on pantry page not working
 
 - What are user_recipe_interactions table in supabase as only table with 0
 
@@ -56,21 +54,9 @@ https://docs.pdfshift.io/#introduction
 
 - Send shopping list to someone by WhatsApp - if easy and / or cheap. Main thing to do though is make it super user friendly to read on mobile version of our app
 
-- Add user prefernces to account section. Currently saved in supabase but account section powered by Clerk.  Say now on Pro account. Clerk docs for features
 
 - Add C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25 to gitignore and then delete from githb
 
-- Double check logic in ai recipe generation isn't forcing recipe to include ALL ingredients given by user. Can just use some as the end meal result is most important not using all the selected ingredients
-
-
-- Add grok 4 fast reasoning 
-
-https://docs.x.ai/docs/overview 
-
-C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Ad Hoc 13 Oct 2025\Alternative_LLM_Research.md
-
-
- - We are using textarea for natural language input in the optional Description field in the ai recipe generation. Could we use something from vercel ai sdk instead as we have it installed already I believe? (give screenshot of docs) . Maybe even something from openAI latest announcements? Isnt textarea quite very basic?
 
 
 - What does personalized recommendations do on the onboard process? Active yet or just as precaution should be add
@@ -87,27 +73,12 @@ NOTES
 Make sure we have claude 4.5 sonnet memory game changer apparently. Mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md line 1161
 
 
+AI code
 
-2: Add other LLM - Grok is cheap by XAI
-
-
-curl https://api.x.ai/v1/chat/completions \
--H "Content-Type: application/json" \
--H "Authorization: Bearer $XAI_API_KEY" \
--d '{
-  "messages": [
-    {
-      "role": "user",
-      "content": "What is the meaning of life, the universe, and everything?"
-    }
-  ],
-  "model": "grok-4",
-  "stream": false,
-  "temperature": 0.7
-}'
-
-
-
+1 - OpenAI
+2 - Claude
+3 - Gemini
+4 - XAI
 
 
 

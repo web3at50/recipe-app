@@ -286,19 +286,20 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
       {/* Main Management Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <CardTitle>Manage Your Pantry Items</CardTitle>
               <CardDescription>
                 Search, filter, and customize your pantry staples preferences
               </CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Dialog open={isOnboardingOpen} onOpenChange={setIsOnboardingOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
-                    Add from Standard List
+                    <span className="hidden sm:inline">Add from Standard List</span>
+                    <span className="sm:hidden">Standard Items</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -335,9 +336,10 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
 
               <Dialog open={isAddingCustom} onOpenChange={setIsAddingCustom}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Custom Item
+                    <span className="hidden sm:inline">Add Custom Item</span>
+                    <span className="sm:hidden">Custom Item</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -407,43 +409,47 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
 
           {/* Bulk Actions */}
           {selectedIds.length > 0 && (
-            <div className="flex items-center gap-4 p-4 bg-accent/50 rounded-lg border border-accent">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 bg-accent/50 rounded-lg border border-accent">
               <span className="text-sm font-medium">
                 {selectedIds.length} item{selectedIds.length > 1 ? 's' : ''} selected
               </span>
-              <div className="flex gap-2 ml-auto">
+              <div className="flex flex-wrap gap-2 sm:ml-auto">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => bulkUpdateState('hide')}
                   disabled={isLoading}
+                  className="flex-1 sm:flex-none"
                 >
                   <EyeOff className="h-4 w-4 mr-2" />
-                  Set to Hide
+                  <span className="hidden xs:inline">Set to </span>Hide
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => bulkUpdateState('show')}
                   disabled={isLoading}
+                  className="flex-1 sm:flex-none"
                 >
                   <Eye className="h-4 w-4 mr-2" />
-                  Set to Show
+                  <span className="hidden xs:inline">Set to </span>Show
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => bulkUpdateState('auto')}
                   disabled={isLoading}
+                  className="flex-1 sm:flex-none"
                 >
                   <Settings2 className="h-4 w-4 mr-2" />
-                  Set to Auto
+                  <span className="hidden xs:inline">Set to </span>Auto
                 </Button>
                 <Button
                   variant="destructive"
                   size="sm"
                   onClick={bulkDelete}
                   disabled={isLoading}
+                  className="flex-1 sm:flex-none"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
@@ -470,22 +476,23 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
               {filteredStaples.map((staple) => (
                 <div
                   key={staple.id}
-                  className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors"
                 >
-                  <Checkbox
-                    checked={selectedIds.includes(staple.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelectedIds((prev) => [...prev, staple.id]);
-                      } else {
-                        setSelectedIds((prev) => prev.filter((id) => id !== staple.id));
-                      }
-                    }}
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium capitalize">{staple.item_pattern}</p>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Checkbox
+                      checked={selectedIds.includes(staple.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedIds((prev) => [...prev, staple.id]);
+                        } else {
+                          setSelectedIds((prev) => prev.filter((id) => id !== staple.id));
+                        }
+                      }}
+                      className="flex-shrink-0"
+                    />
+                    <p className="font-medium capitalize flex-1 truncate">{staple.item_pattern}</p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:ml-auto">
                     {getStateBadge(staple.preference_state)}
                     <Select
                       value={staple.preference_state}
@@ -504,6 +511,7 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() => deleteSingleItem(staple.id)}
+                      className="flex-shrink-0"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

@@ -41,9 +41,9 @@ export default async function DashboardLayout({
 
   return (
     <>
-      <div className="flex min-h-[calc(100vh-4rem)]">
-        {/* Sidebar */}
-        <aside className="w-64 border-r bg-muted/40 p-4">
+      <div className="flex h-full">
+        {/* Desktop Sidebar - Hidden on mobile, visible on md+ */}
+        <aside className="hidden md:block w-64 border-r bg-muted/40 p-4 flex-shrink-0">
           <nav className="space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
@@ -61,8 +61,8 @@ export default async function DashboardLayout({
           </nav>
         </aside>
 
-        {/* Main content */}
-        <div className="flex-1">
+        {/* Main content - Full width on mobile, with sidebar offset on desktop */}
+        <div className="flex-1 w-full md:w-auto overflow-y-auto">
           {children}
         </div>
       </div>

@@ -37,22 +37,22 @@ export default async function RecipesPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold">My Recipes</h1>
           <p className="text-muted-foreground mt-1">
             Manage your recipe collection
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/generate">
-            <Button>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <Link href="/generate" className="w-full sm:w-auto">
+            <Button className="w-full">
               <Sparkles className="h-4 w-4 mr-2" />
               Generate with AI
             </Button>
           </Link>
-          <Link href="/recipes/new">
-            <Button variant="outline">
+          <Link href="/recipes/new" className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full">
               <Plus className="h-4 w-4 mr-2" />
               Create Manually
             </Button>
