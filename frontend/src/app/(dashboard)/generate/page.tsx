@@ -18,6 +18,7 @@ import type { Recipe } from '@/types/recipe';
 import type { UserPreferences } from '@/types/user-profile';
 import type { IngredientMode } from '@/types';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { FeedbackButton } from '@/components/feedback-button';
 
 // Helper function to map model numbers to API model keys
 const getAPIModelKey = (model: 'model_1' | 'model_2' | 'model_3' | 'model_4'): 'openai' | 'claude' | 'gemini' | 'grok' => {
@@ -893,6 +894,7 @@ export default function GeneratePage() {
           )}
         </div>
       </div>
+      <FeedbackButton page="generate" />
     </div>
   );
 }
