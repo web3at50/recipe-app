@@ -3,6 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
+// Force dynamic rendering to ensure Clerk middleware context is available
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 // Validation schema
 const feedbackSchema = z.object({
   liked: z.string().optional(),
