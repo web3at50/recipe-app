@@ -17,6 +17,7 @@ import { WeekView } from '@/components/meal-planner/week-view';
 import type { MealPlanItemWithRecipe, MealType } from '@/types/meal-plan';
 import type { Recipe } from '@/types/recipe';
 import { toast } from 'sonner';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 export default function MealPlannerPage() {
   interface MealPlan {
@@ -215,7 +216,7 @@ export default function MealPlannerPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -227,7 +228,12 @@ export default function MealPlannerPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
+      <Breadcrumb items={[
+        { label: 'My Recipes', href: '/recipes' },
+        { label: 'Meal Planner' }
+      ]} />
+
       <div className="mb-8 space-y-4">
         <div>
           <h1 className="text-3xl font-bold">Meal Planner</h1>

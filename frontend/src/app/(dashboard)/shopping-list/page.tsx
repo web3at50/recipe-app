@@ -27,6 +27,7 @@ import type { PantryStaple, PantryPreferenceState } from '@/types/pantry';
 import { UNIT_OPTIONS } from '@/lib/units';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 type DisplayMode = 'shopping' | 'complete' | 'pantry';
 
@@ -408,7 +409,12 @@ export default function ShoppingListPage() {
   const checkedCount = activeList?.items.filter(item => item.checked).length || 0;
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
+      <Breadcrumb items={[
+        { label: 'My Recipes', href: '/recipes' },
+        { label: 'Shopping List' }
+      ]} />
+
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>

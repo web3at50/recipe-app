@@ -36,7 +36,10 @@
       "Bash(cat:*)",
       "Bash(git restore:*)",
       "Bash(Remove-Item \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\components\\pantry\\pantry-modal-playground.tsx\" -Force)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Bash(move \"settings\\page.tsx\" \"(dashboard)\\settings\\page.tsx\")",
+      "Bash(move \"settings\\pantry-staples\\page.tsx\" \"(dashboard)\\settings\\pantry-staples\\page.tsx\")",
+      "Bash(powershell Move-Item:*)"
     ],
     "deny": [],
     "ask": []

@@ -61,11 +61,11 @@ export default async function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-5xl space-y-8">
+    <div className="container mx-auto px-4 py-8 max-w-screen-2xl">
+      <div className="space-y-8">
         {/* Breadcrumb */}
         <Breadcrumb items={[
-          { label: 'Dashboard', href: '/recipes' },
+          { label: 'My Recipes', href: '/recipes' },
           { label: 'Settings' }
         ]} />
 

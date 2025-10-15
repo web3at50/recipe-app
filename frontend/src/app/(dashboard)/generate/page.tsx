@@ -17,6 +17,7 @@ import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Le
 import type { Recipe } from '@/types/recipe';
 import type { UserPreferences } from '@/types/user-profile';
 import type { IngredientMode } from '@/types';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 // Helper function to map model numbers to API model keys
 const getAPIModelKey = (model: 'model_1' | 'model_2' | 'model_3' | 'model_4'): 'openai' | 'claude' | 'gemini' | 'grok' => {
@@ -290,7 +291,12 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
+      <Breadcrumb items={[
+        { label: 'My Recipes', href: '/recipes' },
+        { label: 'AI Generate' }
+      ]} />
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <ChefHat className="h-8 w-8" />
