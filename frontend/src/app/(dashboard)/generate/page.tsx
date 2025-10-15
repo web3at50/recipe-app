@@ -312,118 +312,115 @@ export default function GeneratePage() {
         </p>
       </div>
 
-      {/* User Preferences Summary - Collapsible */}
-      {!isLoadingPreferences && userPreferences && (
-        <div className="mb-6">
-          {!profileExpanded ? (
-            <div className="flex items-center justify-between gap-3 p-3 bg-muted rounded-lg border">
-              <button
-                onClick={() => setProfileExpanded(true)}
-                className="flex items-center gap-3 flex-1 text-left"
-              >
-                <Info className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <div className="flex flex-wrap gap-2 items-center">
-                  {/* Allergens in amber */}
-                  {userPreferences.allergies && userPreferences.allergies.length > 0 && (
-                    <span className="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-100 rounded font-medium">
-                      ⚠️ Avoiding: {userPreferences.allergies.join(', ')}
-                    </span>
-                  )}
-                  {/* Dietary restrictions in blue */}
-                  {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
-                    <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-950 text-blue-900 dark:text-blue-100 rounded font-medium">
-                      🥗 {userPreferences.dietary_restrictions.join(', ')}
-                    </span>
-                  )}
-                  {/* If neither exists */}
-                  {(!userPreferences.allergies || userPreferences.allergies.length === 0) &&
-                    (!userPreferences.dietary_restrictions || userPreferences.dietary_restrictions.length === 0) && (
-                    <span className="text-sm text-muted-foreground">No dietary restrictions set</span>
-                  )}
-                </div>
-              </button>
-              <Link href="/settings">
-                <Button variant="ghost" size="sm" className="flex-shrink-0">
-                  Edit
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <Card className="bg-primary/5 border-primary/20">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Info className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-base">Your Profile</CardTitle>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setProfileExpanded(false)}
-                    className="h-8 text-xs"
-                  >
-                    Collapse
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Servings</p>
-                    <p className="font-medium">{userPreferences.household_size || 2}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Skill Level</p>
-                    <p className="font-medium capitalize">{userPreferences.cooking_skill || 'intermediate'}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Typical Time</p>
-                    <p className="font-medium">{userPreferences.typical_cook_time || 30} mins</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Spice Level</p>
-                    <p className="font-medium capitalize">{userPreferences.spice_level || 'medium'}</p>
-                  </div>
-                </div>
-                {userPreferences.cuisines_liked && userPreferences.cuisines_liked.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-muted-foreground text-sm">Favourite Cuisines</p>
-                    <p className="font-medium">{userPreferences.cuisines_liked.join(', ')}</p>
-                  </div>
-                )}
-                {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
-                  <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <Leaf className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm">
-                        <p className="font-medium text-blue-500">Dietary Preferences</p>
-                        <p className="text-muted-foreground capitalize">
-                          {userPreferences.dietary_restrictions.join(', ')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {userPreferences.allergies && userPreferences.allergies.length > 0 && (
-                  <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm">
-                        <p className="font-medium text-amber-500">Active Allergen Protection</p>
-                        <p className="text-muted-foreground">
-                          Avoiding: {userPreferences.allergies.join(', ')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      )}
-
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* User Preferences Summary - Collapsible */}
+        {!isLoadingPreferences && userPreferences && (
+          <div className="mb-6">
+            {!profileExpanded ? (
+              <div className="flex items-center justify-between gap-3 p-3 bg-muted rounded-lg border">
+                <button
+                  onClick={() => setProfileExpanded(true)}
+                  className="flex items-center gap-3 flex-1 text-left"
+                >
+                  <Info className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {/* Allergens in amber */}
+                    {userPreferences.allergies && userPreferences.allergies.length > 0 && (
+                      <span className="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-100 rounded font-medium">
+                        ⚠️ Avoiding: {userPreferences.allergies.join(', ')}
+                      </span>
+                    )}
+                    {/* Dietary restrictions in blue */}
+                    {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
+                      <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-950 text-blue-900 dark:text-blue-100 rounded font-medium">
+                        🥗 {userPreferences.dietary_restrictions.join(', ')}
+                      </span>
+                    )}
+                    {/* If neither exists */}
+                    {(!userPreferences.allergies || userPreferences.allergies.length === 0) &&
+                      (!userPreferences.dietary_restrictions || userPreferences.dietary_restrictions.length === 0) && (
+                      <span className="text-sm text-muted-foreground">No dietary restrictions set</span>
+                    )}
+                  </div>
+                </button>
+                <Button variant="link" size="sm" asChild className="h-auto p-0 flex-shrink-0">
+                  <Link href="/settings">Edit →</Link>
+                </Button>
+              </div>
+            ) : (
+              <Card className="bg-primary/5 border-primary/20">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Info className="h-5 w-5 text-primary" />
+                      <CardTitle className="text-base">Your Profile</CardTitle>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setProfileExpanded(false)}
+                      className="h-8 text-xs"
+                    >
+                      Collapse
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Servings</p>
+                      <p className="font-medium">{userPreferences.household_size || 2}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Skill Level</p>
+                      <p className="font-medium capitalize">{userPreferences.cooking_skill || 'intermediate'}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Typical Time</p>
+                      <p className="font-medium">{userPreferences.typical_cook_time || 30} mins</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Spice Level</p>
+                      <p className="font-medium capitalize">{userPreferences.spice_level || 'medium'}</p>
+                    </div>
+                  </div>
+                  {userPreferences.cuisines_liked && userPreferences.cuisines_liked.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-muted-foreground text-sm">Favourite Cuisines</p>
+                      <p className="font-medium">{userPreferences.cuisines_liked.join(', ')}</p>
+                    </div>
+                  )}
+                  {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
+                    <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <Leaf className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium text-blue-500">Dietary Preferences</p>
+                          <p className="text-muted-foreground capitalize">
+                            {userPreferences.dietary_restrictions.join(', ')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {userPreferences.allergies && userPreferences.allergies.length > 0 && (
+                    <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium text-amber-500">Active Allergen Protection</p>
+                          <p className="text-muted-foreground">
+                            Avoiding: {userPreferences.allergies.join(', ')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
         {/* Input Section */}
         <div className="space-y-6">
           {/* Pantry Staples Display - Collapsible on Mobile */}
@@ -572,8 +569,9 @@ export default function GeneratePage() {
                     min="10"
                     max="180"
                     step="5"
-                    value={maxCookTime || userPreferences?.typical_cook_time || 30}
-                    onChange={(e) => setMaxCookTime(parseInt(e.target.value))}
+                    placeholder={(userPreferences?.typical_cook_time || 30).toString()}
+                    value={maxCookTime ?? ''}
+                    onChange={(e) => setMaxCookTime(e.target.value ? parseInt(e.target.value) : null)}
                   />
                 </div>
 
@@ -895,35 +893,6 @@ export default function GeneratePage() {
           )}
         </div>
       </div>
-
-      {/* Sticky Mobile CTA */}
-      {ingredientsText.trim().length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg p-4 md:hidden z-50">
-          <Button
-            className="w-full h-12"
-            size="lg"
-            onClick={handleGenerate}
-            disabled={isGenerating || isGeneratingAll}
-          >
-            {(isGenerating || isGeneratingAll) ? (
-              <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <ChefHat className="h-5 w-5 mr-2" />
-                Generate with {ingredientsText.split('\n').filter(line => line.trim().length > 0).length} ingredients
-              </>
-            )}
-          </Button>
-        </div>
-      )}
-
-      {/* Add padding to prevent content being hidden by sticky bar on mobile */}
-      {ingredientsText.trim().length > 0 && (
-        <div className="h-20 md:hidden" />
-      )}
     </div>
   );
 }
