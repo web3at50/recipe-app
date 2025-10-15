@@ -64,6 +64,10 @@ export default function GeneratePage() {
     currentModel: string;
   } | null>(null);
 
+  // State for collapsible profile and pantry
+  const [profileExpanded, setProfileExpanded] = useState(false);
+  const [pantryExpanded, setPantryExpanded] = useState(false);
+
   // Fetch user preferences on mount
   useEffect(() => {
     const fetchPreferences = async () => {
@@ -157,20 +161,21 @@ export default function GeneratePage() {
     if (selectedModel === 'all') {
       setIsGeneratingAll(true);
       setGeneratedRecipes({ model_1: null, model_2: null, model_3: null, model_4: null });
-      setGenerationProgress({ current: 0, total: 4, currentModel: 'Model 1' });
+      setGenerationProgress({ current: 0, total: 4, currentModel: 'ChatGPT' });
 
       const models: Array<'model_1' | 'model_2' | 'model_3' | 'model_4'> = ['model_1', 'model_2', 'model_3', 'model_4'];
+      const modelNames = ['ChatGPT', 'Claude', 'Gemini', 'Grok'];
       const results: typeof generatedRecipes = { model_1: null, model_2: null, model_3: null, model_4: null };
 
       try {
         for (let i = 0; i < models.length; i++) {
           const model = models[i];
-          const modelNum = i + 1;
+          const modelName = modelNames[i];
 
           setGenerationProgress({
             current: i,
             total: 4,
-            currentModel: `Model ${modelNum}`,
+            currentModel: modelName,
           });
 
           try {
@@ -181,9 +186,9 @@ export default function GeneratePage() {
             results[model] = recipe;
             setGeneratedRecipes({ ...results });
 
-            console.log(`Model ${modelNum} completed in ${duration}s`);
+            console.log(`${modelName} completed in ${duration}s`);
           } catch (error) {
-            console.error(`Error generating with ${model}:`, error);
+            console.error(`Error generating with ${modelName}:`, error);
             // Continue with other models even if one fails
           }
         }
@@ -307,100 +312,176 @@ export default function GeneratePage() {
         </p>
       </div>
 
-      {/* User Preferences Summary */}
+      {/* User Preferences Summary - Collapsible */}
       {!isLoadingPreferences && userPreferences && (
-        <Card className="mb-6 bg-primary/5 border-primary/20">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Info className="h-5 w-5 text-primary" />
-              <CardTitle className="text-base">Your Profile</CardTitle>
+        <div className="mb-6">
+          {!profileExpanded ? (
+            <div className="flex items-center justify-between gap-3 p-3 bg-muted rounded-lg border">
+              <button
+                onClick={() => setProfileExpanded(true)}
+                className="flex items-center gap-3 flex-1 text-left"
+              >
+                <Info className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="flex flex-wrap gap-2 items-center">
+                  {/* Allergens in amber */}
+                  {userPreferences.allergies && userPreferences.allergies.length > 0 && (
+                    <span className="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-100 rounded font-medium">
+                      ⚠️ Avoiding: {userPreferences.allergies.join(', ')}
+                    </span>
+                  )}
+                  {/* Dietary restrictions in blue */}
+                  {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
+                    <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-950 text-blue-900 dark:text-blue-100 rounded font-medium">
+                      🥗 {userPreferences.dietary_restrictions.join(', ')}
+                    </span>
+                  )}
+                  {/* If neither exists */}
+                  {(!userPreferences.allergies || userPreferences.allergies.length === 0) &&
+                    (!userPreferences.dietary_restrictions || userPreferences.dietary_restrictions.length === 0) && (
+                    <span className="text-sm text-muted-foreground">No dietary restrictions set</span>
+                  )}
+                </div>
+              </button>
+              <Link href="/settings">
+                <Button variant="ghost" size="sm" className="flex-shrink-0">
+                  Edit
+                </Button>
+              </Link>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground">Servings</p>
-                <p className="font-medium">{userPreferences.household_size || 2}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Skill Level</p>
-                <p className="font-medium capitalize">{userPreferences.cooking_skill || 'intermediate'}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Typical Time</p>
-                <p className="font-medium">{userPreferences.typical_cook_time || 30} mins</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Spice Level</p>
-                <p className="font-medium capitalize">{userPreferences.spice_level || 'medium'}</p>
-              </div>
-            </div>
-            {userPreferences.cuisines_liked && userPreferences.cuisines_liked.length > 0 && (
-              <div className="mt-4">
-                <p className="text-muted-foreground text-sm">Favourite Cuisines</p>
-                <p className="font-medium">{userPreferences.cuisines_liked.join(', ')}</p>
-              </div>
-            )}
-            {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
-              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <Leaf className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium text-blue-500">Dietary Preferences</p>
-                    <p className="text-muted-foreground capitalize">
-                      {userPreferences.dietary_restrictions.join(', ')}
-                    </p>
+          ) : (
+            <Card className="bg-primary/5 border-primary/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Info className="h-5 w-5 text-primary" />
+                    <CardTitle className="text-base">Your Profile</CardTitle>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setProfileExpanded(false)}
+                    className="h-8 text-xs"
+                  >
+                    Collapse
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Servings</p>
+                    <p className="font-medium">{userPreferences.household_size || 2}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Skill Level</p>
+                    <p className="font-medium capitalize">{userPreferences.cooking_skill || 'intermediate'}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Typical Time</p>
+                    <p className="font-medium">{userPreferences.typical_cook_time || 30} mins</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Spice Level</p>
+                    <p className="font-medium capitalize">{userPreferences.spice_level || 'medium'}</p>
                   </div>
                 </div>
-              </div>
-            )}
-            {userPreferences.allergies && userPreferences.allergies.length > 0 && (
-              <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium text-amber-500">Active Allergen Protection</p>
-                    <p className="text-muted-foreground">
-                      Avoiding: {userPreferences.allergies.join(', ')}
-                    </p>
+                {userPreferences.cuisines_liked && userPreferences.cuisines_liked.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-muted-foreground text-sm">Favourite Cuisines</p>
+                    <p className="font-medium">{userPreferences.cuisines_liked.join(', ')}</p>
                   </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                )}
+                {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
+                  <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <Leaf className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-medium text-blue-500">Dietary Preferences</p>
+                        <p className="text-muted-foreground capitalize">
+                          {userPreferences.dietary_restrictions.join(', ')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {userPreferences.allergies && userPreferences.allergies.length > 0 && (
+                  <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-medium text-amber-500">Active Allergen Protection</p>
+                        <p className="text-muted-foreground">
+                          Avoiding: {userPreferences.allergies.join(', ')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input Section */}
         <div className="space-y-6">
-          {/* Pantry Staples Display */}
+          {/* Pantry Staples Display - Collapsible on Mobile */}
           {pantryStaples.length > 0 && (
-            <Card className="bg-secondary/10 border-secondary/20">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Package className="h-5 w-5 text-secondary-foreground" />
-                    <CardTitle className="text-base">Your Pantry Staples</CardTitle>
-                  </div>
-                  <Button variant="link" size="sm" asChild className="h-auto p-0">
-                    <Link href="/settings/pantry-staples">Edit Pantry →</Link>
-                  </Button>
-                </div>
-                <CardDescription>
-                  Items you have at home (used in recipe generation)
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {pantryStaples.map((item, index) => (
-                    <Badge key={index} variant="secondary" className="capitalize">
-                      {item}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="mb-6">
+              {/* Collapsed View (Mobile Default) */}
+              {!pantryExpanded ? (
+                <button
+                  onClick={() => setPantryExpanded(true)}
+                  className="flex items-center gap-2 p-3 bg-secondary/10 border border-secondary/20 rounded-lg hover:bg-secondary/20 transition-colors w-full text-left md:hidden"
+                >
+                  <Package className="h-4 w-4 text-secondary-foreground flex-shrink-0" />
+                  <span className="text-sm font-medium">
+                    ✓ {pantryStaples.length} Pantry Staples Available
+                  </span>
+                  <span className="text-xs text-muted-foreground ml-auto">Tap to view</span>
+                </button>
+              ) : null}
+
+              {/* Expanded View (Desktop Always, Mobile on Tap) */}
+              {(pantryExpanded || true) && (
+                <Card className={`bg-secondary/10 border-secondary/20 ${!pantryExpanded ? 'hidden md:block' : ''}`}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Package className="h-5 w-5 text-secondary-foreground" />
+                        <CardTitle className="text-base">Your Pantry Staples</CardTitle>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setPantryExpanded(false)}
+                          className="h-8 text-xs md:hidden"
+                        >
+                          Collapse
+                        </Button>
+                        <Button variant="link" size="sm" asChild className="h-auto p-0">
+                          <Link href="/settings/pantry-staples">Edit →</Link>
+                        </Button>
+                      </div>
+                    </div>
+                    <CardDescription>
+                      Items you have at home (used in recipe generation)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {pantryStaples.map((item, index) => (
+                        <Badge key={index} variant="secondary" className="capitalize">
+                          {item}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
 
           <Card>
@@ -417,8 +498,8 @@ export default function GeneratePage() {
                   id="ingredients"
                   value={ingredientsText}
                   onChange={(e) => setIngredientsText(e.target.value)}
-                  placeholder="Chicken breast&#10;Onions&#10;Garlic&#10;Rice&#10;..."
-                  className="min-h-[200px] font-mono"
+                  placeholder={"Chicken breast\nOnions\nGarlic\nRice\n..."}
+                  className="min-h-[150px] font-mono"
                 />
               </div>
 
@@ -432,7 +513,7 @@ export default function GeneratePage() {
                   value={descriptionText}
                   onChange={(e) => setDescriptionText(e.target.value)}
                   placeholder="E.g., Something creamy and comforting, Italian-style, not too spicy..."
-                  className="min-h-[80px]"
+                  className="min-h-[120px]"
                 />
                 <p className="text-xs text-muted-foreground">
                   This helps the AI understand what kind of recipe you&apos;re looking for
@@ -443,26 +524,26 @@ export default function GeneratePage() {
               <div className="space-y-3 p-4 bg-muted rounded-lg border-2 border-muted">
                 <Label className="text-base font-semibold">Ingredient Mode</Label>
                 <RadioGroup value={ingredientMode} onValueChange={(v) => setIngredientMode(v as IngredientMode)}>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="flex items-start space-x-3">
                       <RadioGroupItem value="strict" id="strict" className="mt-1" />
-                      <Label htmlFor="strict" className="font-normal cursor-pointer flex-1">
-                        <div className="font-medium">🔒 No Shop</div>
-                        <div className="text-xs text-muted-foreground">Use only what I have</div>
+                      <Label htmlFor="strict" className="cursor-pointer flex-1">
+                        <div className="font-semibold text-base">No Shop - Use Only What I Have</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Use only listed ingredients</div>
                       </Label>
                     </div>
                     <div className="flex items-start space-x-3">
                       <RadioGroupItem value="flexible" id="flexible" className="mt-1" />
-                      <Label htmlFor="flexible" className="font-normal cursor-pointer flex-1">
-                        <div className="font-medium">🧑‍🍳 Flexible (Default)</div>
-                        <div className="text-xs text-muted-foreground">Use what I have + pantry basics</div>
+                      <Label htmlFor="flexible" className="cursor-pointer flex-1">
+                        <div className="font-semibold text-base">Flexible (Default) - Use What I Have + Other Basics</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Listed ingredients + common pantry basics</div>
                       </Label>
                     </div>
                     <div className="flex items-start space-x-3">
                       <RadioGroupItem value="creative" id="creative" className="mt-1" />
-                      <Label htmlFor="creative" className="font-normal cursor-pointer flex-1">
-                        <div className="font-medium">✨ Creative</div>
-                        <div className="text-xs text-muted-foreground">Inspire me with new ingredients</div>
+                      <Label htmlFor="creative" className="cursor-pointer flex-1">
+                        <div className="font-semibold text-base">Creative - Inspire Me & Happy to Shop!</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Listed ingredients + exciting new ingredients</div>
                       </Label>
                     </div>
                   </div>
@@ -470,7 +551,7 @@ export default function GeneratePage() {
               </div>
 
               {/* Cooking Parameters */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="servings">Servings</Label>
                   <Input
@@ -529,77 +610,38 @@ export default function GeneratePage() {
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="favouriteCuisine">Favourite Cuisine</Label>
-                  <Select
-                    value={favouriteCuisine || (userPreferences?.cuisines_liked?.[0] || 'any')}
-                    onValueChange={setFavouriteCuisine}
-                  >
-                    <SelectTrigger id="favouriteCuisine">
-                      <SelectValue placeholder="Select cuisine..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="any">Any Cuisine</SelectItem>
-                      <SelectItem value="British">British</SelectItem>
-                      <SelectItem value="Italian">Italian</SelectItem>
-                      <SelectItem value="Indian">Indian</SelectItem>
-                      <SelectItem value="Chinese">Chinese</SelectItem>
-                      <SelectItem value="Mexican">Mexican</SelectItem>
-                      <SelectItem value="Thai">Thai</SelectItem>
-                      <SelectItem value="Japanese">Japanese</SelectItem>
-                      <SelectItem value="French">French</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Choose AI Model</Label>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                  <Button
-                    type="button"
-                    variant={selectedModel === 'model_1' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('model_1')}
-                    className="w-full"
-                  >
-                    Model 1
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={selectedModel === 'model_2' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('model_2')}
-                    className="w-full"
-                  >
-                    Model 2
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={selectedModel === 'model_3' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('model_3')}
-                    className="w-full"
-                  >
-                    Model 3
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={selectedModel === 'model_4' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('model_4')}
-                    className="w-full"
-                  >
-                    Model 4
-                  </Button>
+              <div className="space-y-3">
+                <Label htmlFor="aiModel">Choose AI Model</Label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1">
+                    <Select
+                      value={selectedModel === 'all' ? 'model_1' : selectedModel}
+                      onValueChange={(value) => setSelectedModel(value as 'model_1' | 'model_2' | 'model_3' | 'model_4')}
+                    >
+                      <SelectTrigger id="aiModel">
+                        <SelectValue placeholder="Select AI model" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="model_1">ChatGPT (OpenAI)</SelectItem>
+                        <SelectItem value="model_2">Claude (Anthropic)</SelectItem>
+                        <SelectItem value="model_3">Gemini (Google)</SelectItem>
+                        <SelectItem value="model_4">Grok (xAI)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Button
                     type="button"
                     variant={selectedModel === 'all' ? 'default' : 'outline'}
                     onClick={() => setSelectedModel('all')}
-                    className="w-full md:col-span-1 col-span-2"
+                    className="sm:w-auto whitespace-nowrap"
                   >
-                    All 4 Models
+                    {selectedModel === 'all' ? '✓ ' : ''}Compare All 4
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Test different AI models to compare recipe quality. &quot;All 4 Models&quot; generates recipes from all models at once.
+                  Choose a single AI model or compare all 4 at once to see different recipe variations.
                 </p>
               </div>
 
@@ -612,12 +654,22 @@ export default function GeneratePage() {
                 {(isGenerating || isGeneratingAll) ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    {isGeneratingAll ? 'Generating All Models...' : `Generating with ${selectedModel.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}...`}
+                    {isGeneratingAll ? 'Generating All Models...' : `Generating with ${
+                      selectedModel === 'model_1' ? 'ChatGPT' :
+                      selectedModel === 'model_2' ? 'Claude' :
+                      selectedModel === 'model_3' ? 'Gemini' :
+                      'Grok'
+                    }...`}
                   </>
                 ) : (
                   <>
                     <ChefHat className="h-5 w-5 mr-2" />
-                    {selectedModel === 'all' ? 'Generate with All 4 Models' : `Generate Recipe with ${selectedModel.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`}
+                    {selectedModel === 'all' ? 'Generate with All 4 Models' : `Generate Recipe with ${
+                      selectedModel === 'model_1' ? 'ChatGPT' :
+                      selectedModel === 'model_2' ? 'Claude' :
+                      selectedModel === 'model_3' ? 'Gemini' :
+                      'Grok'
+                    }`}
                   </>
                 )}
               </Button>
@@ -638,7 +690,7 @@ export default function GeneratePage() {
                   </div>
                   <Progress value={(generationProgress.current / generationProgress.total) * 100} className="h-2" />
                   <div className="space-y-2 text-sm">
-                    {['Model 1', 'Model 2', 'Model 3', 'Model 4'].map((modelName, index) => {
+                    {['ChatGPT', 'Claude', 'Gemini', 'Grok'].map((modelName, index) => {
                       const isComplete = generationProgress.current > index;
                       const isCurrent = generationProgress.current === index;
                       const isWaiting = generationProgress.current < index;
@@ -743,10 +795,10 @@ export default function GeneratePage() {
               <CardContent>
                 <Tabs defaultValue="model_1" className="w-full">
                   <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="model_1">Model 1</TabsTrigger>
-                    <TabsTrigger value="model_2">Model 2</TabsTrigger>
-                    <TabsTrigger value="model_3">Model 3</TabsTrigger>
-                    <TabsTrigger value="model_4">Model 4</TabsTrigger>
+                    <TabsTrigger value="model_1">ChatGPT</TabsTrigger>
+                    <TabsTrigger value="model_2">Claude</TabsTrigger>
+                    <TabsTrigger value="model_3">Gemini</TabsTrigger>
+                    <TabsTrigger value="model_4">Grok</TabsTrigger>
                   </TabsList>
 
                   {(['model_1', 'model_2', 'model_3', 'model_4'] as const).map((modelKey) => {
@@ -822,17 +874,56 @@ export default function GeneratePage() {
           {!generatedRecipe && !Object.values(generatedRecipes).some(r => r !== null) && !generationProgress && (
             <Card className="border-dashed">
               <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                <ChefHat className="h-16 w-16 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">
-                  {(isGenerating || isGeneratingAll)
-                    ? 'AI is cooking up something delicious...'
-                    : 'Your generated recipe will appear here'}
-                </p>
+                {(isGenerating || isGeneratingAll) ? (
+                  <>
+                    <ChefHat className="h-16 w-16 text-muted-foreground mb-4 animate-pulse" />
+                    <p className="text-muted-foreground">
+                      AI is cooking up something delicious...
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <ChefHat className="h-16 w-16 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Ready to Generate Your Recipe?</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Your AI-generated recipe will appear here
+                    </p>
+                  </>
+                )}
               </CardContent>
             </Card>
           )}
         </div>
       </div>
+
+      {/* Sticky Mobile CTA */}
+      {ingredientsText.trim().length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg p-4 md:hidden z-50">
+          <Button
+            className="w-full h-12"
+            size="lg"
+            onClick={handleGenerate}
+            disabled={isGenerating || isGeneratingAll}
+          >
+            {(isGenerating || isGeneratingAll) ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <ChefHat className="h-5 w-5 mr-2" />
+                Generate with {ingredientsText.split('\n').filter(line => line.trim().length > 0).length} ingredients
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* Add padding to prevent content being hidden by sticky bar on mobile */}
+      {ingredientsText.trim().length > 0 && (
+        <div className="h-20 md:hidden" />
+      )}
     </div>
   );
 }
