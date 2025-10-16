@@ -821,7 +821,7 @@ export default function GeneratePage() {
               </div>
 
               <Button
-                className="w-full h-12 text-base font-semibold bg-green-600 hover:bg-green-700 text-white"
+                className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
                 size="lg"
                 onClick={handleGenerate}
                 disabled={isGenerating || isGeneratingAll || !ingredientsText.trim()}
