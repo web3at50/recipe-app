@@ -4,9 +4,9 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { ChevronLeft, Clock, Users, Edit } from 'lucide-react';
-import { RecipeDetailClient } from './recipe-detail-client';
+import { PrintButton } from '@/components/recipes/print-button';
+import { DeleteRecipeButton } from '@/components/recipes/delete-recipe-button';
 import type { Ingredient, Instruction } from '@/types/recipe';
 
 type PageProps = {
@@ -64,8 +64,8 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
   const fromMealPlanner = search.from === 'meal-planner';
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      <div className="flex gap-2 mb-4">
+    <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
+      <div className="flex gap-2 mb-4 no-print">
         <Link href="/recipes">
           <Button variant="ghost" size="sm">
             <ChevronLeft className="h-4 w-4 mr-2" />
@@ -82,18 +82,15 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
 
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">{recipe.name}</h1>
-              {recipe.description && (
-                <p className="text-muted-foreground">{recipe.description}</p>
-              )}
-            </div>
-            <RecipeDetailClient recipeId={id} isFavorite={recipe.is_favorite} />
+        <div className="recipe-header">
+          <div className="mb-4">
+            <h1 className="text-3xl font-bold mb-2">{recipe.name}</h1>
+            {recipe.description && (
+              <p className="text-muted-foreground">{recipe.description}</p>
+            )}
           </div>
 
-          <div className="flex items-center gap-6 text-muted-foreground">
+          <div className="flex flex-col gap-3 text-muted-foreground recipe-meta">
             {totalTime > 0 && (
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
@@ -116,7 +113,7 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
           </div>
 
           {tags.length > 0 && (
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-2 mt-4 recipe-tags">
               {tags.map((tag: string, index: number) => (
                 <span
                   key={index}
@@ -129,17 +126,15 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
           )}
         </div>
 
-        <Separator />
-
         {/* Ingredients */}
-        <Card>
+        <Card className="print-keep-together">
           <CardHeader>
             <CardTitle>Ingredients</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
               {ingredients?.map((ingredient: Ingredient, index: number) => (
-                <li key={index} className="flex items-start gap-2">
+                <li key={index} className="flex items-start gap-2 print-keep-together">
                   <span className="text-muted-foreground">•</span>
                   <span>
                     {ingredient.quantity && `${ingredient.quantity} `}
@@ -154,14 +149,14 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
         </Card>
 
         {/* Instructions */}
-        <Card>
+        <Card className="print-keep-together">
           <CardHeader>
             <CardTitle>Instructions</CardTitle>
           </CardHeader>
           <CardContent>
             <ol className="space-y-4">
               {instructions?.map((instruction: Instruction, index: number) => (
-                <li key={index} className="flex gap-4">
+                <li key={index} className="flex gap-4 print-keep-together">
                   <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
                     {instruction.step || index + 1}
                   </span>
@@ -173,13 +168,15 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
         </Card>
 
         {/* Actions */}
-        <div className="flex gap-4">
-          <Link href={`/recipes/${id}/edit`} className="flex-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 no-print">
+          <Link href={`/recipes/${id}/edit`}>
             <Button variant="outline" className="w-full">
               <Edit className="h-4 w-4 mr-2" />
               Edit Recipe
             </Button>
           </Link>
+          <PrintButton className="w-full" />
+          <DeleteRecipeButton recipeId={id} recipeName={recipe.name} className="w-full" />
         </div>
       </div>
     </div>

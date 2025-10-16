@@ -108,3 +108,208 @@ body {
 .theme-transitioning * {
   transition: none !important;
 }
+
+/* ============================================
+   PRINT STYLES
+
+   Optimized for printing recipes on letter-size paper.
+   Hides UI elements, forces light mode, and prevents
+   awkward page breaks in ingredients and instructions.
+
+   Browser Support: Chrome, Firefox, Safari, Edge, Mobile
+   WCAG Compliance: Colors meet AAA contrast standards
+   ============================================ */
+
+@media print {
+  /* Page Configuration */
+  @page {
+    size: letter portrait;
+    margin: 2cm 1.5cm;
+  }
+
+  /* Force Light Mode Theme - Override all color variables */
+  :root,
+  .dark {
+    --background: 0 0% 100% !important;      /* Pure white */
+    --foreground: 0 0% 0% !important;        /* Pure black */
+    --card: 0 0% 100% !important;            /* Pure white */
+    --card-foreground: 0 0% 0% !important;   /* Pure black */
+    --muted-foreground: 0 0% 30% !important; /* Dark gray */
+    --border: 0 0% 85% !important;           /* Light gray */
+    --primary: 0 0% 0% !important;           /* Black */
+    --primary-foreground: 0 0% 100% !important; /* White */
+  }
+
+  /* Allow content to flow across pages - FIX SCROLLBAR ISSUE */
+  html,
+  body {
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Hide UI Elements - Navigation, Buttons, Interactive Elements */
+  .no-print,
+  nav,
+  header[role="banner"],
+  footer[role="contentinfo"] {
+    display: none !important;
+  }
+
+  /* Allow page breaks in large containers, but keep small items together */
+  .print-keep-together {
+    page-break-inside: avoid;
+    break-inside: avoid; /* Modern syntax */
+  }
+
+  /* Override: Allow cards to break across pages (they're too large) */
+  [class*="card"].print-keep-together {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  /* Keep card headers with their content */
+  [class*="CardHeader"],
+  [class*="card-header"] {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  /* Typography Adjustments for Print */
+  h1 {
+    font-size: 24pt;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    page-break-after: avoid;
+    color: black !important;
+  }
+
+  h2,
+  h3,
+  .text-xl,
+  .text-2xl {
+    font-size: 16pt;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    page-break-after: avoid;
+    color: black !important;
+  }
+
+  p, span, li, div {
+    color: black !important;
+  }
+
+  /* Remove Decorative Styles - Shadows, Gradients, Rounded Corners */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+  }
+
+  /* Card Components - Simple Borders for Print */
+  [class*="card"] {
+    border: 1px solid #d4d4d4 !important;
+    padding: 1em !important;
+    margin-bottom: 1em !important;
+    background: white !important;
+  }
+
+  /* Lists - Ingredients and Instructions */
+  ul {
+    list-style-type: disc;
+    margin-left: 1.5em;
+  }
+
+  ol {
+    list-style-type: decimal;
+    margin-left: 1.5em;
+  }
+
+  li {
+    page-break-inside: avoid;
+    margin-bottom: 0.5em;
+    color: black !important;
+  }
+
+  /* Separator Lines */
+  [class*="separator"],
+  hr {
+    border-top: 1px solid #d4d4d4 !important;
+    margin: 1em 0 !important;
+    background: transparent !important;
+  }
+
+  /* Icons - Keep Visible but Sized Appropriately */
+  svg {
+    display: inline-block;
+    width: 14pt;
+    height: 14pt;
+  }
+
+  /* Container Adjustments - Full Width for Print */
+  .container {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Ensure all divs allow content flow */
+  div {
+    overflow: visible !important;
+  }
+
+  /* Allow space-y containers to break across pages */
+  .space-y-6,
+  .space-y-4,
+  .space-y-2 {
+    page-break-inside: auto !important;
+  }
+
+  /* Recipe-Specific Styles */
+  .recipe-header {
+    margin-bottom: 1.5em;
+  }
+
+  .recipe-meta {
+    font-size: 11pt;
+    color: #333 !important;
+    margin-bottom: 1em;
+  }
+
+  .recipe-tags {
+    margin-top: 0.5em;
+  }
+
+  .recipe-tags span {
+    display: inline-block;
+    padding: 0.25em 0.75em;
+    border: 1px solid #d4d4d4 !important;
+    background: white !important;
+    margin-right: 0.5em;
+    margin-bottom: 0.5em;
+    font-size: 10pt;
+    color: black !important;
+  }
+
+  /* Instruction Step Numbers - Keep Visible */
+  .rounded-full {
+    border: 2px solid black !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Remove Transitions for Print */
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}
