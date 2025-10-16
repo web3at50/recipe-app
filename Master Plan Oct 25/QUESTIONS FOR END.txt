@@ -1,28 +1,26 @@
+ - Tidy up pre auth after extensive review - pushing to launch
 
-
- - Make mobile friendly as this is where most will use. Some bits are some bits aren't. Should be do this as we go or all at the end ?  Pages but also recipes and meal planners and shopping lists as will all mainly be used on mobile
-
- - Natasha law page and link to from onboarding flow. Need to create page and write content and link to from onboarding flow
-
- - Breadcrumbs and navigation for whole site review
-
- - Implement PDF SHift
+ - Add basic natasha age before lauch - just link from onboarding flow - Natasha law page and link to from onboarding flow. Need to create page and write content and link to from onboarding flow
 
  - Need to add additional diet preferences facility into onboarding and  like low carb, keto, no dairy (other ?). Step 2 in onboarding Dietary Preferences. So they get put into ai generation prompts etc too
 
+ - How to get beta testers.  Free sign in so need to restrict numbers or number of recipes generation requests - https://www.producthunt.com/
+
+ - Add feedback button to all pages and change its colour
 
 -  We need Privacy/GDPR page and link to from onboarding (just create holding page for now)
 
+- Add tagging and / or categories to recipe main page
 
 - Pricing plan to be decided
 
-- What plan with the image section in the my recipe page  Was there one? We could maybe use below. See if any good before decide if and how to add
-
-Gemini 2.5 Flash Image - mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Multiple AI\Google_Gemini_Analysis.md 
-page - https://ai.google.dev/gemini-api/docs/image-generation
 
  - Safety disclaimer, emergency info page created. Natahas page created. need to update privacy policy page when we have it - read C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Ad Hoc\Natasha_Law_Research_Report.md
+/app/allergen-information/page.tsx
+/app/food-allergy-safety/page.tsx
+ components (AllergenCard, NatashaStorySection, etc.)
 
+ - Bug reporter make a different colour and add to all pages
 
 - Maybe later enhacements to meal plan
 
@@ -37,14 +35,9 @@ page - https://ai.google.dev/gemini-api/docs/image-generation
 
 - App logo. Favicon okay but main logo didn't really work so look at again
 
-- Add pdf shift for pdf generation in the recipe page - have already added PDF_SHIFT_API_KEY to local.env and vercel env variables
-
-https://docs.pdfshift.io/#introduction
 
 
 - Security review - is AI having direct access to use info? If so which and how 
-
-- Edit /add pantry items on pantry page not working
 
 - What are user_recipe_interactions table in supabase as only table with 0
 
@@ -64,6 +57,19 @@ https://docs.pdfshift.io/#introduction
  - Need to sort google search console and sitemap and bing etc
 
 
+- Plan to get user feedback on models they prefer
+
+BONUS: AI Model Feedback System (8-12 hours)
+Collect user preferences when they use "All 4 Models"
+Modal prompts: "Which recipe did you prefer?"
+Store feedback in new database table
+Track which AI models users prefer for future pricing decisions
+
+C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Ad Hoc\generate-page-implementation-roadmap.md
+C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Ad Hoc\session-continuation-plan-generate-ux.md
+
+
+
 Will be adding this in later phase 
 
 NOTES
@@ -73,13 +79,10 @@ NOTES
 Make sure we have claude 4.5 sonnet memory game changer apparently. Mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Focused_MVP_Product_Strategy_2025.md line 1161
 
 
-AI code
-
-1 - OpenAI
-2 - Claude
-3 - Gemini
-4 - XAI
+Check https://ui.shadcn.com/
 
 
+Gemini 2.5 Flash Image - mentioned in C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25\Multiple AI\Google_Gemini_Analysis.md 
+page - https://ai.google.dev/gemini-api/docs/image-generation
 
 
