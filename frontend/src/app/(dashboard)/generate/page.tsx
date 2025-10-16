@@ -230,14 +230,13 @@ export default function GeneratePage() {
     if (!recipe) return;
 
     const aiModel = modelOverride || recipe.ai_model;
-    const modelLabel = aiModel ? ` (${aiModel.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())})` : '';
 
     try {
       const response = await fetch('/api/recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: `${recipe.name}${modelLabel}`,
+          name: recipe.name,
           description: recipe.description,
           prep_time: recipe.prep_time,
           cook_time: recipe.cook_time,
