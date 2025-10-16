@@ -13,7 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf, Settings2, Sparkles } from 'lucide-react';
 import type { Recipe } from '@/types/recipe';
 import type { UserPreferences } from '@/types/user-profile';
 import type { IngredientMode } from '@/types';
@@ -68,6 +70,9 @@ export default function GeneratePage() {
   // State for collapsible profile and pantry
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [pantryExpanded, setPantryExpanded] = useState(false);
+
+  // State for mobile drawer
+  const [ingredientModeDrawerOpen, setIngredientModeDrawerOpen] = useState(false);
 
   // Fetch user preferences on mount
   useEffect(() => {
@@ -304,16 +309,15 @@ export default function GeneratePage() {
       ]} />
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <ChefHat className="h-8 w-8" />
-          AI Recipe Generator
+        <h1 className="text-3xl font-bold">
+          Recipe Generator
         </h1>
         <p className="text-muted-foreground mt-1">
-          Enter ingredients and let AI create a personalized recipe for you
+          Generate custom recipe(s) in minutes
         </p>
       </div>
 
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="space-y-6">
         {/* User Preferences Summary - Collapsible */}
         {!isLoadingPreferences && userPreferences && (
           <div className="mb-6">
@@ -422,7 +426,7 @@ export default function GeneratePage() {
             )}
           </div>
         )}
-        {/* Input Section */}
+        {/* Input Section - Restructured */}
         <div className="space-y-6">
           {/* Pantry Staples Display - Collapsible on Mobile */}
           {pantryStaples.length > 0 && (
@@ -482,170 +486,343 @@ export default function GeneratePage() {
             </div>
           )}
 
+          {/* 1. Your Ingredients */}
           <Card>
             <CardHeader>
-              <CardTitle>Ingredients</CardTitle>
-              <CardDescription>
-                Enter ingredients, one per line
-              </CardDescription>
+              <CardTitle>Your Ingredients</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                id="ingredients"
+                value={ingredientsText}
+                onChange={(e) => setIngredientsText(e.target.value)}
+                placeholder={"Chicken breast\nOnions\nGarlic\nRice\n..."}
+                className="min-h-[150px] font-mono"
+              />
+            </CardContent>
+          </Card>
+
+          {/* 2. What Kind of Dish? */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">What kind of dish? (Optional)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                id="description"
+                value={descriptionText}
+                onChange={(e) => setDescriptionText(e.target.value)}
+                placeholder="E.g., Something creamy and comforting, Italian-style, not too spicy..."
+                className="min-h-[100px]"
+              />
+            </CardContent>
+          </Card>
+
+          {/* 3. Ingredient Mode - Compact Single Line */}
+          <Card>
+            <CardContent className="py-3">
+              {/* Mobile: Drawer */}
+              <div className="md:hidden">
+                <Drawer open={ingredientModeDrawerOpen} onOpenChange={setIngredientModeDrawerOpen}>
+                  <DrawerTrigger asChild>
+                    <button className="flex items-center justify-between w-full text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🍳</span>
+                        <span className="text-sm">
+                          <span className="font-medium">Ingredient Mode:</span>{' '}
+                          <span className="text-muted-foreground">
+                            {ingredientMode === 'strict' && 'Use Only What I Have'}
+                            {ingredientMode === 'flexible' && 'Flexible'}
+                            {ingredientMode === 'creative' && 'Creative'}
+                          </span>
+                        </span>
+                      </div>
+                      <span className="text-xs text-primary font-medium flex-shrink-0 ml-2">Edit →</span>
+                    </button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>Choose Ingredient Mode</DrawerTitle>
+                      <DrawerDescription>
+                        How should AI use your ingredients?
+                      </DrawerDescription>
+                    </DrawerHeader>
+                    <div className="px-4 pb-4 space-y-3">
+                      <button
+                        onClick={() => {
+                          setIngredientMode('strict');
+                          setIngredientModeDrawerOpen(false);
+                        }}
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
+                          ingredientMode === 'strict'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-muted hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="font-semibold flex items-center gap-2">
+                          🏠 Use Only What I Have
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Use only listed ingredients
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIngredientMode('flexible');
+                          setIngredientModeDrawerOpen(false);
+                        }}
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
+                          ingredientMode === 'flexible'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-muted hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="font-semibold flex items-center gap-2">
+                          ⚖️ Flexible (Default)
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Listed ingredients + common pantry basics
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIngredientMode('creative');
+                          setIngredientModeDrawerOpen(false);
+                        }}
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
+                          ingredientMode === 'creative'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-muted hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="font-semibold flex items-center gap-2">
+                          ✨ Creative - Inspire Me!
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Listed ingredients + exciting new ingredients
+                        </div>
+                      </button>
+                    </div>
+                    <DrawerFooter>
+                      <DrawerClose asChild>
+                        <Button variant="outline">Close</Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+              </div>
+
+              {/* Desktop: Inline Display with Popover/Dropdown */}
+              <div className="hidden md:flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🍳</span>
+                  <span className="text-sm">
+                    <span className="font-medium">Ingredient Mode:</span>{' '}
+                    <span className="text-muted-foreground">
+                      {ingredientMode === 'strict' && 'Use Only What I Have'}
+                      {ingredientMode === 'flexible' && 'Flexible'}
+                      {ingredientMode === 'creative' && 'Creative'}
+                    </span>
+                  </span>
+                </div>
+                <Drawer open={ingredientModeDrawerOpen} onOpenChange={setIngredientModeDrawerOpen}>
+                  <DrawerTrigger asChild>
+                    <button className="text-xs text-primary font-medium flex-shrink-0 ml-2">
+                      Edit →
+                    </button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>Choose Ingredient Mode</DrawerTitle>
+                      <DrawerDescription>
+                        How should AI use your ingredients?
+                      </DrawerDescription>
+                    </DrawerHeader>
+                    <div className="px-4 pb-4 space-y-3">
+                      <button
+                        onClick={() => {
+                          setIngredientMode('strict');
+                          setIngredientModeDrawerOpen(false);
+                        }}
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
+                          ingredientMode === 'strict'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-muted hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="font-semibold flex items-center gap-2">
+                          🏠 Use Only What I Have
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Use only listed ingredients
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIngredientMode('flexible');
+                          setIngredientModeDrawerOpen(false);
+                        }}
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
+                          ingredientMode === 'flexible'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-muted hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="font-semibold flex items-center gap-2">
+                          ⚖️ Flexible (Default)
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Listed ingredients + common pantry basics
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIngredientMode('creative');
+                          setIngredientModeDrawerOpen(false);
+                        }}
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-colors ${
+                          ingredientMode === 'creative'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-muted hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="font-semibold flex items-center gap-2">
+                          ✨ Creative - Inspire Me!
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Listed ingredients + exciting new ingredients
+                        </div>
+                      </button>
+                    </div>
+                    <DrawerFooter>
+                      <DrawerClose asChild>
+                        <Button variant="outline">Close</Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 4. Recipe Preferences - Compact Single Line */}
+          <Card className="bg-muted/30">
+            <CardContent className="py-3">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="preferences" className="border-none">
+                  <AccordionTrigger className="py-0 hover:no-underline">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <Settings2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-sm">
+                          <span className="font-medium">Recipe Preferences:</span>{' '}
+                          <span className="text-muted-foreground">Saved</span>
+                        </span>
+                      </div>
+                      <span className="text-xs text-primary font-medium flex-shrink-0 ml-2">Edit →</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="servings" className="text-sm">Servings</Label>
+                        <Input
+                          id="servings"
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={servings || userPreferences?.household_size || 4}
+                          onChange={(e) => setServings(parseInt(e.target.value))}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="maxTime" className="text-sm">Max Time (mins)</Label>
+                        <Input
+                          id="maxTime"
+                          type="number"
+                          min="10"
+                          max="180"
+                          step="5"
+                          placeholder={(userPreferences?.typical_cook_time || 30).toString()}
+                          value={maxCookTime ?? ''}
+                          onChange={(e) => setMaxCookTime(e.target.value ? parseInt(e.target.value) : null)}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="skillLevel" className="text-sm">Skill Level</Label>
+                        <Select
+                          value={skillLevel || userPreferences?.cooking_skill || 'intermediate'}
+                          onValueChange={setSkillLevel}
+                        >
+                          <SelectTrigger id="skillLevel">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="beginner">Beginner</SelectItem>
+                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="advanced">Advanced</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="spiceLevel" className="text-sm">Spice Level</Label>
+                        <Select
+                          value={spiceLevel || userPreferences?.spice_level || 'medium'}
+                          onValueChange={setSpiceLevel}
+                        >
+                          <SelectTrigger id="spiceLevel">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="mild">Mild</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="hot">Hot</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
+
+          {/* 3. AI Model & Generate - Prominent CTA */}
+          <Card className="border-2 border-primary/20 bg-primary/5">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <CardTitle className="text-base">Generate Your Recipe</CardTitle>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="ingredients">Available Ingredients</Label>
-                <Textarea
-                  id="ingredients"
-                  value={ingredientsText}
-                  onChange={(e) => setIngredientsText(e.target.value)}
-                  placeholder={"Chicken breast\nOnions\nGarlic\nRice\n..."}
-                  className="min-h-[150px] font-mono"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">
-                  What kind of dish? (Optional)
-                  <span className="text-xs text-muted-foreground ml-2">Describe the style or mood</span>
-                </Label>
-                <Textarea
-                  id="description"
-                  value={descriptionText}
-                  onChange={(e) => setDescriptionText(e.target.value)}
-                  placeholder="E.g., Something creamy and comforting, Italian-style, not too spicy..."
-                  className="min-h-[120px]"
-                />
-                <p className="text-xs text-muted-foreground">
-                  This helps the AI understand what kind of recipe you&apos;re looking for
-                </p>
-              </div>
-
-              {/* Ingredient Mode Toggle */}
-              <div className="space-y-3 p-4 bg-muted rounded-lg border-2 border-muted">
-                <Label className="text-base font-semibold">Ingredient Mode</Label>
-                <RadioGroup value={ingredientMode} onValueChange={(v) => setIngredientMode(v as IngredientMode)}>
-                  <div className="space-y-4">
-                    <div className="flex items-start space-x-3">
-                      <RadioGroupItem value="strict" id="strict" className="mt-1" />
-                      <Label htmlFor="strict" className="cursor-pointer flex-1">
-                        <div className="font-semibold text-base">No Shop - Use Only What I Have</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Use only listed ingredients</div>
-                      </Label>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <RadioGroupItem value="flexible" id="flexible" className="mt-1" />
-                      <Label htmlFor="flexible" className="cursor-pointer flex-1">
-                        <div className="font-semibold text-base">Flexible (Default) - Use What I Have + Other Basics</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Listed ingredients + common pantry basics</div>
-                      </Label>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <RadioGroupItem value="creative" id="creative" className="mt-1" />
-                      <Label htmlFor="creative" className="cursor-pointer flex-1">
-                        <div className="font-semibold text-base">Creative - Inspire Me & Happy to Shop!</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">Listed ingredients + exciting new ingredients</div>
-                      </Label>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              {/* Cooking Parameters */}
-              <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="servings">Servings</Label>
-                  <Input
-                    id="servings"
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={servings || userPreferences?.household_size || 4}
-                    onChange={(e) => setServings(parseInt(e.target.value))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="maxTime">Max Time (mins)</Label>
-                  <Input
-                    id="maxTime"
-                    type="number"
-                    min="10"
-                    max="180"
-                    step="5"
-                    placeholder={(userPreferences?.typical_cook_time || 30).toString()}
-                    value={maxCookTime ?? ''}
-                    onChange={(e) => setMaxCookTime(e.target.value ? parseInt(e.target.value) : null)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="skillLevel">Skill Level</Label>
-                  <Select
-                    value={skillLevel || userPreferences?.cooking_skill || 'intermediate'}
-                    onValueChange={setSkillLevel}
-                  >
-                    <SelectTrigger id="skillLevel">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="beginner">Beginner</SelectItem>
-                      <SelectItem value="intermediate">Intermediate</SelectItem>
-                      <SelectItem value="advanced">Advanced</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="spiceLevel">Spice Level</Label>
-                  <Select
-                    value={spiceLevel || userPreferences?.spice_level || 'medium'}
-                    onValueChange={setSpiceLevel}
-                  >
-                    <SelectTrigger id="spiceLevel">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="mild">Mild</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="hot">Hot</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
               <div className="space-y-3">
-                <Label htmlFor="aiModel">Choose AI Model</Label>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="flex-1">
-                    <Select
-                      value={selectedModel === 'all' ? 'model_1' : selectedModel}
-                      onValueChange={(value) => setSelectedModel(value as 'model_1' | 'model_2' | 'model_3' | 'model_4')}
-                    >
-                      <SelectTrigger id="aiModel">
-                        <SelectValue placeholder="Select AI model" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="model_1">ChatGPT (OpenAI)</SelectItem>
-                        <SelectItem value="model_2">Claude (Anthropic)</SelectItem>
-                        <SelectItem value="model_3">Gemini (Google)</SelectItem>
-                        <SelectItem value="model_4">Grok (xAI)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button
-                    type="button"
-                    variant={selectedModel === 'all' ? 'default' : 'outline'}
-                    onClick={() => setSelectedModel('all')}
-                    className="sm:w-auto whitespace-nowrap"
-                  >
-                    {selectedModel === 'all' ? '✓ ' : ''}Compare All 4
-                  </Button>
-                </div>
+                <Label htmlFor="aiModel" className="text-sm">Choose AI Model</Label>
+                <Select
+                  value={selectedModel}
+                  onValueChange={(value) => setSelectedModel(value as 'model_1' | 'model_2' | 'model_3' | 'model_4' | 'all')}
+                >
+                  <SelectTrigger id="aiModel" className="h-11">
+                    <SelectValue placeholder="Select AI model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">🎨 All 4 Models (Compare)</SelectItem>
+                    <SelectItem value="model_1">ChatGPT (OpenAI)</SelectItem>
+                    <SelectItem value="model_2">Claude (Anthropic)</SelectItem>
+                    <SelectItem value="model_3">Gemini (Google)</SelectItem>
+                    <SelectItem value="model_4">Grok (xAI)</SelectItem>
+                  </SelectContent>
+                </Select>
                 <p className="text-xs text-muted-foreground">
-                  Choose a single AI model or compare all 4 at once to see different recipe variations.
+                  Choose a single AI or compare all 4 to see different variations
                 </p>
               </div>
 
               <Button
-                className="w-full"
+                className="w-full h-12 text-base font-semibold bg-green-600 hover:bg-green-700 text-white"
                 size="lg"
                 onClick={handleGenerate}
                 disabled={isGenerating || isGeneratingAll || !ingredientsText.trim()}
@@ -663,12 +840,7 @@ export default function GeneratePage() {
                 ) : (
                   <>
                     <ChefHat className="h-5 w-5 mr-2" />
-                    {selectedModel === 'all' ? 'Generate with All 4 Models' : `Generate Recipe with ${
-                      selectedModel === 'model_1' ? 'ChatGPT' :
-                      selectedModel === 'model_2' ? 'Claude' :
-                      selectedModel === 'model_3' ? 'Gemini' :
-                      'Grok'
-                    }`}
+                    {selectedModel === 'all' ? 'Generate All 4 Recipes' : 'Generate Recipe'}
                   </>
                 )}
               </Button>
@@ -852,7 +1024,7 @@ export default function GeneratePage() {
                           </>
                         ) : (
                           <div className="text-center py-8 text-muted-foreground">
-                            <p>No recipe generated for this model</p>
+                            <p>Temporary error with this model - please try again</p>
                           </div>
                         )}
                       </TabsContent>
