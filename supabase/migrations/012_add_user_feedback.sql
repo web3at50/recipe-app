@@ -25,17 +25,18 @@ CREATE TABLE IF NOT EXISTS user_feedback (
 ALTER TABLE user_feedback ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can insert their own feedback
+-- Use 'public' role (not 'authenticated') because we use Clerk Auth, not Supabase Auth
 CREATE POLICY "Users can insert feedback"
   ON user_feedback FOR INSERT
-  TO authenticated
-  WITH CHECK (true);
+  TO public
+  WITH CHECK ((auth.jwt() ->> 'sub'::text) IS NOT NULL);
 
 -- Policy: Users can view their own feedback
 -- Use auth.jwt() ->> 'sub' pattern (same as all other tables) instead of auth.uid()
 -- auth.uid() tries to cast to UUID which fails with Clerk user IDs
 CREATE POLICY "Users can view own feedback"
   ON user_feedback FOR SELECT
-  TO authenticated
+  TO public
   USING ((auth.jwt() ->> 'sub'::text) = user_id);
 
 -- Index for efficient queries
