@@ -138,6 +138,18 @@ export async function POST(request: Request) {
         temperature: 0.7,
         maxOutputTokens: 2000,
       });
+
+      // Debug: Check OpenAI token usage
+      console.log('=== OPENAI DEBUG START ===');
+      console.log('Result keys:', Object.keys(result));
+      console.log('Has usage?:', !!result.usage);
+      if (result.usage) {
+        console.log('Prompt tokens:', result.usage.promptTokens);
+        console.log('Completion tokens:', result.usage.completionTokens);
+        console.log('Total tokens:', result.usage.totalTokens);
+      }
+      console.log('=== OPENAI DEBUG END ===');
+
       text = result.text;
 
     } else if (model === 'claude') {
@@ -157,6 +169,16 @@ export async function POST(request: Request) {
         messages: [{ role: 'user', content: prompt }],
       });
 
+      // Debug: Check Claude token usage
+      console.log('=== CLAUDE DEBUG START ===');
+      console.log('Message keys:', Object.keys(message));
+      console.log('Has usage?:', !!message.usage);
+      if (message.usage) {
+        console.log('Input tokens:', message.usage.input_tokens);
+        console.log('Output tokens:', message.usage.output_tokens);
+      }
+      console.log('=== CLAUDE DEBUG END ===');
+
       // Extract text from Claude response
       const contentBlock = message.content[0];
       text = contentBlock.type === 'text' ? contentBlock.text : '';
@@ -172,22 +194,6 @@ export async function POST(request: Request) {
         model: 'gemini-2.0-flash-exp',
         contents: prompt,
       });
-
-      // 🆕 Debug logging - Check if Gemini returns token usage
-      console.log('=== GEMINI DEBUG START ===');
-      // Check different possible locations for usage metadata
-      console.log('Result keys:', Object.keys(result));
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const resultAny = result as any;
-      console.log('Has usageMetadata?:', !!resultAny.usageMetadata);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const usage = resultAny.usageMetadata;
-      if (usage) {
-        console.log('Input tokens (promptTokenCount):', usage.promptTokenCount);
-        console.log('Output tokens (candidatesTokenCount):', usage.candidatesTokenCount);
-        console.log('Total tokens:', usage.totalTokenCount);
-      }
-      console.log('=== GEMINI DEBUG END ===');
 
       text = result.text || '';
 
@@ -219,6 +225,17 @@ export async function POST(request: Request) {
         temperature: 0.7,
         max_tokens: 2000,
       });
+
+      // Debug: Check Grok token usage
+      console.log('=== GROK DEBUG START ===');
+      console.log('Completion keys:', Object.keys(completion));
+      console.log('Has usage?:', !!completion.usage);
+      if (completion.usage) {
+        console.log('Prompt tokens:', completion.usage.prompt_tokens);
+        console.log('Completion tokens:', completion.usage.completion_tokens);
+        console.log('Total tokens:', completion.usage.total_tokens);
+      }
+      console.log('=== GROK DEBUG END ===');
 
       text = completion.choices[0]?.message?.content || '';
 
