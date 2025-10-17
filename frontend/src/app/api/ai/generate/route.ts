@@ -144,9 +144,8 @@ export async function POST(request: Request) {
       console.log('Result keys:', Object.keys(result));
       console.log('Has usage?:', !!result.usage);
       if (result.usage) {
-        console.log('Prompt tokens:', result.usage.promptTokens);
-        console.log('Completion tokens:', result.usage.completionTokens);
-        console.log('Total tokens:', result.usage.totalTokens);
+        console.log('Usage keys:', Object.keys(result.usage));
+        console.log('Full usage object:', JSON.stringify(result.usage));
       }
       console.log('=== OPENAI DEBUG END ===');
 
