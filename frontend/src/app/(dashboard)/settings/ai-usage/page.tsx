@@ -78,11 +78,22 @@ interface CostProjectionRow {
   profit_margin_14_99_pct: number;
 }
 
+// Admin user IDs (your Clerk user IDs)
+const ADMIN_USER_IDS = [
+  'user_343TO1lsjoH8s1EKDNrhoiQh7TH',
+  'user_3435IpOreHjAGbteEEIvJ81zJkL',
+];
+
 export default async function AIUsagePage() {
   const { userId } = await auth();
 
   if (!userId) {
     redirect('/sign-in');
+  }
+
+  // Check if user is admin
+  if (!ADMIN_USER_IDS.includes(userId)) {
+    redirect('/');
   }
 
   const supabase = await createClient();
