@@ -173,6 +173,17 @@ export async function POST(request: Request) {
         contents: prompt,
       });
 
+      // 🆕 Debug logging - Check if Gemini returns token usage
+      console.log('=== GEMINI DEBUG START ===');
+      console.log('Has usageMetadata?:', !!result.response?.usageMetadata);
+      if (result.response?.usageMetadata) {
+        const usage = result.response.usageMetadata;
+        console.log('Input tokens (promptTokenCount):', usage.promptTokenCount);
+        console.log('Output tokens (candidatesTokenCount):', usage.candidatesTokenCount);
+        console.log('Total tokens:', usage.totalTokenCount);
+      }
+      console.log('=== GEMINI DEBUG END ===');
+
       text = result.text || '';
 
     } else if (model === 'grok') {
