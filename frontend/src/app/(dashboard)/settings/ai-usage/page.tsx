@@ -78,11 +78,9 @@ interface CostProjectionRow {
   profit_margin_14_99_pct: number;
 }
 
-// Admin user IDs (your Clerk user IDs)
-const ADMIN_USER_IDS = [
-  'user_343TO1lsjoH8s1EKDNrhoiQh7TH',
-  'user_3435IpOreHjAGbteEEIvJ81zJkL',
-];
+// Load admin user IDs from environment variable
+// Format: ADMIN_USER_IDS=user_id1,user_id2,user_id3
+const ADMIN_USER_IDS = process.env.ADMIN_USER_IDS?.split(',').map(id => id.trim()) || [];
 
 export default async function AIUsagePage() {
   const { userId } = await auth();
@@ -93,6 +91,7 @@ export default async function AIUsagePage() {
 
   // Check if user is admin
   if (!ADMIN_USER_IDS.includes(userId)) {
+    console.warn(`Non-admin user ${userId} attempted to access AI usage dashboard`);
     redirect('/');
   }
 
