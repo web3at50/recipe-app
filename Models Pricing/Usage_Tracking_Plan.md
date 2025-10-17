@@ -2,8 +2,53 @@
 ## Phase 2: Real-Time Cost Monitoring
 
 **Created:** 2025-10-17
-**Status:** Planning Phase
+**Updated:** 2025-10-17 (Token properties verified)
+**Status:** Implementation Ready ✅
 **Purpose:** Track actual token usage and costs for AI recipe generation
+
+---
+
+## ✅ VERIFIED: Token Usage Properties from Real API Responses
+
+**Verification Date:** 2025-10-17
+**Method:** Tested all 4 providers in production and captured actual response structures
+
+### OpenAI (via Vercel AI SDK)
+```typescript
+// VERIFIED Response Structure
+result.usage.inputTokens          // 487 (NOT promptTokens!)
+result.usage.outputTokens         // 1016 (NOT completionTokens!)
+result.usage.cachedInputTokens    // 0
+result.usage.totalTokens          // 1503
+result.usage.reasoningTokens      // 0
+```
+
+### Claude (Anthropic SDK)
+```typescript
+// VERIFIED Response Structure
+message.usage.input_tokens    // 582 ✅
+message.usage.output_tokens   // 1293 ✅
+```
+
+### Gemini (Google GenAI SDK)
+```typescript
+// VERIFIED Response Structure (cast required)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const usageMetadata = (result as any).usageMetadata;
+usageMetadata.promptTokenCount        // 537 ✅
+usageMetadata.candidatesTokenCount    // 1277 ✅
+usageMetadata.totalTokenCount         // 1814 ✅
+```
+
+### Grok (XAI via OpenAI SDK)
+```typescript
+// VERIFIED Response Structure
+completion.usage.prompt_tokens      // 661 ✅
+completion.usage.completion_tokens  // 710 ✅
+completion.usage.total_tokens       // 1894 ✅
+```
+
+**Important:** Vercel AI SDK uses different property names than native OpenAI SDK!
 
 ---
 

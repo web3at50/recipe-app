@@ -4,8 +4,22 @@ import { createClient } from '@/lib/supabase/server';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { createRecipeGenerationPrompt, parseRecipeFromAI } from '@/lib/ai/prompts';
+import { logAIUsage, generateRequestId, generateSessionId } from '@/lib/ai/usage-tracker';
 
 export async function POST(request: Request) {
+  // Start timing for performance tracking
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+  const sessionId = request.headers.get('x-session-id') || generateSessionId();
+
+  // Token usage tracking variables (populated by each provider)
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let cachedTokens = 0;
+  let modelProvider = '';
+  let modelName = '';
+  let recipeGenerated = false;
+
   try {
     const body = await request.json();
 
@@ -139,21 +153,19 @@ export async function POST(request: Request) {
         maxOutputTokens: 2000,
       });
 
-      // Debug: Check OpenAI token usage
-      console.log('=== OPENAI DEBUG START ===');
-      console.log('Result keys:', Object.keys(result));
-      console.log('Has usage?:', !!result.usage);
-      if (result.usage) {
-        console.log('Usage keys:', Object.keys(result.usage));
-        console.log('Full usage object:', JSON.stringify(result.usage));
-      }
-      console.log('=== OPENAI DEBUG END ===');
+      // Extract token usage (VERIFIED property names from Vercel AI SDK)
+      modelProvider = 'openai';
+      modelName = openaiModel;
+      inputTokens = result.usage?.inputTokens || 0;
+      outputTokens = result.usage?.outputTokens || 0;
+      cachedTokens = result.usage?.cachedInputTokens || 0;
+      recipeGenerated = true;
 
       text = result.text;
 
     } else if (model === 'claude') {
-      // Claude Sonnet 4.5
-      console.log('Generating recipe with Claude Sonnet 4.5...');
+      // Claude Haiku 4.5
+      console.log('Generating recipe with Claude Haiku 4.5...');
 
       const Anthropic = (await import('@anthropic-ai/sdk')).default;
       const anthropic = new Anthropic({
@@ -168,15 +180,12 @@ export async function POST(request: Request) {
         messages: [{ role: 'user', content: prompt }],
       });
 
-      // Debug: Check Claude token usage
-      console.log('=== CLAUDE DEBUG START ===');
-      console.log('Message keys:', Object.keys(message));
-      console.log('Has usage?:', !!message.usage);
-      if (message.usage) {
-        console.log('Input tokens:', message.usage.input_tokens);
-        console.log('Output tokens:', message.usage.output_tokens);
-      }
-      console.log('=== CLAUDE DEBUG END ===');
+      // Extract token usage (VERIFIED property names from Anthropic SDK)
+      modelProvider = 'claude';
+      modelName = 'claude-haiku-4-5-20251001';
+      inputTokens = message.usage.input_tokens;
+      outputTokens = message.usage.output_tokens;
+      recipeGenerated = true;
 
       // Extract text from Claude response
       const contentBlock = message.content[0];
@@ -193,6 +202,15 @@ export async function POST(request: Request) {
         model: 'gemini-2.0-flash-exp',
         contents: prompt,
       });
+
+      // Extract token usage (VERIFIED property names from Google GenAI SDK)
+      modelProvider = 'gemini';
+      modelName = 'gemini-2.0-flash-exp';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const usageMetadata = (result as any).usageMetadata;
+      inputTokens = usageMetadata?.promptTokenCount || 0;
+      outputTokens = usageMetadata?.candidatesTokenCount || 0;
+      recipeGenerated = true;
 
       text = result.text || '';
 
@@ -225,16 +243,12 @@ export async function POST(request: Request) {
         max_tokens: 2000,
       });
 
-      // Debug: Check Grok token usage
-      console.log('=== GROK DEBUG START ===');
-      console.log('Completion keys:', Object.keys(completion));
-      console.log('Has usage?:', !!completion.usage);
-      if (completion.usage) {
-        console.log('Prompt tokens:', completion.usage.prompt_tokens);
-        console.log('Completion tokens:', completion.usage.completion_tokens);
-        console.log('Total tokens:', completion.usage.total_tokens);
-      }
-      console.log('=== GROK DEBUG END ===');
+      // Extract token usage (VERIFIED property names from XAI via OpenAI SDK)
+      modelProvider = 'grok';
+      modelName = 'grok-4-fast-reasoning';
+      inputTokens = completion.usage?.prompt_tokens || 0;
+      outputTokens = completion.usage?.completion_tokens || 0;
+      recipeGenerated = true;
 
       text = completion.choices[0]?.message?.content || '';
 
@@ -287,12 +301,53 @@ export async function POST(request: Request) {
     // Add source metadata
     recipe.source = 'ai_generated';
 
+    // Log AI usage for cost tracking and analytics (non-blocking)
+    const responseTime = Date.now() - startTime;
+    logAIUsage({
+      userId: userId || undefined,
+      sessionId,
+      requestId,
+      modelProvider: modelProvider as 'openai' | 'claude' | 'gemini' | 'grok',
+      modelName,
+      modelVersion: modelName,
+      inputTokens,
+      outputTokens,
+      cachedTokens,
+      complexityScore: model === 'openai' ? complexityScore : undefined,
+      recipeGenerated,
+      responseTimeMs: responseTime,
+      ingredientCount: ingredients.length,
+      allergenCount: userAllergens.length,
+      dietaryRestrictionCount: mergedDietaryPrefs.length,
+    }).catch((error) => {
+      // Don't let logging errors affect the response
+      console.error('Failed to log AI usage:', error);
+    });
+
     return NextResponse.json({
       recipe,
       allergen_warnings: allergenWarnings.length > 0 ? allergenWarnings : undefined,
     });
   } catch (error) {
     console.error('Error in AI recipe generation:', error);
+
+    // Log failed attempt for cost tracking (non-blocking)
+    const responseTime = Date.now() - startTime;
+    logAIUsage({
+      userId: undefined,
+      sessionId,
+      requestId,
+      modelProvider: (modelProvider || 'openai') as 'openai' | 'claude' | 'gemini' | 'grok',
+      modelName: modelName || 'unknown',
+      modelVersion: modelName || 'unknown',
+      inputTokens: inputTokens || 0,
+      outputTokens: 0,
+      recipeGenerated: false,
+      responseTimeMs: responseTime,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+    }).catch((logError) => {
+      console.error('Failed to log error:', logError);
+    });
 
     if (error instanceof Error) {
       return NextResponse.json(

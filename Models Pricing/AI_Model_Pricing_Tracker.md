@@ -253,16 +253,78 @@ Score = (ingredients × 0.5) + (allergens × 3) + (dietary_restrictions × 2) + 
 
 ---
 
-## Next Steps
+## ✅ IMPLEMENTED: Real-Time Usage Tracking
 
-### Phase 2: Real-Time Usage Tracking
+**Implementation Date:** 2025-10-17
+**Status:** Live in production
 
-See `Usage_Tracking_Plan.md` for implementation details on:
-- Database schema for cost tracking
-- Real-time token counting
+### What Was Implemented
+
+1. **Database Tables** (Migration 016)
+   - `ai_usage_logs` table with token counts, costs, and performance metrics
+   - `ai_cost_summary` materialized view for daily aggregations
+   - Row Level Security (RLS) policies
+   - Indexes for query performance
+
+2. **Usage Tracker Library** (`lib/ai/usage-tracker.ts`)
+   - Automated token counting from all 4 providers
+   - Real-time cost calculation based on MODEL_PRICING
+   - Non-blocking async logging (doesn't affect recipe generation)
+   - Error handling with graceful degradation
+
+3. **Route Integration** (`app/api/ai/generate/route.ts`)
+   - VERIFIED token property names for all providers:
+     - OpenAI: `usage.inputTokens` / `usage.outputTokens`
+     - Claude: `usage.input_tokens` / `usage.output_tokens`
+     - Gemini: `usageMetadata.promptTokenCount` / `usageMetadata.candidatesTokenCount`
+     - Grok: `usage.prompt_tokens` / `usage.completion_tokens`
+   - Logs both successful and failed requests
+   - Tracks complexity score, response time, and recipe metadata
+
+### How to Access Data
+
+**Query Recent Usage:**
+```sql
+SELECT * FROM ai_usage_logs
+ORDER BY created_at DESC
+LIMIT 100;
+```
+
+**Daily Cost Summary:**
+```sql
+SELECT * FROM ai_cost_summary
+ORDER BY date DESC
+LIMIT 30;
+```
+
+**Cost by Provider:**
+```sql
+SELECT
+  model_provider,
+  COUNT(*) as requests,
+  SUM(calculated_cost) as total_cost,
+  AVG(calculated_cost) as avg_cost
+FROM ai_usage_logs
+WHERE created_at >= NOW() - INTERVAL '30 days'
+GROUP BY model_provider
+ORDER BY total_cost DESC;
+```
+
+### What to Monitor
+
+- Check Vercel logs for: `✅ AI Usage: [model] | [tokens] tokens | $[cost] | [time]ms`
+- Query Supabase `ai_usage_logs` table daily
+- Refresh materialized view: `SELECT refresh_ai_cost_summary();`
+- Compare calculated costs to actual provider bills
+
+### Next Steps
+
+See `Usage_Tracking_Plan.md` for Phase 2 enhancements:
+- Analytics dashboard UI
+- Cost alerts and notifications
+- Budget tracking
 - Per-user cost analytics
-- Monthly cost reports
-- Cost optimization alerts
+- Monthly reports
 
 ---
 
