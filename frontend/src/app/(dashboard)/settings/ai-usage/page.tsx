@@ -118,9 +118,9 @@ export default async function AIUsagePage() {
   ]);
 
   // Calculate summary stats
-  const totalCost = (dailyCosts || []).reduce((sum, row) => sum + Number(row.total_cost), 0);
-  const totalRequests = (dailyCosts || []).reduce((sum, row) => sum + Number(row.request_count), 0);
-  const totalTokens = (dailyCosts || []).reduce((sum, row) => sum + Number(row.total_tokens), 0);
+  const totalCost = (dailyCosts || []).reduce((sum: number, row) => sum + Number(row.total_cost), 0);
+  const totalRequests = (dailyCosts || []).reduce((sum: number, row) => sum + Number(row.request_count), 0);
+  const totalTokens = (dailyCosts || []).reduce((sum: number, row) => sum + Number(row.total_tokens), 0);
 
   const profitableAt999 = (userProfit || []).filter(u => u.profitability_tier_low === 'Profitable').length;
   const profitableAt1499 = (userProfit || []).filter(u => u.profitability_tier_high === 'Profitable').length;
