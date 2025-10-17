@@ -177,10 +177,11 @@ export async function POST(request: Request) {
       console.log('=== GEMINI DEBUG START ===');
       // Check different possible locations for usage metadata
       console.log('Result keys:', Object.keys(result));
-      // @ts-ignore - Checking for usage metadata in response
-      console.log('Has usageMetadata?:', !!(result as any).usageMetadata);
-      // @ts-ignore - Try to access usage data
-      const usage = (result as any).usageMetadata;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const resultAny = result as any;
+      console.log('Has usageMetadata?:', !!resultAny.usageMetadata);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const usage = resultAny.usageMetadata;
       if (usage) {
         console.log('Input tokens (promptTokenCount):', usage.promptTokenCount);
         console.log('Output tokens (candidatesTokenCount):', usage.candidatesTokenCount);
