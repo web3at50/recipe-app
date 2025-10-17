@@ -150,7 +150,7 @@ export async function POST(request: Request) {
       });
 
       const message = await anthropic.messages.create({
-        model: 'claude-sonnet-4-5-20250929',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 2000,
         temperature: 0.7,
         system: "You are a professional UK-based chef assistant. Generate recipes in the exact JSON format requested.",
@@ -162,11 +162,11 @@ export async function POST(request: Request) {
       text = contentBlock.type === 'text' ? contentBlock.text : '';
 
     } else if (model === 'gemini') {
-      // Gemini 2.5 Flash (FREE TIER)
-      console.log('Generating recipe with Gemini 2.5 Flash (free tier)...');
+      // Gemini 2.5 Flash (PAID TIER)
+      console.log('Generating recipe with Gemini 2.5 Flash (paid tier)...');
 
       const { GoogleGenAI } = await import('@google/genai');
-      const genai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_FREE_API_KEY! });
+      const genai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY! });
 
       const result = await genai.models.generateContent({
         model: 'gemini-2.0-flash-exp',
