@@ -22,12 +22,12 @@ export default async function Home() {
               alt="PlateWise Logo"
               width={80}
               height={80}
-              className="rounded-full"
+              className="rounded-full ring-4 ring-orange-500 ring-offset-4 ring-offset-background"
             />
           </div>
 
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-            Welcome to PlateWise
+            Welcome to <span className="text-orange-500">P</span>late<span className="text-orange-500">W</span>ise
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
