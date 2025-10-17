@@ -88,27 +88,33 @@ export default async function AIUsagePage() {
   const supabase = await createClient();
 
   // Fetch analytics data using the SQL functions we created
+  const dailyCostsPromise = supabase.rpc('get_daily_cost_summary', {
+    date_from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    date_to: new Date().toISOString().split('T')[0],
+  });
+
+  const providerPerfPromise = supabase.rpc('get_provider_performance', { days_back: 30 });
+
+  const userProfitPromise = supabase.rpc('get_user_profitability', {
+    price_tier_low: 9.99,
+    price_tier_high: 14.99,
+  });
+
+  const costProjectionPromise = supabase.rpc('get_cost_projection', {
+    estimated_users: 100,
+    avg_recipes_per_user: 5,
+  });
+
   const [
     { data: dailyCosts },
     { data: providerPerf },
     { data: userProfit },
     { data: costProjection },
   ] = await Promise.all([
-    supabase.rpc('get_daily_cost_summary', {
-      date_from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      date_to: new Date().toISOString().split('T')[0],
-    }) as Promise<{ data: DailyCostRow[] | null }>,
-    supabase.rpc('get_provider_performance', { days_back: 30 }) as Promise<{
-      data: ProviderPerfRow[] | null
-    }>,
-    supabase.rpc('get_user_profitability', {
-      price_tier_low: 9.99,
-      price_tier_high: 14.99,
-    }) as Promise<{ data: UserProfitRow[] | null }>,
-    supabase.rpc('get_cost_projection', {
-      estimated_users: 100,
-      avg_recipes_per_user: 5,
-    }) as Promise<{ data: CostProjectionRow[] | null }>,
+    dailyCostsPromise,
+    providerPerfPromise,
+    userProfitPromise,
+    costProjectionPromise,
   ]);
 
   // Calculate summary stats
