@@ -122,14 +122,14 @@ export default async function AIUsagePage() {
   const totalRequests = (dailyCosts || []).reduce((sum: number, row: DailyCostRow) => sum + Number(row.request_count), 0);
   const totalTokens = (dailyCosts || []).reduce((sum: number, row: DailyCostRow) => sum + Number(row.total_tokens), 0);
 
-  const profitableAt999 = (userProfit || []).filter(u => u.profitability_tier_low === 'Profitable').length;
-  const profitableAt1499 = (userProfit || []).filter(u => u.profitability_tier_high === 'Profitable').length;
+  const profitableAt999 = (userProfit || []).filter((u: UserProfitRow) => u.profitability_tier_low === 'Profitable').length;
+  const profitableAt1499 = (userProfit || []).filter((u: UserProfitRow) => u.profitability_tier_high === 'Profitable').length;
   const totalUsers = (userProfit || []).length;
 
   // Get cheapest and fastest providers
-  const cheapestProvider = (providerPerf || []).sort((a, b) => Number(a.avg_cost) - Number(b.avg_cost))[0];
+  const cheapestProvider = (providerPerf || []).sort((a: ProviderPerfRow, b: ProviderPerfRow) => Number(a.avg_cost) - Number(b.avg_cost))[0];
   const fastestProvider = (providerPerf || []).sort(
-    (a, b) => Number(a.avg_response_time_ms) - Number(b.avg_response_time_ms)
+    (a: ProviderPerfRow, b: ProviderPerfRow) => Number(a.avg_response_time_ms) - Number(b.avg_response_time_ms)
   )[0];
 
   return (
