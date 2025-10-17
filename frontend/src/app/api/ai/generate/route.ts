@@ -313,7 +313,7 @@ export async function POST(request: Request) {
       inputTokens,
       outputTokens,
       cachedTokens,
-      complexityScore: model === 'openai' ? complexityScore : undefined,
+      complexityScore, // Log for all providers for analytics (OpenAI uses it for model selection)
       recipeGenerated,
       responseTimeMs: responseTime,
       ingredientCount: ingredients.length,
