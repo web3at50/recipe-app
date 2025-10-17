@@ -39,7 +39,9 @@
       "Bash(git diff:*)",
       "Bash(move \"settings\\page.tsx\" \"(dashboard)\\settings\\page.tsx\")",
       "Bash(move \"settings\\pantry-staples\\page.tsx\" \"(dashboard)\\settings\\pantry-staples\\page.tsx\")",
-      "Bash(powershell Move-Item:*)"
+      "Bash(powershell Move-Item:*)",
+      "Bash(Remove-Item -Path \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\app\\playground\" -Recurse -Force)",
+      "Bash(Remove-Item -Path \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\lib\\session-storage.ts\" -Force)"
     ],
     "deny": [],
     "ask": []

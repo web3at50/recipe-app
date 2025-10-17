@@ -60,14 +60,19 @@ export default function RootLayout({
                     <MobileNavWrapper />
                   </SignedIn>
                   <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <Image
-                      src="/logo.png"
-                      alt="PlateWise Logo"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                    <span className="text-2xl font-bold">PlateWise</span>
+                    <div className="relative">
+                      <Image
+                        src="/logo.png"
+                        alt="PlateWise Logo"
+                        width={40}
+                        height={40}
+                        className="rounded-full ring-2 ring-orange-500 ring-offset-2 ring-offset-background"
+                      />
+                    </div>
+                    <span className="text-2xl font-bold">
+                      <span className="text-orange-500">P</span>late
+                      <span className="text-orange-500">W</span>ise
+                    </span>
                   </Link>
                 </div>
                 <nav className="flex items-center gap-2">
