@@ -175,9 +175,13 @@ export async function POST(request: Request) {
 
       // 🆕 Debug logging - Check if Gemini returns token usage
       console.log('=== GEMINI DEBUG START ===');
-      console.log('Has usageMetadata?:', !!result.response?.usageMetadata);
-      if (result.response?.usageMetadata) {
-        const usage = result.response.usageMetadata;
+      // Check different possible locations for usage metadata
+      console.log('Result keys:', Object.keys(result));
+      // @ts-ignore - Checking for usage metadata in response
+      console.log('Has usageMetadata?:', !!(result as any).usageMetadata);
+      // @ts-ignore - Try to access usage data
+      const usage = (result as any).usageMetadata;
+      if (usage) {
         console.log('Input tokens (promptTokenCount):', usage.promptTokenCount);
         console.log('Output tokens (candidatesTokenCount):', usage.candidatesTokenCount);
         console.log('Total tokens:', usage.totalTokenCount);
