@@ -5,6 +5,7 @@ import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut } from '
 import { ThemeProvider } from "@/components/theme-provider"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { UserButtonWithLinks } from "@/components/user-button-with-links"
 import { MobileNavWrapper } from "@/components/navigation/mobile-nav-wrapper"
@@ -32,7 +33,7 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: "Plate Wise",
+  title: "PlateWise",
   description: "Your personal recipe manager and meal planner",
   icons: {
     icon: '/favicon.ico',
@@ -58,8 +59,15 @@ export default function RootLayout({
                   <SignedIn>
                     <MobileNavWrapper />
                   </SignedIn>
-                  <Link href="/" className="text-xl font-semibold">
-                    Plate Wise
+                  <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <Image
+                      src="/logo.png"
+                      alt="PlateWise Logo"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                    <span className="text-2xl font-bold">PlateWise</span>
                   </Link>
                 </div>
                 <nav className="flex items-center gap-2">
