@@ -231,7 +231,7 @@ export default async function AIUsagePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(providerPerf || []).map((row, idx) => (
+                  {(providerPerf || []).map((row: ProviderPerfRow, idx: number) => (
                     <TableRow key={idx}>
                       <TableCell className="font-medium capitalize">{row.model_provider}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{row.model_name}</TableCell>
@@ -328,7 +328,7 @@ export default async function AIUsagePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(userProfit || []).slice(0, 20).map((row, idx) => (
+                  {(userProfit || []).slice(0, 20).map((row: UserProfitRow, idx: number) => (
                     <TableRow key={idx}>
                       <TableCell className="font-mono text-xs">
                         {row.user_id.substring(0, 20)}...
@@ -386,7 +386,7 @@ export default async function AIUsagePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(costProjection || []).map((row, idx) => (
+                  {(costProjection || []).map((row: CostProjectionRow, idx: number) => (
                     <TableRow key={idx}>
                       <TableCell className="font-medium capitalize">{row.model_provider}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{row.model_name}</TableCell>
@@ -446,7 +446,7 @@ export default async function AIUsagePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(dailyCosts || []).map((row, idx) => (
+                  {(dailyCosts || []).map((row: DailyCostRow, idx: number) => (
                     <TableRow key={idx}>
                       <TableCell>{new Date(row.date).toLocaleDateString()}</TableCell>
                       <TableCell className="capitalize">{row.model_provider}</TableCell>
