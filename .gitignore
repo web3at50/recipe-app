@@ -1,5 +1,8 @@
 # Setup directory (contains sensitive files)
 setup/
+Marketing/
+Site Pricing/
+Markdown Docs/
 
 # Environment variables
 .env
