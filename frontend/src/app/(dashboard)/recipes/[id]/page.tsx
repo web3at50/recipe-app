@@ -132,11 +132,11 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
             <CardTitle>Ingredients</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {ingredients?.map((ingredient: Ingredient, index: number) => (
-                <li key={index} className="flex items-start gap-2 print-keep-together">
-                  <span className="text-muted-foreground">•</span>
-                  <span>
+                <li key={index} className="flex items-start gap-2 p-3 rounded-lg bg-accent/50 hover:bg-accent transition-colors print-keep-together">
+                  <span className="text-muted-foreground mt-0.5">•</span>
+                  <span className="flex-1">
                     {ingredient.quantity && `${ingredient.quantity} `}
                     {ingredient.unit && `${ingredient.unit} `}
                     {ingredient.item}

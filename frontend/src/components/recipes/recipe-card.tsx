@@ -48,7 +48,7 @@ export function RecipeCard({ recipe, onToggleFavorite, onDelete, userAllergens }
   const { gradient, emoji } = getCuisineVisuals(recipe.cuisine);
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden hover:shadow-lg hover:shadow-primary/20 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 ease-in-out">
       <Link href={`/recipes/${recipe.id}`}>
         <div className="aspect-video relative">
           {recipe.image_url ? (
@@ -111,8 +111,7 @@ export function RecipeCard({ recipe, onToggleFavorite, onDelete, userAllergens }
             {onToggleFavorite && (
               <Button
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8"
+                size="icon-sm"
                 onClick={() => onToggleFavorite(recipe.id, !recipe.is_favorite)}
               >
                 <Heart
@@ -125,8 +124,8 @@ export function RecipeCard({ recipe, onToggleFavorite, onDelete, userAllergens }
             {onDelete && (
               <Button
                 variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:text-red-500"
+                size="icon-sm"
+                className="hover:text-red-500"
                 onClick={() => onDelete(recipe.id)}
               >
                 <Trash2 className="h-4 w-4" />

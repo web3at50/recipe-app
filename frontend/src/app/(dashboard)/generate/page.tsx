@@ -922,11 +922,14 @@ export default function GeneratePage() {
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="font-semibold mb-3">Ingredients</h3>
-                  <ul className="space-y-1">
+                  <ul className="space-y-2">
                     {generatedRecipe.ingredients.map((ing, index) => (
-                      <li key={index} className="text-sm">
-                        • {ing.quantity} {ing.unit} {ing.item}
-                        {ing.notes && ` (${ing.notes})`}
+                      <li key={index} className="text-sm p-2 rounded-lg bg-accent/50 hover:bg-accent transition-colors flex items-start gap-2">
+                        <span className="text-muted-foreground mt-0.5">•</span>
+                        <span className="flex-1">
+                          {ing.quantity} {ing.unit} {ing.item}
+                          {ing.notes && ` (${ing.notes})`}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -989,11 +992,14 @@ export default function GeneratePage() {
 
                             <div>
                               <h4 className="font-semibold mb-2">Ingredients</h4>
-                              <ul className="space-y-1">
+                              <ul className="space-y-2">
                                 {recipe.ingredients.map((ing, index) => (
-                                  <li key={index} className="text-sm">
-                                    • {ing.quantity} {ing.unit} {ing.item}
-                                    {ing.notes && ` (${ing.notes})`}
+                                  <li key={index} className="text-sm p-2 rounded-lg bg-accent/50 hover:bg-accent transition-colors flex items-start gap-2">
+                                    <span className="text-muted-foreground mt-0.5">•</span>
+                                    <span className="flex-1">
+                                      {ing.quantity} {ing.unit} {ing.item}
+                                      {ing.notes && ` (${ing.notes})`}
+                                    </span>
                                   </li>
                                 ))}
                               </ul>
