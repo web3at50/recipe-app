@@ -45,16 +45,15 @@ export default async function RecipesPage() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <Link href="/generate" className="w-full sm:w-auto">
+          <Link href="/create-recipe" className="w-full sm:w-auto">
             <Button className="w-full">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Generate with AI
+              Create Recipe(s) With AI
             </Button>
           </Link>
           <Link href="/recipes/new" className="w-full sm:w-auto">
             <Button variant="outline" className="w-full">
               <Plus className="h-4 w-4 mr-2" />
-              Create Manually
+              Create Recipe Manually
             </Button>
           </Link>
         </div>

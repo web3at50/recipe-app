@@ -37,7 +37,7 @@ export default function GeneratePage() {
   const router = useRouter();
   const [ingredientsText, setIngredientsText] = useState('');
   const [descriptionText, setDescriptionText] = useState('');
-  const [selectedModel, setSelectedModel] = useState<'model_1' | 'model_2' | 'model_3' | 'model_4' | 'all'>('model_1');
+  const [selectedModel, setSelectedModel] = useState<'model_1' | 'model_2' | 'model_3' | 'model_4' | 'all'>('all');
   const [servings, setServings] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
@@ -301,15 +301,15 @@ export default function GeneratePage() {
     <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
       <Breadcrumb items={[
         { label: 'My Recipes', href: '/recipes' },
-        { label: 'AI Generate' }
+        { label: 'Create Recipe' }
       ]} />
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold">
-          Recipe Generator
+          Create Recipe
         </h1>
         <p className="text-muted-foreground mt-1">
-          Generate custom recipe(s) in minutes
+          Create 1-4 unique recipes instantly. Uses your saved preferences, or customize for one-time generation.
         </p>
       </div>
 
@@ -790,10 +790,7 @@ export default function GeneratePage() {
           {/* 3. AI Model & Generate - Prominent CTA */}
           <Card className="border-2 border-primary/20 bg-primary/5">
             <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <CardTitle className="text-base">Generate Your Recipe</CardTitle>
-              </div>
+              <CardTitle className="text-base">Generate Your Recipe</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
@@ -836,7 +833,6 @@ export default function GeneratePage() {
                   </>
                 ) : (
                   <>
-                    <ChefHat className="h-5 w-5 mr-2" />
                     {selectedModel === 'all' ? 'Generate All 4 Recipes' : 'Generate Recipe'}
                   </>
                 )}
@@ -1050,7 +1046,6 @@ export default function GeneratePage() {
               <CardContent className="flex flex-col items-center justify-center py-16 text-center">
                 {(isGenerating || isGeneratingAll) ? (
                   <>
-                    <ChefHat className="h-16 w-16 text-muted-foreground mb-4 animate-pulse" />
                     <p className="text-muted-foreground">
                       AI is cooking up something delicious...
                     </p>
