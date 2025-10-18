@@ -47,6 +47,10 @@ export function PreferencesForm({ initialPreferences }: PreferencesFormProps) {
   const router = useRouter();
   const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences);
   const [isSaving, setIsSaving] = useState(false);
+  // Track household size separately to allow empty input during editing
+  const [householdSizeInput, setHouseholdSizeInput] = useState<string>(
+    initialPreferences.household_size?.toString() || '2'
+  );
 
   const handleToggleArray = (field: keyof UserPreferences, value: string) => {
     const currentArray = (preferences[field] as string[]) || [];
@@ -64,17 +68,27 @@ export function PreferencesForm({ initialPreferences }: PreferencesFormProps) {
   };
 
   const handleSave = async () => {
+    // Ensure household size has a valid value before saving
+    const finalPreferences = {
+      ...preferences,
+      household_size: parseInt(householdSizeInput) || preferences.household_size || 2
+    };
+
     setIsSaving(true);
     try {
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ preferences })
+        body: JSON.stringify({ preferences: finalPreferences })
       });
 
       if (!response.ok) {
         throw new Error('Failed to save preferences');
       }
+
+      // Update local state with the saved value
+      setPreferences(finalPreferences);
+      setHouseholdSizeInput(finalPreferences.household_size.toString());
 
       router.refresh();
       alert('Preferences saved successfully!');
@@ -196,10 +210,22 @@ export function PreferencesForm({ initialPreferences }: PreferencesFormProps) {
                 type="number"
                 min="1"
                 max="12"
-                value={preferences.household_size}
-                onChange={(e) =>
-                  setPreferences({ ...preferences, household_size: parseInt(e.target.value) || 1 })
-                }
+                placeholder="2"
+                value={householdSizeInput}
+                onChange={(e) => {
+                  setHouseholdSizeInput(e.target.value);
+                  // Update preferences if valid number
+                  const value = parseInt(e.target.value);
+                  if (!isNaN(value) && value >= 1 && value <= 12) {
+                    setPreferences({ ...preferences, household_size: value });
+                  }
+                }}
+                onBlur={() => {
+                  // Restore saved value if input is empty on blur
+                  if (!householdSizeInput) {
+                    setHouseholdSizeInput(preferences.household_size?.toString() || '2');
+                  }
+                }}
               />
             </div>
 

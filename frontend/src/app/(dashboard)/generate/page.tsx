@@ -83,10 +83,7 @@ export default function GeneratePage() {
           const data = await response.json();
           const prefs = data.profile?.preferences;
           setUserPreferences(prefs);
-          // Set default servings from user preferences
-          if (prefs?.household_size && servings === null) {
-            setServings(prefs.household_size);
-          }
+          // Note: Servings will use placeholder from household_size, not pre-fill
         }
       } catch (error) {
         console.error('Failed to fetch user preferences:', error);
@@ -730,8 +727,9 @@ export default function GeneratePage() {
                           type="number"
                           min="1"
                           max="20"
-                          value={servings || userPreferences?.household_size || 4}
-                          onChange={(e) => setServings(parseInt(e.target.value))}
+                          placeholder={(userPreferences?.household_size || 4).toString()}
+                          value={servings ?? ''}
+                          onChange={(e) => setServings(e.target.value ? parseInt(e.target.value) : null)}
                         />
                       </div>
 
