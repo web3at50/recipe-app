@@ -38,6 +38,7 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [tempPantrySelection, setTempPantrySelection] = useState<string[]>([]);
   const [customItemName, setCustomItemName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -224,6 +225,7 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
         a.item_pattern.localeCompare(b.item_pattern)
       ));
       setIsOnboardingOpen(false);
+      setTempPantrySelection([]);
     } catch (error) {
       console.error('Error saving onboarding items:', error);
       alert('Failed to save items. Please try again.');
@@ -294,7 +296,16 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
               </CardDescription>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Dialog open={isOnboardingOpen} onOpenChange={setIsOnboardingOpen}>
+              <Dialog
+                open={isOnboardingOpen}
+                onOpenChange={(open) => {
+                  setIsOnboardingOpen(open);
+                  // Clear selection when dialog closes
+                  if (!open) {
+                    setTempPantrySelection([]);
+                  }
+                }}
+              >
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" className="w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
@@ -310,22 +321,24 @@ export function PantryManagement({ initialStaples }: PantryManagementProps) {
                     </DialogDescription>
                   </DialogHeader>
                   <PantryOnboarding
-                    selected={[]}
-                    onChange={(ids) => {
-                      // Store temporarily for save
-                      (window as unknown as { tempPantrySelection: string[] }).tempPantrySelection = ids;
-                    }}
+                    selected={tempPantrySelection}
+                    onChange={setTempPantrySelection}
                   />
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsOnboardingOpen(false)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsOnboardingOpen(false);
+                        setTempPantrySelection([]);
+                      }}
+                    >
                       Cancel
                     </Button>
                     <Button
                       onClick={() => {
-                        const ids = (window as unknown as { tempPantrySelection?: string[] }).tempPantrySelection || [];
-                        handleOnboardingSave(ids);
+                        handleOnboardingSave(tempPantrySelection);
                       }}
-                      disabled={isLoading}
+                      disabled={isLoading || tempPantrySelection.length === 0}
                     >
                       {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                       Add Selected Items

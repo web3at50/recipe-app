@@ -243,9 +243,8 @@ export function PantryOnboarding({
                       <Checkbox
                         id={item.id}
                         checked={isSelected}
-                        onCheckedChange={() => !isDisabled && handleToggle(item.id)}
                         disabled={isDisabled}
-                        className="flex-shrink-0"
+                        className="flex-shrink-0 pointer-events-none"
                       />
                       <Label
                         htmlFor={item.id}
