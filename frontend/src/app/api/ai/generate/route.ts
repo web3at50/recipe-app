@@ -39,6 +39,14 @@ export async function POST(request: Request) {
         .single();
 
       userPreferences = profile?.preferences || {};
+
+      // Allow session-only overrides from request body (for temporary preference changes)
+      if (body.preferences) {
+        userPreferences = {
+          ...userPreferences,
+          ...body.preferences,
+        };
+      }
     } else {
       // Playground user - use preferences from request body
       userPreferences = body.preferences || {};
@@ -52,6 +60,7 @@ export async function POST(request: Request) {
       prepTimeMax,
       difficulty,
       spice_level,
+      pantry_staples,
       model = 'openai'
     } = body;
 
@@ -85,22 +94,27 @@ export async function POST(request: Request) {
     }
 
     // Fetch user's pantry staples (authenticated users only)
-    let pantryStaples: string[] = [];
-    if (userId) {
+    // Allow session-only override from request body (for excluding items temporarily)
+    let pantryStaplesArray: string[] = [];
+    if (pantry_staples) {
+      // Use overridden pantry staples from request (filtered list)
+      pantryStaplesArray = pantry_staples;
+    } else if (userId) {
+      // Fetch from database if no override provided
       const supabase = await createClient();
       const { data: pantryData } = await supabase
         .from('user_pantry_staples')
         .select('item_pattern')
         .eq('user_id', userId);
 
-      pantryStaples = pantryData?.map((item) => item.item_pattern) || [];
+      pantryStaplesArray = pantryData?.map((item) => item.item_pattern) || [];
     }
 
-    // Merge user dietary preferences with request preferences
-    const mergedDietaryPrefs = [
-      ...(userPreferences.dietary_restrictions || []),
-      ...(dietary_preferences || []),
-    ];
+    // Use dietary preferences (already merged in userPreferences if overrides provided)
+    // Legacy parameter dietary_preferences is kept for backward compatibility
+    const mergedDietaryPrefs = dietary_preferences && dietary_preferences.length > 0
+      ? dietary_preferences
+      : (userPreferences.dietary_restrictions || []);
 
     // Use user preferences as defaults if not specified
     const finalServings = servings || userPreferences.household_size || 2;
@@ -111,7 +125,7 @@ export async function POST(request: Request) {
     // Generate recipe prompt with user context
     const prompt = createRecipeGenerationPrompt({
       ingredients,
-      pantryStaples,
+      pantryStaples: pantryStaplesArray,
       ingredientMode: ingredient_mode as 'strict' | 'flexible' | 'creative',
       description,
       dietary_preferences: mergedDietaryPrefs,

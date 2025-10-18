@@ -15,12 +15,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
-import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf, Settings2, Sparkles } from 'lucide-react';
+import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf, Settings2, Sparkles, Eye, EyeOff, ChevronDown, ShoppingCart } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { Recipe } from '@/types/recipe';
 import type { UserPreferences } from '@/types/user-profile';
 import type { IngredientMode } from '@/types';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { FeedbackButton } from '@/components/feedback-button';
+
+// UK Allergen list (from preferences-form.tsx)
+const UK_ALLERGENS = [
+  { id: 'peanuts', label: 'Peanuts' },
+  { id: 'tree_nuts', label: 'Tree Nuts' },
+  { id: 'milk', label: 'Milk/Dairy' },
+  { id: 'eggs', label: 'Eggs' },
+  { id: 'fish', label: 'Fish' },
+  { id: 'shellfish', label: 'Shellfish' },
+  { id: 'soy', label: 'Soya' },
+  { id: 'gluten', label: 'Gluten' },
+  { id: 'sesame', label: 'Sesame' },
+  { id: 'celery', label: 'Celery' },
+  { id: 'mustard', label: 'Mustard' },
+  { id: 'lupin', label: 'Lupin' },
+  { id: 'sulphites', label: 'Sulphites' },
+  { id: 'molluscs', label: 'Molluscs' }
+];
+
+// Dietary restriction options (from preferences-form.tsx)
+const DIETARY_OPTIONS = [
+  { id: 'vegetarian', label: 'Vegetarian' },
+  { id: 'vegan', label: 'Vegan' },
+  { id: 'pescatarian', label: 'Pescatarian' },
+  { id: 'halal', label: 'Halal' },
+  { id: 'kosher', label: 'Kosher' }
+];
 
 // Helper function to map model numbers to API model keys
 const getAPIModelKey = (model: 'model_1' | 'model_2' | 'model_3' | 'model_4'): 'openai' | 'claude' | 'gemini' | 'grok' => {
@@ -67,12 +95,16 @@ export default function GeneratePage() {
     currentModel: string;
   } | null>(null);
 
-  // State for collapsible profile and pantry
-  const [profileExpanded, setProfileExpanded] = useState(false);
+  // State for collapsible sections
   const [pantryExpanded, setPantryExpanded] = useState(false);
 
   // State for mobile drawer
   const [ingredientModeDrawerOpen, setIngredientModeDrawerOpen] = useState(false);
+
+  // Temporary overrides for allergens, dietary, and pantry (session-only, not saved to DB)
+  const [tempAllergies, setTempAllergies] = useState<string[]>([]);
+  const [tempDietaryRestrictions, setTempDietaryRestrictions] = useState<string[]>([]);
+  const [excludedPantryStaples, setExcludedPantryStaples] = useState<string[]>([]);
 
   // Fetch user preferences on mount
   useEffect(() => {
@@ -123,6 +155,13 @@ export default function GeneratePage() {
 
     const apiModel = getAPIModelKey(model);
 
+    // Apply temporary overrides if set, otherwise use saved preferences
+    const effectiveAllergies = tempAllergies.length > 0 ? tempAllergies : (userPreferences?.allergies || []);
+    const effectiveDietaryRestrictions = tempDietaryRestrictions.length > 0 ? tempDietaryRestrictions : (userPreferences?.dietary_restrictions || []);
+
+    // Filter out excluded pantry staples
+    const activePantryStaples = pantryStaples.filter(item => !excludedPantryStaples.includes(item));
+
     const response = await fetch('/api/ai/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -135,6 +174,13 @@ export default function GeneratePage() {
         difficulty: skillLevel || undefined,
         spice_level: spiceLevel || undefined,
         favourite_cuisine: favouriteCuisine && favouriteCuisine !== 'any' ? favouriteCuisine : undefined,
+        // Override user preferences with temporary session values
+        preferences: {
+          allergies: effectiveAllergies,
+          dietary_restrictions: effectiveDietaryRestrictions,
+        },
+        // Pass filtered pantry staples (API will use these instead of DB lookup)
+        pantry_staples: activePantryStaples,
         model: apiModel,
       }),
     });
@@ -314,168 +360,234 @@ export default function GeneratePage() {
       </div>
 
       <div className="space-y-6">
-        {/* User Preferences Summary - Collapsible */}
+        {/* Allergens & Restrictions - Inline Editable */}
         {!isLoadingPreferences && userPreferences && (
-          <div className="mb-6">
-            {!profileExpanded ? (
-              <div className="flex items-center justify-between gap-3 p-3 bg-muted rounded-lg border">
-                <button
-                  onClick={() => setProfileExpanded(true)}
-                  className="flex items-center gap-3 flex-1 text-left"
-                >
-                  <Info className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <div className="flex flex-wrap gap-2 items-center">
-                    {/* Allergens in amber */}
-                    {userPreferences.allergies && userPreferences.allergies.length > 0 && (
-                      <span className="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-100 rounded font-medium">
-                        ⚠️ Avoiding: {userPreferences.allergies.join(', ')}
-                      </span>
-                    )}
-                    {/* Dietary restrictions in blue */}
-                    {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
-                      <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-950 text-blue-900 dark:text-blue-100 rounded font-medium">
-                        🥗 {userPreferences.dietary_restrictions.join(', ')}
-                      </span>
-                    )}
-                    {/* If neither exists */}
-                    {(!userPreferences.allergies || userPreferences.allergies.length === 0) &&
-                      (!userPreferences.dietary_restrictions || userPreferences.dietary_restrictions.length === 0) && (
-                      <span className="text-sm text-muted-foreground">No dietary restrictions set</span>
-                    )}
-                  </div>
-                </button>
-                <Button variant="link" size="sm" asChild className="h-auto p-0 flex-shrink-0">
-                  <Link href="/settings">Edit →</Link>
-                </Button>
-              </div>
-            ) : (
-              <Card className="bg-primary/5 border-primary/20">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Info className="h-5 w-5 text-primary" />
-                      <CardTitle className="text-base">Your Profile</CardTitle>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setProfileExpanded(false)}
-                      className="h-8 text-xs"
-                    >
-                      Collapse
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Servings</p>
-                      <p className="font-medium">{userPreferences.household_size || 2}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Skill Level</p>
-                      <p className="font-medium capitalize">{userPreferences.cooking_skill || 'intermediate'}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Typical Time</p>
-                      <p className="font-medium">{userPreferences.typical_cook_time || 30} mins</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Spice Level</p>
-                      <p className="font-medium capitalize">{userPreferences.spice_level || 'medium'}</p>
-                    </div>
-                  </div>
-                  {userPreferences.cuisines_liked && userPreferences.cuisines_liked.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-muted-foreground text-sm">Favourite Cuisines</p>
-                      <p className="font-medium">{userPreferences.cuisines_liked.join(', ')}</p>
-                    </div>
-                  )}
-                  {userPreferences.dietary_restrictions && userPreferences.dietary_restrictions.length > 0 && (
-                    <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <Leaf className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm">
-                          <p className="font-medium text-blue-500">Dietary Preferences</p>
-                          <p className="text-muted-foreground capitalize">
-                            {userPreferences.dietary_restrictions.join(', ')}
-                          </p>
-                        </div>
+          <Card className="bg-amber-500/5 border-amber-500/20">
+            <CardContent className="py-3">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="allergens" className="border-none">
+                  <AccordionTrigger className="py-0 hover:no-underline">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                        <span className="text-sm">
+                          <span className="font-medium">Allergens & Restrictions:</span>{' '}
+                          <span className="text-muted-foreground">
+                            {(() => {
+                              const active = tempAllergies.length > 0 ? tempAllergies : (userPreferences.allergies || []);
+                              return active.length > 0
+                                ? `Avoiding ${active.length} item${active.length > 1 ? 's' : ''}`
+                                : 'None set';
+                            })()}
+                          </span>
+                        </span>
                       </div>
                     </div>
-                  )}
-                  {userPreferences.allergies && userPreferences.allergies.length > 0 && (
-                    <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm">
-                          <p className="font-medium text-amber-500">Active Allergen Protection</p>
-                          <p className="text-muted-foreground">
-                            Avoiding: {userPreferences.allergies.join(', ')}
-                          </p>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4 space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {UK_ALLERGENS.map((allergen) => (
+                        <div key={allergen.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`temp-${allergen.id}`}
+                            checked={
+                              tempAllergies.length > 0
+                                ? tempAllergies.includes(allergen.id)
+                                : (userPreferences.allergies || []).includes(allergen.id)
+                            }
+                            onCheckedChange={(checked) => {
+                              const currentAllergies = tempAllergies.length > 0
+                                ? tempAllergies
+                                : (userPreferences.allergies || []);
+
+                              if (checked) {
+                                setTempAllergies([...currentAllergies, allergen.id]);
+                              } else {
+                                setTempAllergies(currentAllergies.filter(a => a !== allergen.id));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={`temp-${allergen.id}`} className="cursor-pointer text-sm">
+                            {allergen.label}
+                          </Label>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                    {tempAllergies.length > 0 && (
+                      <div className="text-xs text-muted-foreground flex items-center justify-between pt-2 border-t">
+                        <span>💡 Changes apply to this recipe only</span>
+                        <button
+                          onClick={() => setTempAllergies([])}
+                          className="text-primary hover:underline"
+                        >
+                          Reset to saved
+                        </button>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
         )}
+
+        {/* Dietary Preferences - Inline Editable */}
+        {!isLoadingPreferences && userPreferences && (
+          <Card className="bg-blue-500/5 border-blue-500/20">
+            <CardContent className="py-3">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="dietary" className="border-none">
+                  <AccordionTrigger className="py-0 hover:no-underline">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <Leaf className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                        <span className="text-sm">
+                          <span className="font-medium">Dietary Preferences:</span>{' '}
+                          <span className="text-muted-foreground">
+                            {(() => {
+                              const active = tempDietaryRestrictions.length > 0 ? tempDietaryRestrictions : (userPreferences.dietary_restrictions || []);
+                              return active.length > 0
+                                ? active.map(d => DIETARY_OPTIONS.find(opt => opt.id === d)?.label).join(', ')
+                                : 'None set';
+                            })()}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4 space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {DIETARY_OPTIONS.map((option) => (
+                        <div key={option.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`temp-diet-${option.id}`}
+                            checked={
+                              tempDietaryRestrictions.length > 0
+                                ? tempDietaryRestrictions.includes(option.id)
+                                : (userPreferences.dietary_restrictions || []).includes(option.id)
+                            }
+                            onCheckedChange={(checked) => {
+                              const currentDietary = tempDietaryRestrictions.length > 0
+                                ? tempDietaryRestrictions
+                                : (userPreferences.dietary_restrictions || []);
+
+                              if (checked) {
+                                setTempDietaryRestrictions([...currentDietary, option.id]);
+                              } else {
+                                setTempDietaryRestrictions(currentDietary.filter(d => d !== option.id));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={`temp-diet-${option.id}`} className="cursor-pointer text-sm">
+                            {option.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                    {tempDietaryRestrictions.length > 0 && (
+                      <div className="text-xs text-muted-foreground flex items-center justify-between pt-2 border-t">
+                        <span>💡 Changes apply to this recipe only</span>
+                        <button
+                          onClick={() => setTempDietaryRestrictions([])}
+                          className="text-primary hover:underline"
+                        >
+                          Reset to saved
+                        </button>
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Input Section - Restructured */}
         <div className="space-y-6">
-          {/* Pantry Staples Display - Collapsible on Mobile */}
+          {/* Pantry Staples Display - With Toggle Exclusion */}
           {pantryStaples.length > 0 && (
             <div className="mb-6">
               {/* Collapsed View (Mobile Default) */}
               {!pantryExpanded ? (
                 <button
                   onClick={() => setPantryExpanded(true)}
-                  className="flex items-center gap-2 p-3 bg-secondary/10 border border-secondary/20 rounded-lg hover:bg-secondary/20 transition-colors w-full text-left md:hidden"
+                  className="flex items-center gap-2 p-3 bg-green-500/5 border border-green-500/20 rounded-lg hover:bg-green-500/10 transition-colors w-full text-left md:hidden"
                 >
-                  <Package className="h-4 w-4 text-secondary-foreground flex-shrink-0" />
+                  <Package className="h-4 w-4 text-green-600 flex-shrink-0" />
                   <span className="text-sm font-medium">
-                    ✓ {pantryStaples.length} Pantry Staples Available
+                    ✓ {pantryStaples.filter(item => !excludedPantryStaples.includes(item)).length}/{pantryStaples.length} Pantry Staples Active
                   </span>
-                  <span className="text-xs text-muted-foreground ml-auto">Tap to view</span>
+                  <span className="text-xs text-muted-foreground ml-auto">Tap to edit</span>
                 </button>
               ) : null}
 
               {/* Expanded View (Desktop Always, Mobile on Tap) */}
               {(pantryExpanded || true) && (
-                <Card className={`bg-secondary/10 border-secondary/20 ${!pantryExpanded ? 'hidden md:block' : ''}`}>
+                <Card className={`bg-green-500/5 border-green-500/20 ${!pantryExpanded ? 'hidden md:block' : ''}`}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Package className="h-5 w-5 text-secondary-foreground" />
+                        <Package className="h-5 w-5 text-green-600" />
                         <CardTitle className="text-base">Your Pantry Staples</CardTitle>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setPantryExpanded(false)}
-                          className="h-8 text-xs md:hidden"
-                        >
-                          Collapse
-                        </Button>
-                        <Button variant="link" size="sm" asChild className="h-auto p-0">
-                          <Link href="/settings/pantry-staples">Edit →</Link>
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setPantryExpanded(false)}
+                        className="h-8 text-xs md:hidden"
+                      >
+                        Collapse
+                      </Button>
                     </div>
                     <CardDescription>
-                      Items you have at home (used in recipe generation)
+                      Items you have at home. Click eye icon to exclude from this recipe.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-3">
                     <div className="flex flex-wrap gap-2">
-                      {pantryStaples.map((item, index) => (
-                        <Badge key={index} variant="secondary" className="capitalize">
-                          {item}
-                        </Badge>
-                      ))}
+                      {pantryStaples.map((item, index) => {
+                        const isExcluded = excludedPantryStaples.includes(item);
+                        return (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className={`capitalize flex items-center gap-1.5 pr-1.5 transition-opacity ${
+                              isExcluded ? 'opacity-50' : 'opacity-100'
+                            }`}
+                          >
+                            {item}
+                            <button
+                              onClick={() => {
+                                if (isExcluded) {
+                                  setExcludedPantryStaples(excludedPantryStaples.filter(i => i !== item));
+                                } else {
+                                  setExcludedPantryStaples([...excludedPantryStaples, item]);
+                                }
+                              }}
+                              className="hover:bg-secondary-foreground/20 rounded p-0.5"
+                              aria-label={isExcluded ? `Include ${item}` : `Exclude ${item}`}
+                            >
+                              {isExcluded ? (
+                                <EyeOff className="h-3 w-3" />
+                              ) : (
+                                <Eye className="h-3 w-3" />
+                              )}
+                            </button>
+                          </Badge>
+                        );
+                      })}
                     </div>
+                    {excludedPantryStaples.length > 0 && (
+                      <div className="text-xs text-muted-foreground flex items-center justify-between pt-2 border-t">
+                        <span>💡 {excludedPantryStaples.length} item{excludedPantryStaples.length > 1 ? 's' : ''} excluded for this recipe</span>
+                        <button
+                          onClick={() => setExcludedPantryStaples([])}
+                          className="text-primary hover:underline"
+                        >
+                          Include all
+                        </button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -523,7 +635,7 @@ export default function GeneratePage() {
                   <DrawerTrigger asChild>
                     <button className="flex items-center justify-between w-full text-left">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">🍳</span>
+                        <ShoppingCart className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <span className="text-sm">
                           <span className="font-medium">Ingredient Mode:</span>{' '}
                           <span className="text-muted-foreground">
@@ -533,7 +645,7 @@ export default function GeneratePage() {
                           </span>
                         </span>
                       </div>
-                      <span className="text-xs text-primary font-medium flex-shrink-0 ml-2">Edit →</span>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     </button>
                   </DrawerTrigger>
                   <DrawerContent>
@@ -609,22 +721,22 @@ export default function GeneratePage() {
               </div>
 
               {/* Desktop: Inline Display with Popover/Dropdown */}
-              <div className="hidden md:flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🍳</span>
-                  <span className="text-sm">
-                    <span className="font-medium">Ingredient Mode:</span>{' '}
-                    <span className="text-muted-foreground">
-                      {ingredientMode === 'strict' && 'Use Only What I Have'}
-                      {ingredientMode === 'flexible' && 'Flexible'}
-                      {ingredientMode === 'creative' && 'Creative'}
-                    </span>
-                  </span>
-                </div>
+              <div className="hidden md:block">
                 <Drawer open={ingredientModeDrawerOpen} onOpenChange={setIngredientModeDrawerOpen}>
                   <DrawerTrigger asChild>
-                    <button className="text-xs text-primary font-medium flex-shrink-0 ml-2">
-                      Edit →
+                    <button className="flex items-center justify-between w-full text-left">
+                      <div className="flex items-center gap-2">
+                        <ShoppingCart className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-sm">
+                          <span className="font-medium">Ingredient Mode:</span>{' '}
+                          <span className="text-muted-foreground">
+                            {ingredientMode === 'strict' && 'Use Only What I Have'}
+                            {ingredientMode === 'flexible' && 'Flexible'}
+                            {ingredientMode === 'creative' && 'Creative'}
+                          </span>
+                        </span>
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     </button>
                   </DrawerTrigger>
                   <DrawerContent>
@@ -709,13 +821,12 @@ export default function GeneratePage() {
                   <AccordionTrigger className="py-0 hover:no-underline">
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-2">
-                        <Settings2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <ChefHat className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <span className="text-sm">
                           <span className="font-medium">Recipe Preferences:</span>{' '}
                           <span className="text-muted-foreground">Saved</span>
                         </span>
                       </div>
-                      <span className="text-xs text-primary font-medium flex-shrink-0 ml-2">Edit →</span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="pt-4 space-y-4">
