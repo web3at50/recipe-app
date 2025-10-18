@@ -33,10 +33,10 @@ export default async function Home() {
           {/* Headline */}
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-              "What's for Dinner?" Solved in 30 Seconds—Without Wasting Food or Money
+              &ldquo;What&rsquo;s for Dinner?&rdquo; Solved in 30 Seconds—Without Wasting Food or Money
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              UK's simplest AI recipe app. Enter what you have, get 4 personalised recipes instantly. <span className="font-semibold text-foreground">No credit card required.</span>
+              UK&rsquo;s simplest AI recipe app. Enter what you have, get 4 personalised recipes instantly. <span className="font-semibold text-foreground">No credit card required.</span>
             </p>
           </div>
 
@@ -237,7 +237,7 @@ export default async function Home() {
             </div>
 
             <p className="text-center text-sm text-muted-foreground mt-8">
-              Start with 40 free recipes. Upgrade to lifetime access when you're ready. No pressure.
+              Start with 40 free recipes. Upgrade to lifetime access when you&rsquo;re ready. No pressure.
             </p>
           </div>
         </div>
@@ -268,7 +268,7 @@ export default async function Home() {
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">🥬 British Ingredients</h3>
                   <p className="text-sm text-muted-foreground">
-                    Courgettes, not zucchini. Aubergines, not eggplants. Recipes that match what's in Tesco.
+                    Courgettes, not zucchini. Aubergines, not eggplants. Recipes that match what&rsquo;s in Tesco.
                   </p>
                 </CardContent>
               </Card>
@@ -277,7 +277,7 @@ export default async function Home() {
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">🛒 UK Supermarket Brands</h3>
                   <p className="text-sm text-muted-foreground">
-                    Shopping lists reference actual products from Tesco, Sainsbury's, and Asda.
+                    Shopping lists reference actual products from Tesco, Sainsbury&rsquo;s, and Asda.
                   </p>
                 </CardContent>
               </Card>
@@ -286,7 +286,7 @@ export default async function Home() {
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">⚖️ UK Allergen Standards</h3>
                   <p className="text-sm text-muted-foreground">
-                    All 14 UK allergens tracked (including celery, lupin, and sulphites). In line with Natasha's Law
+                    All 14 UK allergens tracked (including celery, lupin, and sulphites). In line with Natasha&rsquo;s Law
                   </p>
                 </CardContent>
               </Card>
@@ -313,7 +313,7 @@ export default async function Home() {
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground">
-                    Yes, it's completely free to start! You get 10 batches of 4 recipes (40 total recipes) without entering any payment details. No credit card required. You only pay £9.99 if you want unlimited access after your free recipes run out.
+                    Yes, it&rsquo;s completely free to start! You get 10 batches of 4 recipes (40 total recipes) without entering any payment details. No credit card required. You only pay £9.99 if you want unlimited access after your free recipes run out.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -324,7 +324,7 @@ export default async function Home() {
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground">
-                    After you've used your 40 free recipes, you'll be prompted to upgrade to lifetime access for £9.99. This is a one-time payment—not a subscription. Pay once, use forever. All your saved recipes, meal plans, and shopping lists stay accessible.
+                    After you&rsquo;ve used your 40 free recipes, you&rsquo;ll be prompted to upgrade to lifetime access for £9.99. This is a one-time payment—not a subscription. Pay once, use forever. All your saved recipes, meal plans, and shopping lists stay accessible.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -335,7 +335,7 @@ export default async function Home() {
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground">
-                    It's a <span className="font-semibold">one-time payment</span> of £9.99 for lifetime access. No monthly fees, no annual renewals, no hidden costs. Pay once and own PlateWise forever. Most recipe apps charge £6.99-£12.99 <em>per month</em>—that's £84-£155 per year. You pay £9.99 once.
+                    It&rsquo;s a <span className="font-semibold">one-time payment</span> of £9.99 for lifetime access. No monthly fees, no annual renewals, no hidden costs. Pay once and own PlateWise forever. Most recipe apps charge £6.99-£12.99 <em>per month</em>—that&rsquo;s £84-£155 per year. You pay £9.99 once.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -346,7 +346,7 @@ export default async function Home() {
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground">
-                    There's nothing to cancel! Since it's a one-time £9.99 payment (not a subscription), you own lifetime access from day one. No recurring charges means nothing to cancel. Your account and all your recipes stay active forever.
+                    There&rsquo;s nothing to cancel! Since it&rsquo;s a one-time £9.99 payment (not a subscription), you own lifetime access from day one. No recurring charges means nothing to cancel. Your account and all your recipes stay active forever.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -370,11 +370,11 @@ export default async function Home() {
 
               <AccordionItem value="item-6">
                 <AccordionTrigger className="text-left">
-                  What if I don't like the recipes?
+                  What if I don&rsquo;t like the recipes?
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground">
-                    That's why we offer 40 free recipes to try before paying anything! If PlateWise doesn't work for you, you've lost nothing (no credit card was required). The more details you provide (ingredients, allergies, preferences), the better your recipes will be. Most users find their favorite recipe style within the first 3-4 batches.
+                    That&rsquo;s why we offer 40 free recipes to try before paying anything! If PlateWise doesn&rsquo;t work for you, you&rsquo;ve lost nothing (no credit card was required). The more details you provide (ingredients, allergies, preferences), the better your recipes will be. Most users find their favorite recipe style within the first 3-4 batches.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -388,7 +388,7 @@ export default async function Home() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center space-y-6">
             <h2 className="text-3xl md:text-4xl font-bold">
-              Ready to Solve "What's for Dinner?" Forever?
+              Ready to Solve &ldquo;What&rsquo;s for Dinner?&rdquo; Forever?
             </h2>
             <p className="text-lg opacity-90">
               Join UK families saving time, money, and reducing food waste with PlateWise
