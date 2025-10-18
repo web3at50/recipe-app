@@ -35,10 +35,6 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "PlateWise",
   description: "Your personal recipe manager and meal planner",
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
 }
 
 export const viewport = {
