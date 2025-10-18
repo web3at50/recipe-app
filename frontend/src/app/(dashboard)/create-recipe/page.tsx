@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
-import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf, Settings2, Sparkles, Eye, EyeOff, ChevronDown, ShoppingCart } from 'lucide-react';
+import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf, Settings2, Sparkles, Eye, EyeOff, ChevronDown, ShoppingCart, X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { Recipe } from '@/types/recipe';
 import type { UserPreferences } from '@/types/user-profile';
@@ -106,6 +106,23 @@ export default function GeneratePage() {
   const [tempAllergies, setTempAllergies] = useState<string[]>([]);
   const [tempDietaryRestrictions, setTempDietaryRestrictions] = useState<string[]>([]);
   const [excludedPantryStaples, setExcludedPantryStaples] = useState<string[]>([]);
+
+  // Info card dismiss state
+  const [showStylesInfo, setShowStylesInfo] = useState(true);
+
+  // Check localStorage for info card dismiss state
+  useEffect(() => {
+    const dismissed = localStorage.getItem('stylesInfoDismissed');
+    if (dismissed === 'true') {
+      setShowStylesInfo(false);
+    }
+  }, []);
+
+  // Handle info card dismiss
+  const handleDismissStylesInfo = () => {
+    setShowStylesInfo(false);
+    localStorage.setItem('stylesInfoDismissed', 'true');
+  };
 
   // Fetch user preferences on mount
   useEffect(() => {
@@ -355,7 +372,7 @@ export default function GeneratePage() {
           Create Recipe
         </h1>
         <p className="text-muted-foreground mt-1">
-          Create 1-4 unique recipes instantly. Uses your saved preferences, or customize for one-time generation.
+          Recipes built around your diet, allergies, and ingredients. Generate one or compare four different styles—each with a unique approach.
         </p>
       </div>
 
@@ -897,6 +914,32 @@ export default function GeneratePage() {
               </Accordion>
             </CardContent>
           </Card>
+
+          {/* Info Card - Why Four Styles? */}
+          {showStylesInfo && (
+            <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+              <CardContent className="py-3 px-4">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                      Why four styles?
+                    </p>
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      Different recipe styles have different strengths—one might give detailed steps, another quick simplicity. Generate all four to compare and find your favourite, or stick with one you know works for you.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleDismissStylesInfo}
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                    aria-label="Dismiss"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* 3. AI Model & Generate - Prominent CTA */}
           <Card className="border-2 border-primary/20 bg-primary/5">
