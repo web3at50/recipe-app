@@ -42,7 +42,8 @@
       "Bash(powershell Move-Item:*)",
       "Bash(Remove-Item -Path \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\app\\playground\" -Recurse -Force)",
       "Bash(Remove-Item -Path \"C:\\Users\\bryn\\Documents\\recipeapp\\frontend\\src\\lib\\session-storage.ts\" -Force)",
-      "Bash(powershell 'Remove-Item -Path \"\"\\\\?\\$((Get-Location).Path)\\nul\"\" -Force')"
+      "Bash(powershell 'Remove-Item -Path \"\"\\\\?\\$((Get-Location).Path)\\nul\"\" -Force')",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

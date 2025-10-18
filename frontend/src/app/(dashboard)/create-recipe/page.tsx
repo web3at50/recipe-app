@@ -22,6 +22,7 @@ import type { UserPreferences } from '@/types/user-profile';
 import type { IngredientMode } from '@/types';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { FeedbackButton } from '@/components/feedback-button';
+import { MODEL_STYLES, getStyleName, getStyleIcon, getStyleDisplay } from '@/lib/model-styles';
 
 // UK Allergen list (from preferences-form.tsx)
 const UK_ALLERGENS = [
@@ -210,21 +211,20 @@ export default function GeneratePage() {
     if (selectedModel === 'all') {
       setIsGeneratingAll(true);
       setGeneratedRecipes({ model_1: null, model_2: null, model_3: null, model_4: null });
-      setGenerationProgress({ current: 0, total: 4, currentModel: 'ChatGPT' });
+      setGenerationProgress({ current: 0, total: 4, currentModel: getStyleName('model_1') });
 
       const models: Array<'model_1' | 'model_2' | 'model_3' | 'model_4'> = ['model_1', 'model_2', 'model_3', 'model_4'];
-      const modelNames = ['ChatGPT', 'Claude', 'Gemini', 'Grok'];
       const results: typeof generatedRecipes = { model_1: null, model_2: null, model_3: null, model_4: null };
 
       try {
         for (let i = 0; i < models.length; i++) {
           const model = models[i];
-          const modelName = modelNames[i];
+          const styleName = getStyleName(model);
 
           setGenerationProgress({
             current: i,
             total: 4,
-            currentModel: modelName,
+            currentModel: styleName,
           });
 
           try {
@@ -235,9 +235,9 @@ export default function GeneratePage() {
             results[model] = recipe;
             setGeneratedRecipes({ ...results });
 
-            console.log(`${modelName} completed in ${duration}s`);
+            console.log(`${styleName} (${model}) completed in ${duration}s`);
           } catch (error) {
-            console.error(`Error generating with ${modelName}:`, error);
+            console.error(`Error generating with ${styleName} (${model}):`, error);
             // Continue with other models even if one fails
           }
         }
@@ -905,7 +905,7 @@ export default function GeneratePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <Label htmlFor="aiModel" className="text-sm">Choose AI Model</Label>
+                <Label htmlFor="aiModel" className="text-sm">Choose Your Recipe Style</Label>
                 <Select
                   value={selectedModel}
                   onValueChange={(value) => setSelectedModel(value as 'model_1' | 'model_2' | 'model_3' | 'model_4' | 'all')}
@@ -914,15 +914,35 @@ export default function GeneratePage() {
                     <SelectValue placeholder="Select AI model" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">🎨 All 4 Models (Compare)</SelectItem>
-                    <SelectItem value="model_1">ChatGPT (OpenAI)</SelectItem>
-                    <SelectItem value="model_2">Claude (Anthropic)</SelectItem>
-                    <SelectItem value="model_3">Gemini (Google)</SelectItem>
-                    <SelectItem value="model_4">Grok (xAI)</SelectItem>
+                    <SelectItem value="all">🎨 All 4 Styles (Compare)</SelectItem>
+                    <SelectItem value="model_1">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{MODEL_STYLES.model_1.icon} {MODEL_STYLES.model_1.name}</span>
+                        <span className="text-xs text-muted-foreground">{MODEL_STYLES.model_1.tagline}</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="model_2">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{MODEL_STYLES.model_2.icon} {MODEL_STYLES.model_2.name}</span>
+                        <span className="text-xs text-muted-foreground">{MODEL_STYLES.model_2.tagline}</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="model_3">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{MODEL_STYLES.model_3.icon} {MODEL_STYLES.model_3.name}</span>
+                        <span className="text-xs text-muted-foreground">{MODEL_STYLES.model_3.tagline}</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="model_4">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{MODEL_STYLES.model_4.icon} {MODEL_STYLES.model_4.name}</span>
+                        <span className="text-xs text-muted-foreground">{MODEL_STYLES.model_4.tagline}</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Choose a single AI or compare all 4 to see different variations
+                  Not sure which to pick? <span className="font-medium">Balanced</span> is a great starting point, or try <span className="font-medium">All 4 Styles</span> to compare.
                 </p>
               </div>
 
@@ -935,16 +955,11 @@ export default function GeneratePage() {
                 {(isGenerating || isGeneratingAll) ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    {isGeneratingAll ? 'Generating All Models...' : `Generating with ${
-                      selectedModel === 'model_1' ? 'ChatGPT' :
-                      selectedModel === 'model_2' ? 'Claude' :
-                      selectedModel === 'model_3' ? 'Gemini' :
-                      'Grok'
-                    }...`}
+                    {isGeneratingAll ? 'Generating All Styles...' : `Generating with ${getStyleName(selectedModel)}...`}
                   </>
                 ) : (
                   <>
-                    {selectedModel === 'all' ? 'Generate All 4 Recipes' : 'Generate Recipe'}
+                    {selectedModel === 'all' ? 'Generate All 4 Styles' : 'Generate Recipe'}
                   </>
                 )}
               </Button>
@@ -965,18 +980,20 @@ export default function GeneratePage() {
                   </div>
                   <Progress value={(generationProgress.current / generationProgress.total) * 100} className="h-2" />
                   <div className="space-y-2 text-sm">
-                    {['ChatGPT', 'Claude', 'Gemini', 'Grok'].map((modelName, index) => {
+                    {['model_1', 'model_2', 'model_3', 'model_4'].map((modelId, index) => {
                       const isComplete = generationProgress.current > index;
                       const isCurrent = generationProgress.current === index;
                       const isWaiting = generationProgress.current < index;
+                      const styleName = getStyleName(modelId);
+                      const styleIcon = getStyleIcon(modelId);
 
                       return (
-                        <div key={modelName} className="flex items-center gap-2">
+                        <div key={modelId} className="flex items-center gap-2">
                           {isComplete && <CheckCircle className="h-4 w-4 text-green-500" />}
                           {isCurrent && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
                           {isWaiting && <Circle className="h-4 w-4 text-muted-foreground" />}
                           <span className={isComplete ? 'text-green-500' : isCurrent ? 'text-primary font-medium' : 'text-muted-foreground'}>
-                            {modelName} {isComplete ? 'complete' : isCurrent ? 'generating...' : 'waiting'}
+                            {styleIcon} {styleName} {isComplete ? 'complete' : isCurrent ? 'generating...' : 'waiting'}
                           </span>
                         </div>
                       );
@@ -991,13 +1008,18 @@ export default function GeneratePage() {
           {generatedRecipe && !isGeneratingAll && (
             <Card>
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
                     <CardTitle>{generatedRecipe.name}</CardTitle>
                     <CardDescription className="mt-1">
                       {generatedRecipe.description}
                     </CardDescription>
                   </div>
+                  {generatedRecipe.ai_model && (
+                    <Badge variant="secondary" className="flex-shrink-0">
+                      {getStyleDisplay(generatedRecipe.ai_model)}
+                    </Badge>
+                  )}
                 </div>
                 <div className="flex gap-4 text-sm text-muted-foreground mt-4">
                   <span>Prep: {generatedRecipe.prep_time}m</span>
@@ -1065,18 +1087,18 @@ export default function GeneratePage() {
           {Object.values(generatedRecipes).some(r => r !== null) && !generatedRecipe && (
             <Card>
               <CardHeader>
-                <CardTitle>Generated Recipes (4 Models)</CardTitle>
+                <CardTitle>Generated Recipes (4 Styles)</CardTitle>
                 <CardDescription>
-                  Compare recipes from different AI models
+                  Compare recipes from different recipe styles
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="model_1" className="w-full">
                   <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="model_1">ChatGPT</TabsTrigger>
-                    <TabsTrigger value="model_2">Claude</TabsTrigger>
-                    <TabsTrigger value="model_3">Gemini</TabsTrigger>
-                    <TabsTrigger value="model_4">Grok</TabsTrigger>
+                    <TabsTrigger value="model_1">{getStyleIcon('model_1')} {getStyleName('model_1')}</TabsTrigger>
+                    <TabsTrigger value="model_2">{getStyleIcon('model_2')} {getStyleName('model_2')}</TabsTrigger>
+                    <TabsTrigger value="model_3">{getStyleIcon('model_3')} {getStyleName('model_3')}</TabsTrigger>
+                    <TabsTrigger value="model_4">{getStyleIcon('model_4')} {getStyleName('model_4')}</TabsTrigger>
                   </TabsList>
 
                   {(['model_1', 'model_2', 'model_3', 'model_4'] as const).map((modelKey) => {
@@ -1086,7 +1108,12 @@ export default function GeneratePage() {
                         {recipe ? (
                           <>
                             <div>
-                              <h3 className="text-lg font-semibold">{recipe.name}</h3>
+                              <div className="flex items-start justify-between gap-4 mb-2">
+                                <h3 className="text-lg font-semibold flex-1">{recipe.name}</h3>
+                                <Badge variant="secondary" className="flex-shrink-0">
+                                  {getStyleDisplay(modelKey)}
+                                </Badge>
+                              </div>
                               <p className="text-sm text-muted-foreground mt-1">{recipe.description}</p>
                               <div className="flex gap-4 text-sm text-muted-foreground mt-2">
                                 <span>Prep: {recipe.prep_time}m</span>
