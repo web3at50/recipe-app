@@ -33,8 +33,61 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: "PlateWise",
-  description: "Your personal recipe manager and meal planner",
+  metadataBase: new URL('https://platewise.xyz'),
+  title: {
+    default: 'PlateWise - AI Recipe Manager | £9.99 Lifetime, No Subscription',
+    template: '%s | PlateWise',
+  },
+  description: 'UK\'s simplest AI recipe app. Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergen standards. 40 recipes free, £9.99 lifetime after. No subscription ever.',
+  keywords: [
+    'AI recipe generator UK',
+    'British recipe app',
+    'meal planning UK',
+    'UK measurements recipes',
+    'allergen tracking UK',
+    'recipe manager',
+    'lifetime recipe app',
+    'no subscription recipe app',
+  ],
+  authors: [{ name: 'PlateWise' }],
+  creator: 'PlateWise',
+  publisher: 'PlateWise',
+  openGraph: {
+    type: 'website',
+    locale: 'en_GB',
+    url: 'https://platewise.xyz',
+    title: 'PlateWise - AI Recipe Manager | £9.99 Lifetime',
+    description: 'UK\'s simplest AI recipe app. 40 recipes free, £9.99 lifetime. British measurements, UK allergens. No subscription.',
+    siteName: 'PlateWise',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'PlateWise - AI Recipe Manager for UK Cooks',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PlateWise - AI Recipe Manager | £9.99 Lifetime',
+    description: 'Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergens. 40 free recipes.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://platewise.xyz',
+  },
 }
 
 export const viewport = {

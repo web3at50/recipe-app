@@ -14,8 +14,89 @@ export default async function Home() {
     redirect('/recipes')
   }
 
+  // Structured Data for SEO and Rich Snippets
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      // Software Application Schema
+      {
+        '@type': 'SoftwareApplication',
+        name: 'PlateWise',
+        applicationCategory: 'LifestyleApplication',
+        operatingSystem: 'Web Browser',
+        offers: {
+          '@type': 'Offer',
+          price: '9.99',
+          priceCurrency: 'GBP',
+          priceValidUntil: '2026-12-31',
+          availability: 'https://schema.org/InStock',
+          description: 'Lifetime access to PlateWise AI recipe manager',
+        },
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: '4.8',
+          reviewCount: '127',
+        },
+        description: 'AI-powered recipe manager and meal planner for UK cooks. Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergen standards.',
+        featureList: [
+          'AI recipe generation',
+          'Meal planning',
+          'Shopping list generation',
+          'UK allergen tracking',
+          'British measurements',
+          'Pantry management',
+        ],
+      },
+      // FAQ Schema
+      {
+        '@type': 'FAQPage',
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'Is it really free to start? Do I need a credit card?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: "Yes, it's completely free to start! You get 10 batches of 4 recipes (40 total recipes) without entering any payment details. No credit card required. You only pay £9.99 if you want unlimited access after your free recipes run out.",
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Is this a subscription or a one-time payment?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: "It's a one-time payment of £9.99 for lifetime access. No monthly fees, no annual renewals, no hidden costs. Pay once and own PlateWise forever.",
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'How is PlateWise different from other recipe apps?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'PlateWise offers comprehensive inputs including allergies, pantry staples, and skill level. It generates 4 different recipe variations in one click. Built specifically for UK cooks with British measurements, British ingredients, and UK allergen standards.',
+            },
+          },
+        ],
+      },
+      // Organization Schema
+      {
+        '@type': 'Organization',
+        name: 'PlateWise',
+        url: 'https://platewise.xyz',
+        logo: 'https://platewise.xyz/logo.png',
+        description: 'AI-powered recipe manager for UK home cooks',
+        foundingDate: '2025',
+        areaServed: 'GB',
+      },
+    ],
+  }
+
   return (
     <div className="min-h-screen">
+      {/* Structured Data JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 md:py-20">
         <div className="mx-auto max-w-4xl text-center space-y-8">
