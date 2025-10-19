@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     siteName: 'PlateWise',
     images: [
       {
-        url: '/opengraph-image',
+        url: 'https://platewise.xyz/opengraph-image.png',
         width: 1200,
         height: 630,
         alt: 'PlateWise - AI Recipe Manager for UK Cooks',
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'PlateWise - AI Recipe Manager | £9.99 Lifetime',
     description: 'Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergens. 40 free recipes.',
-    images: ['/twitter-image'],
+    images: ['https://platewise.xyz/twitter-image.png'],
   },
   robots: {
     index: true,
