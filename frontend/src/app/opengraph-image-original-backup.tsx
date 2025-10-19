@@ -10,24 +10,20 @@ export const size = {
 export const contentType = 'image/png'
 
 /**
- * VARIATION 3: "BOLD PRICING HERO" - CUSTOM VERSION
+ * VARIATION 3: "BOLD PRICING HERO"
  *
  * Visual Description:
- * - Clean pricing message: "£9.99 No Subscription"
- * - Top: PlateWise logo (PW in circles) + wordmark with orange P/W
- * - Center: Simple, positive pricing without comparison
+ * - Pricing-first approach with large, attention-grabbing comparison
+ * - Top: PlateWise logo and wordmark
+ * - Center: Massive "£9.99 Once. Not £84/Year." hero text
+ * - Visual strikethrough on £84/Year for emphasis
  * - Bottom: Key value props in badge style
  * - High-contrast orange and white color scheme
  * - Gradient background: cream to orange
  *
- * Custom Changes:
- * - Real PW logo styling (not emoji)
- * - PlateWise wordmark with orange P and W
- * - Simplified pricing: "£9.99 No Subscription" (no comparison)
- * - Clean, positive messaging
- *
- * Design Goal: Value-focused, professional, scroll-stopping
- * Best For: Performance marketing, paid social ads, clear value proposition
+ * Design Goal: Value-conscious, direct response, scroll-stopping
+ * Best For: Performance marketing, paid social ads, price-sensitive audience
+ * Text Coverage: ~25% (maximum allowed, but highly impactful)
  */
 
 export default async function Image() {
@@ -81,82 +77,32 @@ export default async function Image() {
             marginBottom: '40px',
           }}
         >
-          {/* PW Logo - stylized with concentric circles */}
           <div
             style={{
-              position: 'relative',
-              width: '80px',
-              height: '80px',
+              width: '70px',
+              height: '70px',
+              borderRadius: '50%',
+              background: 'white',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxShadow: '0 8px 24px rgba(247, 147, 30, 0.3)',
+              fontSize: '42px',
             }}
           >
-            {/* Outer orange circle */}
-            <div
-              style={{
-                position: 'absolute',
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                border: '4px solid #F7931E',
-                display: 'flex',
-              }}
-            />
-            {/* Inner gray circle */}
-            <div
-              style={{
-                position: 'absolute',
-                width: '60px',
-                height: '60px',
-                borderRadius: '50%',
-                border: '3px solid rgba(180, 180, 180, 0.4)',
-                display: 'flex',
-              }}
-            />
-            {/* White background */}
-            <div
-              style={{
-                position: 'absolute',
-                width: '70px',
-                height: '70px',
-                borderRadius: '50%',
-                background: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 8px 24px rgba(247, 147, 30, 0.3)',
-              }}
-            >
-              {/* PW text */}
-              <div
-                style={{
-                  fontSize: '32px',
-                  fontWeight: 700,
-                  color: '#1A1A1A',
-                  display: 'flex',
-                  letterSpacing: '-0.05em',
-                }}
-              >
-                PW
-              </div>
-            </div>
+            🍳
           </div>
-
-          {/* PlateWise wordmark with orange P and W */}
           <div
             style={{
               fontSize: '56px',
               fontWeight: 700,
+              color: 'white',
               display: 'flex',
               textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               letterSpacing: '-0.02em',
             }}
           >
-            <span style={{ color: '#F7931E' }}>P</span>
-            <span style={{ color: 'white' }}>late</span>
-            <span style={{ color: '#F7931E' }}>W</span>
-            <span style={{ color: 'white' }}>ise</span>
+            PlateWise
           </div>
         </div>
 
@@ -176,36 +122,37 @@ export default async function Image() {
             maxWidth: '1000px',
           }}
         >
-          {/* Hero pricing - simplified */}
+          {/* Hero pricing comparison */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '12px',
+              gap: '16px',
             }}
           >
             <div
               style={{
-                fontSize: '80px',
+                fontSize: '72px',
                 fontWeight: 700,
                 color: '#4CAF50',
                 display: 'flex',
                 lineHeight: 1,
               }}
             >
-              £9.99
+              £9.99 Once.
             </div>
             <div
               style={{
-                fontSize: '42px',
-                fontWeight: 600,
-                color: '#1A1A1A',
+                fontSize: '52px',
+                fontWeight: 700,
+                color: '#737373',
                 display: 'flex',
+                position: 'relative',
                 lineHeight: 1,
               }}
             >
-              No Subscription
+              <span style={{ textDecoration: 'line-through', opacity: 0.6 }}>Not £84/Year.</span>
             </div>
           </div>
 

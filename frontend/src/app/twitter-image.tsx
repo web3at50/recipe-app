@@ -9,6 +9,27 @@ export const size = {
 }
 export const contentType = 'image/png'
 
+/**
+ * VARIATION 3: "BOLD PRICING HERO" - CUSTOM VERSION
+ *
+ * Visual Description:
+ * - Clean pricing message: "£9.99 No Subscription"
+ * - Top: PlateWise logo (PW in circles) + wordmark with orange P/W
+ * - Center: Simple, positive pricing without comparison
+ * - Bottom: Key value props in badge style
+ * - High-contrast orange and white color scheme
+ * - Gradient background: cream to orange
+ *
+ * Custom Changes:
+ * - Real PW logo styling (not emoji)
+ * - PlateWise wordmark with orange P and W
+ * - Simplified pricing: "£9.99 No Subscription" (no comparison)
+ * - Clean, positive messaging
+ *
+ * Design Goal: Value-focused, professional, scroll-stopping
+ * Best For: Performance marketing, paid social ads, clear value proposition
+ */
+
 export default async function Image() {
   return new ImageResponse(
     (
@@ -17,204 +38,256 @@ export default async function Image() {
           height: '100%',
           width: '100%',
           display: 'flex',
-          background: 'linear-gradient(135deg, #fff5eb 0%, #ffedd5 50%, #fed7aa 100%)',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(160deg, #FAEBD7 0%, #FFE4C4 30%, #FFB366 100%)',
+          padding: '60px',
           position: 'relative',
         }}
       >
-        {/* Decorative circles in background */}
+        {/* Decorative circles */}
         <div
           style={{
             position: 'absolute',
-            width: '400px',
-            height: '400px',
+            width: '600px',
+            height: '600px',
             borderRadius: '50%',
-            background: 'rgba(249, 115, 22, 0.1)',
-            top: '-100px',
-            right: '-100px',
+            background: 'rgba(255, 255, 255, 0.2)',
+            top: '-200px',
+            left: '-200px',
             display: 'flex',
           }}
         />
         <div
           style={{
             position: 'absolute',
-            width: '300px',
-            height: '300px',
+            width: '500px',
+            height: '500px',
             borderRadius: '50%',
-            background: 'rgba(251, 146, 60, 0.08)',
-            bottom: '-80px',
-            left: '-80px',
+            background: 'rgba(247, 147, 30, 0.15)',
+            bottom: '-150px',
+            right: '-150px',
             display: 'flex',
           }}
         />
 
-        {/* Main content container */}
+        {/* Logo + Wordmark at top */}
         <div
           style={{
             display: 'flex',
-            width: '100%',
-            height: '100%',
-            padding: '60px 80px',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            gap: '20px',
+            marginBottom: '40px',
           }}
         >
-          {/* Left side - Branding */}
+          {/* PW Logo - stylized with concentric circles */}
           <div
             style={{
+              position: 'relative',
+              width: '80px',
+              height: '80px',
               display: 'flex',
-              flexDirection: 'column',
-              gap: '40px',
-              width: '35%',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            {/* Logo placeholder - simplified visual */}
+            {/* Outer orange circle */}
             <div
               style={{
+                position: 'absolute',
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                border: '4px solid #F7931E',
+                display: 'flex',
+              }}
+            />
+            {/* Inner gray circle */}
+            <div
+              style={{
+                position: 'absolute',
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                border: '3px solid rgba(180, 180, 180, 0.4)',
+                display: 'flex',
+              }}
+            />
+            {/* White background */}
+            <div
+              style={{
+                position: 'absolute',
+                width: '70px',
+                height: '70px',
+                borderRadius: '50%',
+                background: 'white',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '16px',
+                justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(247, 147, 30, 0.3)',
               }}
             >
+              {/* PW text */}
               <div
                 style={{
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
+                  fontSize: '32px',
+                  fontWeight: 700,
+                  color: '#1A1A1A',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 8px 24px rgba(249, 115, 22, 0.3)',
-                  fontSize: '48px',
+                  letterSpacing: '-0.05em',
                 }}
               >
-                🍳
-              </div>
-            </div>
-
-            {/* Feature icons */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                  fontSize: '24px',
-                }}
-              >
-                <span style={{ fontSize: '32px' }}>✨</span>
-                <span style={{ color: '#78716c', fontWeight: 500 }}>AI Powered</span>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                  fontSize: '24px',
-                }}
-              >
-                <span style={{ fontSize: '32px' }}>🇬🇧</span>
-                <span style={{ color: '#78716c', fontWeight: 500 }}>UK Focused</span>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                  fontSize: '24px',
-                }}
-              >
-                <span style={{ fontSize: '32px' }}>⚡</span>
-                <span style={{ color: '#78716c', fontWeight: 500 }}>30 Seconds</span>
+                PW
               </div>
             </div>
           </div>
 
-          {/* Right side - Main message */}
+          {/* PlateWise wordmark with orange P and W */}
+          <div
+            style={{
+              fontSize: '56px',
+              fontWeight: 700,
+              display: 'flex',
+              textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            <span style={{ color: '#F7931E' }}>P</span>
+            <span style={{ color: 'white' }}>late</span>
+            <span style={{ color: '#F7931E' }}>W</span>
+            <span style={{ color: 'white' }}>ise</span>
+          </div>
+        </div>
+
+        {/* Main pricing hero container */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'white',
+            padding: '60px 80px',
+            borderRadius: '32px',
+            boxShadow: '0 30px 80px rgba(0, 0, 0, 0.2)',
+            border: '4px solid #F7931E',
+            gap: '32px',
+            maxWidth: '1000px',
+          }}
+        >
+          {/* Hero pricing - simplified */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '24px',
-              width: '60%',
-              backgroundColor: 'white',
-              padding: '50px',
-              borderRadius: '24px',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
-              border: '1px solid rgba(249, 115, 22, 0.1)',
+              alignItems: 'center',
+              gap: '12px',
             }}
           >
-            {/* Brand name */}
             <div
               style={{
-                fontSize: '64px',
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
-                backgroundClip: 'text',
-                color: 'transparent',
+                fontSize: '80px',
+                fontWeight: 700,
+                color: '#4CAF50',
                 display: 'flex',
-                letterSpacing: '-0.02em',
+                lineHeight: 1,
               }}
             >
-              PlateWise
+              £9.99
             </div>
-
-            {/* Tagline */}
             <div
               style={{
-                fontSize: '32px',
-                color: '#292524',
+                fontSize: '42px',
                 fontWeight: 600,
-                lineHeight: 1.3,
+                color: '#1A1A1A',
                 display: 'flex',
+                lineHeight: 1,
               }}
             >
-              AI Recipe Manager for UK Cooks
+              No Subscription
             </div>
+          </div>
 
-            {/* Divider */}
+          {/* Divider */}
+          <div
+            style={{
+              height: '3px',
+              background: '#F7931E',
+              width: '60%',
+              display: 'flex',
+            }}
+          />
+
+          {/* Subtitle */}
+          <div
+            style={{
+              fontSize: '32px',
+              color: '#1A1A1A',
+              fontWeight: 600,
+              textAlign: 'center',
+              display: 'flex',
+            }}
+          >
+            AI Recipe Manager for UK Cooks
+          </div>
+
+          {/* Value prop badges */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '16px',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+            }}
+          >
             <div
               style={{
-                height: '2px',
-                background: 'linear-gradient(90deg, #f97316 0%, transparent 100%)',
-                width: '100%',
                 display: 'flex',
-              }}
-            />
-
-            {/* Pricing */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
+                alignItems: 'center',
+                gap: '8px',
+                backgroundColor: '#F7931E',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '100px',
+                fontSize: '22px',
+                fontWeight: 600,
               }}
             >
-              <div
-                style={{
-                  fontSize: '36px',
-                  fontWeight: 'bold',
-                  color: '#f97316',
-                  display: 'flex',
-                }}
-              >
-                £9.99 Lifetime
-              </div>
-              <div
-                style={{
-                  fontSize: '24px',
-                  color: '#78716c',
-                  display: 'flex',
-                }}
-              >
-                No Subscription • 40 Free Recipes
-              </div>
+              <span>🇬🇧</span>
+              <span>British Measurements</span>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                backgroundColor: '#F7931E',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '100px',
+                fontSize: '22px',
+                fontWeight: 600,
+              }}
+            >
+              <span>⚡</span>
+              <span>30 Seconds</span>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '100px',
+                fontSize: '22px',
+                fontWeight: 600,
+              }}
+            >
+              <span>✓</span>
+              <span>40 Free Recipes</span>
             </div>
           </div>
         </div>
