@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, Users, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Ingredient, Instruction } from '@/types/recipe';
 
 interface Props {
   params: Promise<{
@@ -188,7 +189,7 @@ export default async function RecipePage({ params }: Props) {
           <div className="md:col-span-1">
             <h2 className="text-2xl font-bold mb-4">Ingredients</h2>
             <ul className="space-y-3">
-              {recipe.ingredients.map((ing, i) => (
+              {recipe.ingredients.map((ing: Ingredient, i: number) => (
                 <li key={i} className="flex items-start gap-2">
                   <span className="text-primary mt-1 flex-shrink-0">•</span>
                   <span className="flex-1">
@@ -211,7 +212,7 @@ export default async function RecipePage({ params }: Props) {
           <div className="md:col-span-2">
             <h2 className="text-2xl font-bold mb-4">Instructions</h2>
             <ol className="space-y-4">
-              {recipe.instructions.map((inst, i) => (
+              {recipe.instructions.map((inst: Instruction, i: number) => (
                 <li key={i} className="flex gap-4">
                   <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold text-sm">
                     {i + 1}
