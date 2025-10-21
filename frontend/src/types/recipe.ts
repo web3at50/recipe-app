@@ -62,6 +62,7 @@ export interface Recipe {
   // SEO fields (for public recipe pages)
   seo_title: string | null;
   seo_description: string | null;
+  seo_keywords: string[] | null;
   seo_slug: string | null;
   category: string | null;
   page_views: number | null;

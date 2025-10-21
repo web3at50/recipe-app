@@ -4,7 +4,7 @@
  * @see https://schema.org/Recipe
  */
 
-import type { Recipe } from '@/types/recipe';
+import type { Recipe, Ingredient, Instruction } from '@/types/recipe';
 
 interface Props {
   recipe: Recipe;
@@ -41,11 +41,11 @@ export function RecipeSchema({ recipe }: Props) {
 
     keywords: recipe.seo_keywords?.join(', '),
 
-    recipeIngredient: recipe.ingredients.map((ing) =>
+    recipeIngredient: recipe.ingredients.map((ing: Ingredient) =>
       [ing.quantity, ing.unit, ing.item].filter(Boolean).join(' ')
     ),
 
-    recipeInstructions: recipe.instructions.map((inst, index) => ({
+    recipeInstructions: recipe.instructions.map((inst: Instruction, index: number) => ({
       '@type': 'HowToStep',
       position: index + 1,
       text: inst.instruction,
@@ -79,10 +79,10 @@ export function RecipeSchema({ recipe }: Props) {
 
     // Suitable for diet (based on tags)
     suitableForDiet: recipe.tags
-      ?.filter((tag) =>
+      ?.filter((tag: string) =>
         ['vegetarian', 'vegan', 'gluten-free', 'dairy-free'].includes(tag)
       )
-      .map((tag) => {
+      .map((tag: string) => {
         const dietMap: Record<string, string> = {
           vegetarian: 'VegetarianDiet',
           vegan: 'VeganDiet',
