@@ -57,9 +57,19 @@ export interface Recipe {
   // Additional
   cost_per_serving: number | null;
   image_url: string | null;
+  image_source: 'ai' | 'upload' | null;
+
+  // SEO fields (for public recipe pages)
+  seo_title: string | null;
+  seo_description: string | null;
+  seo_slug: string | null;
+  category: string | null;
+  page_views: number | null;
+  published_at: string | null;
 
   // Status flags
   is_favorite: boolean;
+  is_public: boolean;
   published: boolean;
   flagged_for_review: boolean;
 
