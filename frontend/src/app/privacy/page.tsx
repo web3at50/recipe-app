@@ -34,7 +34,7 @@ export default function PrivacyPage() {
         </CardHeader>
         <CardContent className="prose prose-sm max-w-none">
           <p>
-            PlateWise ("we", "our", "us") is committed to protecting your privacy.
+            PlateWise (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is committed to protecting your privacy.
             This Privacy Policy explains how we collect, use, disclose, and safeguard
             your information when you use our AI recipe generation service.
           </p>
@@ -126,7 +126,7 @@ export default function PrivacyPage() {
           <ul>
             <li><strong>Access</strong> - Request a copy of your personal data</li>
             <li><strong>Rectification</strong> - Correct inaccurate or incomplete data</li>
-            <li><strong>Erasure</strong> - Request deletion of your data ("right to be forgotten")</li>
+            <li><strong>Erasure</strong> - Request deletion of your data (&quot;right to be forgotten&quot;)</li>
             <li><strong>Portability</strong> - Receive your data in a machine-readable format</li>
             <li><strong>Restriction</strong> - Limit how we use your data</li>
             <li><strong>Object</strong> - Object to certain types of processing</li>
@@ -245,7 +245,7 @@ export default function PrivacyPage() {
         <CardContent className="prose prose-sm max-w-none">
           <p>
             If you believe we have not handled your data correctly, you have the right
-            to lodge a complaint with the Information Commissioner's Office (ICO):
+            to lodge a complaint with the Information Commissioner&apos;s Office (ICO):
           </p>
           <ul>
             <li>Website: <a href="https://ico.org.uk" className="text-primary hover:underline" target="_blank" rel="noopener">ico.org.uk</a></li>

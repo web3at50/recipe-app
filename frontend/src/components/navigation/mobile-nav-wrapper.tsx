@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import { MobileNav } from './mobile-nav';
-import { BookOpen, ChefHat, Calendar, ShoppingCart, Package, Settings } from 'lucide-react';
 
 const navigation = [
   { name: 'My Recipes', href: '/my-recipes', iconName: 'BookOpen' },

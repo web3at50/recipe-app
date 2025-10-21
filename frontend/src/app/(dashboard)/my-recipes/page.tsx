@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RecipeList } from '@/components/recipes/recipe-list';
 

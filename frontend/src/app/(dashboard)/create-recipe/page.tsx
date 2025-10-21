@@ -2,20 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
-import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf, Settings2, Sparkles, Eye, EyeOff, ChevronDown, ShoppingCart, X } from 'lucide-react';
+import { ChefHat, Loader2, AlertTriangle, Info, Package, CheckCircle, Circle, Leaf, Eye, EyeOff, ChevronDown, ShoppingCart, X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { Recipe } from '@/types/recipe';
 import type { UserPreferences } from '@/types/user-profile';
@@ -80,6 +78,7 @@ export default function GeneratePage() {
   const [skillLevel, setSkillLevel] = useState<string | null>(null);
   const [maxCookTime, setMaxCookTime] = useState<number | null>(null);
   const [spiceLevel, setSpiceLevel] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [favouriteCuisine, setFavouriteCuisine] = useState<string | null>(null);
 
   // State for "All 4" feature
@@ -143,7 +142,6 @@ export default function GeneratePage() {
     };
 
     fetchPreferences();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch pantry staples on mount

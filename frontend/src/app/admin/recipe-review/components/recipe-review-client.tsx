@@ -4,10 +4,8 @@ import { useState } from 'react';
 import type { Recipe } from '@/types/recipe';
 import { RecipeCard } from './recipe-card';
 import { PublishModal } from './publish-modal';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { FileText, CheckCircle, Clock } from 'lucide-react';
 
 interface Props {

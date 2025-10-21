@@ -25,7 +25,7 @@ export default function AboutPage() {
       <div className="mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4">About PlateWise</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          The UK's simplest AI recipe app. British measurements, UK allergen standards,
+          The UK&apos;s simplest AI recipe app. British measurements, UK allergen standards,
           and personalised recipes in 30 seconds.
         </p>
       </div>
@@ -41,12 +41,12 @@ export default function AboutPage() {
         <CardContent className="prose prose-sm max-w-none">
           <p>
             PlateWise was created to solve a simple problem: traditional recipe apps are
-            overcomplicated, ad-heavy, and don't speak to UK cooks. We wanted something
+            overcomplicated, ad-heavy, and don&apos;t speak to UK cooks. We wanted something
             that understood British measurements, UK allergen standards, and actually
-            worked with what's in your kitchen.
+            worked with what&apos;s in your kitchen.
           </p>
           <p>
-            Using AI, we've built a recipe generator that creates personalised recipes
+            Using AI, we&apos;ve built a recipe generator that creates personalised recipes
             in seconds. No scrolling through life stories. No pop-up ads. Just simple,
             practical recipes tailored to your ingredients and preferences.
           </p>
@@ -90,7 +90,7 @@ export default function AboutPage() {
             <li className="flex gap-3">
               <span className="text-primary mt-1">✓</span>
               <div>
-                <strong>Your Ingredients</strong> - Generate recipes based on what's actually in your kitchen
+                <strong>Your Ingredients</strong> - Generate recipes based on what&apos;s actually in your kitchen
               </div>
             </li>
           </ul>

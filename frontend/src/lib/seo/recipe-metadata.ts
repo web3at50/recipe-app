@@ -46,7 +46,6 @@ export function generateSEODescription(recipe: Recipe): string {
     prep_time,
     cook_time,
     servings,
-    ai_model,
   } = recipe;
 
   // Extract key info

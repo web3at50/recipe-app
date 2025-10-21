@@ -34,8 +34,8 @@ export default function TermsPage() {
         </CardHeader>
         <CardContent className="prose prose-sm max-w-none">
           <p>
-            By accessing or using PlateWise ("the Service"), you agree to be bound by
-            these Terms of Service ("Terms"). If you disagree with any part of these
+            By accessing or using PlateWise (&quot;the Service&quot;), you agree to be bound by
+            these Terms of Service (&quot;Terms&quot;). If you disagree with any part of these
             terms, you may not access the Service.
           </p>
           <p>
@@ -85,7 +85,7 @@ export default function TermsPage() {
 
           <h3>Refund Policy</h3>
           <p>
-            We offer a 14-day money-back guarantee. If you're not satisfied, contact us
+            We offer a 14-day money-back guarantee. If you&apos;re not satisfied, contact us
             at{' '}
             <a href="mailto:support@platewise.xyz" className="text-primary hover:underline">
               support@platewise.xyz
@@ -169,7 +169,7 @@ export default function TermsPage() {
           <p>You may not use PlateWise to:</p>
           <ul>
             <li>Violate any laws or regulations</li>
-            <li>Infringe on others' intellectual property rights</li>
+            <li>Infringe on others&apos; intellectual property rights</li>
             <li>Transmit viruses, malware, or harmful code</li>
             <li>Reverse engineer or attempt to access our source code</li>
             <li>Use bots or automated tools to generate recipes at scale</li>
