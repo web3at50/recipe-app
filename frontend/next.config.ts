@@ -10,10 +10,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Allow access from local network (for mobile testing)
-  experimental: {
-    allowedDevOrigins: ['192.168.0.80:3000'],
-  },
   async redirects() {
     return [
       {
