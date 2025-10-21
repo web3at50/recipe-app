@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: [
           '/api/',           // API endpoints
-          '/recipes',        // Auth required
+          '/my-recipes',     // Auth required
           '/meal-planner',   // Auth required
           '/shopping-list',  // Auth required
           '/settings',       // Auth required
@@ -33,7 +33,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: [
           '/api/',
-          '/recipes',
+          '/my-recipes',
           '/meal-planner',
           '/shopping-list',
           '/settings',

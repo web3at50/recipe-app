@@ -54,7 +54,7 @@ export function DeleteRecipeButton({
       if (!response.ok) throw new Error('Failed to delete recipe')
 
       // Redirect to recipes list
-      router.push('/recipes')
+      router.push('/my-recipes')
       router.refresh()
     } catch (error) {
       console.error('Error deleting recipe:', error)

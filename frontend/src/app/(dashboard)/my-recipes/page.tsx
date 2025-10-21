@@ -50,7 +50,7 @@ export default async function RecipesPage() {
               Create Recipe(s) With AI
             </Button>
           </Link>
-          <Link href="/recipes/new" className="w-full sm:w-auto">
+          <Link href="/my-recipes/new" className="w-full sm:w-auto">
             <Button variant="outline" className="w-full">
               <Plus className="h-4 w-4 mr-2" />
               Create Recipe Manually

@@ -65,7 +65,7 @@ export default async function SettingsPage() {
       <div className="space-y-8">
         {/* Breadcrumb */}
         <Breadcrumb items={[
-          { label: 'My Recipes', href: '/recipes' },
+          { label: 'My Recipes', href: '/my-recipes' },
           { label: 'Settings' }
         ]} />
 

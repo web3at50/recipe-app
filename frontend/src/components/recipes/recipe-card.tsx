@@ -49,7 +49,7 @@ export function RecipeCard({ recipe, onToggleFavorite, onDelete, userAllergens }
 
   return (
     <Card className="overflow-hidden hover:shadow-lg hover:shadow-primary/20 hover:border-primary/40 hover:scale-[1.02] transition-all duration-300 ease-in-out">
-      <Link href={`/recipes/${recipe.id}`}>
+      <Link href={`/my-recipes/${recipe.id}`}>
         <div className="aspect-video relative">
           {recipe.image_url ? (
             <Image
@@ -75,7 +75,7 @@ export function RecipeCard({ recipe, onToggleFavorite, onDelete, userAllergens }
       </Link>
 
       <CardHeader>
-        <Link href={`/recipes/${recipe.id}`}>
+        <Link href={`/my-recipes/${recipe.id}`}>
           <h3 className="font-semibold line-clamp-2 hover:underline">
             {recipe.name}
           </h3>

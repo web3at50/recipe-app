@@ -26,7 +26,7 @@ export default function EditRecipePage() {
       } catch (error) {
         console.error('Error fetching recipe:', error);
         alert('Failed to load recipe');
-        router.push('/recipes');
+        router.push('/my-recipes');
       } finally {
         setIsLoading(false);
       }
@@ -50,7 +50,7 @@ export default function EditRecipePage() {
         throw new Error(error.error || 'Failed to update recipe');
       }
 
-      router.push(`/recipes/${id}`);
+      router.push(`/my-recipes/${id}`);
       router.refresh();
     } catch (error) {
       console.error('Error updating recipe:', error);
@@ -74,7 +74,7 @@ export default function EditRecipePage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-8">
-        <Link href={`/recipes/${id}`}>
+        <Link href={`/my-recipes/${id}`}>
           <Button variant="ghost" size="sm" className="mb-4">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Back to Recipe

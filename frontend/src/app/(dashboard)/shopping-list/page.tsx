@@ -411,7 +411,7 @@ export default function ShoppingListPage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
       <Breadcrumb items={[
-        { label: 'My Recipes', href: '/recipes' },
+        { label: 'My Recipes', href: '/my-recipes' },
         { label: 'Shopping List' }
       ]} />
 

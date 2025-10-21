@@ -26,7 +26,7 @@ export default async function OnboardingLayout({
   // If onboarding already completed, redirect to dashboard
   // Note: profile being null is fine - it means new user
   if (profile && profile.onboarding_completed) {
-    redirect('/recipes');
+    redirect('/my-recipes');
   }
 
   // If profile is null or onboarding not completed, show onboarding page

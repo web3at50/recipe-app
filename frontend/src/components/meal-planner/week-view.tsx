@@ -64,7 +64,7 @@ export function WeekView({ startDate, items, onAddRecipe, onRemoveRecipe }: Week
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-1">
                         <Link
-                          href={`/recipes/${item.recipe_id}?servings=${item.servings}&from=meal-planner`}
+                          href={`/my-recipes/${item.recipe_id}?servings=${item.servings}&from=meal-planner`}
                           className="text-sm font-medium line-clamp-2 hover:underline cursor-pointer flex-1"
                         >
                           {item.recipe?.name || 'Unknown Recipe'}

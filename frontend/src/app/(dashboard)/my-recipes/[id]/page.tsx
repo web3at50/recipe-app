@@ -66,7 +66,7 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
   return (
     <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
       <div className="flex gap-2 mb-4 no-print">
-        <Link href="/recipes">
+        <Link href="/my-recipes">
           <Button variant="ghost" size="sm">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Back to Recipes
@@ -169,7 +169,7 @@ export default async function RecipeDetailPage({ params, searchParams }: PagePro
 
         {/* Actions */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 no-print">
-          <Link href={`/recipes/${id}/edit`}>
+          <Link href={`/my-recipes/${id}/edit`}>
             <Button variant="outline" className="w-full">
               <Edit className="h-4 w-4 mr-2" />
               Edit Recipe

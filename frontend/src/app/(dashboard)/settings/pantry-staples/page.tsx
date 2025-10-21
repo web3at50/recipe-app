@@ -29,7 +29,7 @@ export default async function PantryStaplesSettingsPage() {
       <div className="space-y-6">
         {/* Breadcrumb */}
         <Breadcrumb items={[
-          { label: 'My Recipes', href: '/recipes' },
+          { label: 'My Recipes', href: '/my-recipes' },
           { label: 'Settings', href: '/settings' },
           { label: 'Pantry Staples' }
         ]} />

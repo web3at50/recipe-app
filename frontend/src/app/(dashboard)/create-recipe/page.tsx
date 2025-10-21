@@ -332,7 +332,7 @@ export default function GeneratePage() {
 
     try {
       const savedRecipe = await handleSaveRecipe(generatedRecipe);
-      router.push(`/recipes/${savedRecipe.id}`);
+      router.push(`/my-recipes/${savedRecipe.id}`);
     } catch {
       alert('Failed to save recipe');
     }
@@ -353,7 +353,7 @@ export default function GeneratePage() {
 
       await Promise.all(savePromises);
       alert(`Successfully saved ${recipesToSave.length} recipes to your collection!`);
-      router.push('/recipes');
+      router.push('/my-recipes');
     } catch (error) {
       console.error('Error saving recipes:', error);
       alert('Failed to save some recipes');
@@ -363,7 +363,7 @@ export default function GeneratePage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
       <Breadcrumb items={[
-        { label: 'My Recipes', href: '/recipes' },
+        { label: 'My Recipes', href: '/my-recipes' },
         { label: 'Create Recipe' }
       ]} />
 

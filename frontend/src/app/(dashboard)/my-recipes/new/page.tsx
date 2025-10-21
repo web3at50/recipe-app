@@ -28,7 +28,7 @@ export default function NewRecipePage() {
       }
 
       const { recipe } = await response.json();
-      router.push(`/recipes/${recipe.id}`);
+      router.push(`/my-recipes/${recipe.id}`);
     } catch (error) {
       console.error('Error creating recipe:', error);
       alert(error instanceof Error ? error.message : 'Failed to create recipe');
@@ -39,7 +39,7 @@ export default function NewRecipePage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-8">
-        <Link href="/recipes">
+        <Link href="/my-recipes">
           <Button variant="ghost" size="sm" className="mb-4">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Back to Recipes

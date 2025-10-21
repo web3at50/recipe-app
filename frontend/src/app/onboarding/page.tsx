@@ -79,7 +79,7 @@ export default function OnboardingPage() {
       }
 
       // Redirect to dashboard
-      router.push('/recipes');
+      router.push('/my-recipes');
       router.refresh();
     } catch (error) {
       console.error('Onboarding error:', error);

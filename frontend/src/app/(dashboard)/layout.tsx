@@ -6,7 +6,7 @@ import { Toaster } from 'sonner';
 import { createClient } from '@/lib/supabase/server';
 
 const navigation = [
-  { name: 'My Recipes', href: '/recipes', icon: BookOpen },
+  { name: 'My Recipes', href: '/my-recipes', icon: BookOpen },
   { name: 'Create Recipe', href: '/create-recipe', icon: ChefHat },
   { name: 'Meal Planner', href: '/meal-planner', icon: Calendar },
   { name: 'Shopping List', href: '/shopping-list', icon: ShoppingCart },

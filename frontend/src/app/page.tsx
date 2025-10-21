@@ -11,7 +11,7 @@ export default async function Home() {
   // Redirect authenticated users to recipes page
   const { userId } = await auth()
   if (userId) {
-    redirect('/recipes')
+    redirect('/my-recipes')
   }
 
   // Structured Data for SEO and Rich Snippets
