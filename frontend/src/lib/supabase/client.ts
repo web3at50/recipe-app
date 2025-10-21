@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { useSession, useAuth } from '@clerk/nextjs'
+import { useSession } from '@clerk/nextjs'
 
 // Client-side Supabase client with Clerk auth token (2025 method)
 // Uses Clerk's native Supabase integration via accessToken callback

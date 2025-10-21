@@ -141,7 +141,7 @@ export function CategoryImageUpload({
             <AlertDescription>
               <strong>Recommended:</strong> 1200x630px (OpenGraph standard)<br />
               <strong>Max size:</strong> 5MB<br />
-              <strong>Fallback:</strong> If no custom image, uses first recipe's image
+              <strong>Fallback:</strong> If no custom image, uses first recipe&apos;s image
             </AlertDescription>
           </Alert>
 

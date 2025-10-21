@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChefHat, Clock, Leaf, Zap, Heart, UtensilsCrossed, Coffee, Cake } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -166,10 +167,11 @@ export default async function RecipesPage() {
                 <Card className="h-full hover:shadow-lg transition-shadow">
                   {recipe.image_url && (
                     <div className="relative w-full aspect-[1.91/1] bg-muted">
-                      <img
+                      <Image
                         src={recipe.image_url}
                         alt={recipe.name}
-                        className="object-cover w-full h-full rounded-t-lg"
+                        fill
+                        className="object-cover rounded-t-lg"
                       />
                     </div>
                   )}
