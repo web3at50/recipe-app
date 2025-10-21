@@ -20,6 +20,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     })) || [];
 
+  // Category pages (all 8 categories, even if empty)
+  const categoryPages: MetadataRoute.Sitemap = [
+    'breakfast',
+    'lunch',
+    'dinner',
+    'desserts',
+    'snacks',
+    'sides',
+    'quick-easy',
+    'healthy',
+  ].map((category) => ({
+    url: `https://platewise.xyz/recipes/${category}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily',
+    priority: 0.85,
+  }));
+
   // Static pages
   return [
     {
@@ -34,6 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     },
+    ...categoryPages,
     ...recipeUrls,
   ];
 }

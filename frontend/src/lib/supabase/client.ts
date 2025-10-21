@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { useSession } from '@clerk/nextjs'
+import { useSession, useAuth } from '@clerk/nextjs'
 
 // Client-side Supabase client with Clerk auth token (2025 method)
 // Uses Clerk's native Supabase integration via accessToken callback
@@ -17,6 +17,21 @@ export function useSupabaseClient() {
   return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
     accessToken: async () => {
       return session?.getToken() ?? null
+    },
+  })
+}
+
+// Non-hook version for use in functions/effects
+// Note: This won't have Clerk token at creation time, but RLS policies
+// will still work for admin users via the JWT stored in browser session
+export function createClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
     },
   })
 }

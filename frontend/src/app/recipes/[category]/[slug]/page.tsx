@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { RecipeSchema } from '@/components/recipes/recipe-schema';
+import { BreadcrumbSchema } from '@/components/recipes/breadcrumb-schema';
 import { RecipePrintButton } from '@/components/recipes/recipe-print';
 import { RecipeCTA } from '@/components/recipes/recipe-cta';
 import { Badge } from '@/components/ui/badge';
@@ -81,10 +82,21 @@ export default async function RecipePage({ params }: Props) {
     .eq('id', recipe.id)
     .then(() => {});
 
+  // Get category display name
+  const categoryDisplayName = category.replace('-', ' & ');
+
   return (
     <div className="min-h-screen">
       {/* Schema.org JSON-LD */}
       <RecipeSchema recipe={recipe} />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://platewise.xyz' },
+          { name: 'Recipes', url: 'https://platewise.xyz/recipes' },
+          { name: categoryDisplayName, url: `https://platewise.xyz/recipes/${category}` },
+          { name: recipe.name, url: `https://platewise.xyz/recipes/${category}/${slug}` },
+        ]}
+      />
 
       <div className="container mx-auto py-8 px-4 max-w-4xl">
         {/* Breadcrumb */}
@@ -101,7 +113,7 @@ export default async function RecipePage({ params }: Props) {
             href={`/recipes/${category}`}
             className="hover:text-foreground capitalize"
           >
-            {category.replace('-', ' & ')}
+            {categoryDisplayName}
           </Link>
           {' / '}
           <span className="text-foreground">{recipe.name}</span>

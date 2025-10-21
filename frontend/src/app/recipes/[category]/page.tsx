@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { BreadcrumbSchema } from '@/components/recipes/breadcrumb-schema';
 
 interface Props {
   params: Promise<{
@@ -58,9 +59,48 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const supabase = await createClient();
+
+  // Fetch category metadata (for custom image)
+  const { data: categoryMeta } = await supabase
+    .from('category_metadata')
+    .select('custom_image_url, custom_description')
+    .eq('category', category)
+    .single();
+
+  // Fetch first recipe image as fallback
+  const { data: firstRecipe } = await supabase
+    .from('recipes')
+    .select('image_url')
+    .eq('category', category)
+    .eq('is_public', true)
+    .order('published_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  // Hybrid image selection: custom > first recipe > default
+  const ogImage = categoryMeta?.custom_image_url
+    || firstRecipe?.image_url
+    || 'https://platewise.xyz/og-default.jpg';
+
+  // Use custom description if available
+  const description = categoryMeta?.custom_description || categoryInfo.description;
+
   return {
     title: `${categoryInfo.title} | PlateWise`,
-    description: categoryInfo.description,
+    description: description,
+    openGraph: {
+      title: `${categoryInfo.title} | PlateWise`,
+      description: description,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${categoryInfo.title} | PlateWise`,
+      description: description,
+      images: [ogImage],
+    },
   };
 }
 
@@ -82,8 +122,40 @@ export default async function CategoryPage({ params }: Props) {
     .eq('is_public', true)
     .order('published_at', { ascending: false });
 
+  // Generate ItemList schema for recipe listing
+  const itemListSchema = recipes && recipes.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${categoryInfo.title} - PlateWise`,
+    description: categoryInfo.description,
+    numberOfItems: recipes.length,
+    itemListElement: recipes.map((recipe, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `https://platewise.xyz/recipes/${recipe.category}/${recipe.seo_slug}`,
+      name: recipe.name,
+    })),
+  } : null;
+
   return (
     <div className="container mx-auto py-12 px-4">
+      {/* Breadcrumb Schema */}
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://platewise.xyz' },
+          { name: 'Recipes', url: 'https://platewise.xyz/recipes' },
+          { name: categoryInfo.title, url: `https://platewise.xyz/recipes/${category}` },
+        ]}
+      />
+
+      {/* ItemList Schema (if recipes exist) */}
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+        />
+      )}
+
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">

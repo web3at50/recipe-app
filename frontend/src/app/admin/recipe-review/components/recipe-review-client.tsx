@@ -4,9 +4,10 @@ import { useState } from 'react';
 import type { Recipe } from '@/types/recipe';
 import { RecipeCard } from './recipe-card';
 import { PublishModal } from './publish-modal';
+import { CategorySettings } from './category-settings';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, CheckCircle, Clock } from 'lucide-react';
+import { FileText, CheckCircle, Clock, Settings } from 'lucide-react';
 
 interface Props {
   initialRecipes: Recipe[];
@@ -119,7 +120,7 @@ export function RecipeReviewClient({ initialRecipes }: Props) {
 
       {/* Tabs */}
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsList className="grid w-full grid-cols-4 max-w-2xl">
           <TabsTrigger value="all">
             All ({recipes.length})
           </TabsTrigger>
@@ -128,6 +129,10 @@ export function RecipeReviewClient({ initialRecipes }: Props) {
           </TabsTrigger>
           <TabsTrigger value="published">
             Published ({publishedCount})
+          </TabsTrigger>
+          <TabsTrigger value="categories">
+            <Settings className="h-4 w-4 mr-2" />
+            Categories
           </TabsTrigger>
         </TabsList>
 
@@ -222,6 +227,11 @@ export function RecipeReviewClient({ initialRecipes }: Props) {
                 ))}
             </div>
           )}
+        </TabsContent>
+
+        {/* Category Settings */}
+        <TabsContent value="categories" className="mt-6">
+          <CategorySettings />
         </TabsContent>
       </Tabs>
 

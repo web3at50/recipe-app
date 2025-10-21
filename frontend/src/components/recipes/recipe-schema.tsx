@@ -70,12 +70,13 @@ export function RecipeSchema({ recipe }: Props) {
         }
       : undefined,
 
-    // Aggregate rating (placeholder - can be updated when we add reviews)
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '12',
-    },
+    // Aggregate rating - REMOVED: Fake ratings violate Google guidelines
+    // TODO: Add conditional aggregateRating when real user reviews are implemented
+    // aggregateRating: recipe.rating_count > 0 ? {
+    //   '@type': 'AggregateRating',
+    //   ratingValue: recipe.rating_value,
+    //   reviewCount: recipe.rating_count,
+    // } : undefined,
 
     // Suitable for diet (based on tags)
     suitableForDiet: recipe.tags
