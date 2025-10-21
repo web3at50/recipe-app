@@ -9,6 +9,9 @@ const isPublicRoute = createRouteMatcher([
   '/opengraph-image',    // Open Graph image for social sharing
   '/twitter-image',      // Twitter card image for social sharing
   '/recipes(.*)',        // Public recipe pages (SEO-optimized)
+  '/about',              // About page
+  '/privacy',            // Privacy policy (GDPR compliance)
+  '/terms',              // Terms of service
 ])
 
 export default clerkMiddleware(async (auth, request) => {
