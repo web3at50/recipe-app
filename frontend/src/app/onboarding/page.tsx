@@ -79,12 +79,11 @@ export default function OnboardingPage() {
       }
 
       // Redirect to dashboard
+      // Note: Don't call setIsSubmitting(false) here - let navigation happen
       router.push('/my-recipes');
-      router.refresh();
     } catch (error) {
       console.error('Onboarding error:', error);
       alert('Failed to save your preferences. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
   };

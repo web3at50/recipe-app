@@ -54,8 +54,8 @@ export function DeleteRecipeButton({
       if (!response.ok) throw new Error('Failed to delete recipe')
 
       // Redirect to recipes list
+      // Note: Navigation will load fresh data, no need to refresh
       router.push('/my-recipes')
-      router.refresh()
     } catch (error) {
       console.error('Error deleting recipe:', error)
       alert('Failed to delete recipe')

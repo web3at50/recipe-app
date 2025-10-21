@@ -50,8 +50,9 @@ export default function EditRecipePage() {
         throw new Error(error.error || 'Failed to update recipe');
       }
 
+      // Navigate back to recipe view
+      // Note: Navigation will load fresh data, no need to refresh
       router.push(`/my-recipes/${id}`);
-      router.refresh();
     } catch (error) {
       console.error('Error updating recipe:', error);
       alert(error instanceof Error ? error.message : 'Failed to update recipe');
