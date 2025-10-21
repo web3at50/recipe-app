@@ -9,6 +9,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { UserButtonWithLinks } from "@/components/user-button-with-links"
 import { MobileNavWrapper } from "@/components/navigation/mobile-nav-wrapper"
+import { PublicMobileNav } from "@/components/navigation/public-mobile-nav"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -112,10 +113,13 @@ export default function RootLayout({
           <ThemeProvider>
             <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
               <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-6">
                   <SignedIn>
                     <MobileNavWrapper />
                   </SignedIn>
+                  <SignedOut>
+                    <PublicMobileNav />
+                  </SignedOut>
                   <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     <div className="relative">
                       <Image
@@ -131,6 +135,15 @@ export default function RootLayout({
                       <span className="text-orange-500">W</span>ise
                     </span>
                   </Link>
+                  <SignedOut>
+                    <nav className="hidden md:flex items-center gap-1">
+                      <Link href="/recipes">
+                        <Button variant="ghost" size="sm">
+                          Recipes
+                        </Button>
+                      </Link>
+                    </nav>
+                  </SignedOut>
                 </div>
                 <nav className="flex items-center gap-2">
                   <ThemeToggle />

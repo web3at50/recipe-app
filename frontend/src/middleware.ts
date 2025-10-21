@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks(.*)',   // Webhook routes
   '/opengraph-image',    // Open Graph image for social sharing
   '/twitter-image',      // Twitter card image for social sharing
+  '/recipes(.*)',        // Public recipe pages (SEO-optimized)
 ])
 
 export default clerkMiddleware(async (auth, request) => {

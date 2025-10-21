@@ -1,9 +1,11 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { BookOpen, ChefHat, Calendar, ShoppingCart, Package, Settings } from 'lucide-react';
+import { BookOpen, ChefHat, Calendar, ShoppingCart, Package, Settings, Shield } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { createClient } from '@/lib/supabase/server';
+
+const ADMIN_USER_IDS = process.env.ADMIN_USER_IDS?.split(',') || [];
 
 const navigation = [
   { name: 'My Recipes', href: '/my-recipes', icon: BookOpen },
@@ -12,6 +14,10 @@ const navigation = [
   { name: 'Shopping List', href: '/shopping-list', icon: ShoppingCart },
   { name: 'My Pantry', href: '/settings/pantry-staples', icon: Package },
   { name: 'Settings', href: '/settings', icon: Settings },
+];
+
+const adminNavigation = [
+  { name: 'Recipe Review', href: '/admin/recipe-review', icon: Shield },
 ];
 
 export default async function DashboardLayout({
@@ -39,6 +45,9 @@ export default async function DashboardLayout({
     redirect('/onboarding');
   }
 
+  // Check if user is admin
+  const isAdmin = ADMIN_USER_IDS.includes(userId);
+
   return (
     <>
       <div className="flex h-full">
@@ -58,6 +67,30 @@ export default async function DashboardLayout({
                 </Link>
               );
             })}
+
+            {/* Admin Section */}
+            {isAdmin && (
+              <>
+                <div className="pt-4 pb-2 border-t mt-4">
+                  <p className="text-xs font-semibold text-muted-foreground px-3">
+                    Admin
+                  </p>
+                </div>
+                {adminNavigation.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </>
+            )}
           </nav>
         </aside>
 
