@@ -171,7 +171,7 @@ export default async function CategoryPage({ params }: Props) {
                 {recipe.tags && recipe.tags.length > 0 && (
                   <CardFooter className="pt-0">
                     <div className="flex flex-wrap gap-1">
-                      {recipe.tags.slice(0, 3).map((tag) => (
+                      {recipe.tags.slice(0, 3).map((tag: string) => (
                         <Badge
                           key={tag}
                           variant="secondary"

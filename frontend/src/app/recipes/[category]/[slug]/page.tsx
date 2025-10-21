@@ -160,7 +160,7 @@ export default async function RecipePage({ params }: Props) {
           {/* Tags */}
           {recipe.tags && recipe.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {recipe.tags.map((tag) => (
+              {recipe.tags.map((tag: string) => (
                 <Badge key={tag} variant="secondary" className="capitalize">
                   {tag.replace('-', ' ')}
                 </Badge>
@@ -233,7 +233,7 @@ export default async function RecipePage({ params }: Props) {
               This recipe contains or may contain the following allergens:
             </p>
             <div className="flex flex-wrap gap-2">
-              {recipe.allergens.map((allergen) => (
+              {recipe.allergens.map((allergen: string) => (
                 <Badge key={allergen} variant="outline" className="capitalize">
                   {allergen.replace('_', ' ')}
                 </Badge>
