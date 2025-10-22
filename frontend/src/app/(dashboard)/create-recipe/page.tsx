@@ -908,7 +908,16 @@ export default function GeneratePage() {
                         <div className="space-y-2 col-span-2">
                           <div className="text-sm text-muted-foreground bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
                             <p className="font-medium text-orange-900 dark:text-orange-100">Air Fryer Mode</p>
-                            <p className="text-xs mt-1">Recipes will include temperature settings (325-400°F), preheating instructions, and reminders to shake/flip halfway through. Cooking times are typically 8-25 minutes.</p>
+                            <p className="text-xs mt-1">Recipes will include temperature settings (160-200°C), preheating instructions, and reminders to shake/flip halfway through. Cooking times are typically 8-25 minutes.</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {cookingMode === 'batch_cook' && (
+                        <div className="space-y-2 col-span-2">
+                          <div className="text-sm text-muted-foreground bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
+                            <p className="font-medium text-purple-900 dark:text-purple-100">Batch Cooking Mode</p>
+                            <p className="text-xs mt-1">Recipes will be scaled to 6-12 portions with freezing, storage, and reheating instructions. Perfect for meal prep and saving time during the week.</p>
                           </div>
                         </div>
                       )}

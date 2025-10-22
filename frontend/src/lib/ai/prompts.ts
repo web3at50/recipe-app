@@ -129,10 +129,11 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
     prompt += `- Recipe Structure: Provide TWO distinct time sets:\n`;
     prompt += `  * Prep Time (prep_time): 5-15 minutes for chopping, seasoning, oil spraying\n`;
     prompt += `  * Air Fry Time (cook_time): 8-25 minutes (FAST cooking)\n`;
-    prompt += `- Temperature: Specify exact temperature in description (325-400°F / 163-204°C)\n`;
-    prompt += `  * Most meats: 390-400°F for crispy exterior\n`;
-    prompt += `  * Vegetables: 350-375°F for tender-crisp\n`;
-    prompt += `  * Delicate items (eggs, fish): 325-350°F\n`;
+    prompt += `- Temperature: Specify exact temperature in CELSIUS ONLY (163-204°C)\n`;
+    prompt += `  * Most meats: 195-200°C for crispy exterior\n`;
+    prompt += `  * Vegetables: 175-190°C for tender-crisp\n`;
+    prompt += `  * Delicate items (eggs, fish): 160-175°C\n`;
+    prompt += `- IMPORTANT: Use ONLY Celsius in instructions - this is a UK app, NO Fahrenheit\n`;
     prompt += `- Total time should be MUCH SHORTER than oven cooking (typically 20-25% less time)\n\n`;
 
     prompt += `OIL SPRAY TECHNIQUE:\n`;
@@ -158,7 +159,7 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
     prompt += `INSTRUCTIONS FORMAT:\n`;
     prompt += `1. Prep steps (chopping, seasoning, patting dry)\n`;
     prompt += `2. Oil spray application (light mist on all sides)\n`;
-    prompt += `3. Preheat air fryer to [TEMP]°F for 3-5 minutes\n`;
+    prompt += `3. Preheat air fryer to [TEMP]°C for 3-5 minutes\n`;
     prompt += `4. Arrange in single layer in basket with space between pieces\n`;
     prompt += `5. Air fry for [X] minutes\n`;
     prompt += `6. Shake basket (or flip food) halfway through cooking\n`;
@@ -167,7 +168,57 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
 
     prompt += `EXAMPLE TIMING:\n`;
     prompt += `"prep_time": 10,  // Quick prep - chopping and seasoning\n`;
-    prompt += `"cook_time": 15,  // Fast air frying (e.g., 15 mins at 380°F)\n\n`;
+    prompt += `"cook_time": 15,  // Fast air frying (e.g., 15 mins at 190°C)\n\n`;
+  } else if (cookingMode === 'batch_cook') {
+    prompt += `\n⚠️ BATCH COOKING MODE - SPECIAL INSTRUCTIONS:\n`;
+    prompt += `You MUST generate a recipe specifically designed for batch cooking and freezing.\n\n`;
+
+    prompt += `BATCH COOKING REQUIREMENTS:\n`;
+    prompt += `- Servings: Create recipe for 6-12 portions (ignore standard serving size request)\n`;
+    prompt += `- Recipe Structure:\n`;
+    prompt += `  * Prep Time (prep_time): 30-60 minutes (larger quantities mean more chopping)\n`;
+    prompt += `  * Cook Time (cook_time): Similar to normal, possibly +10-20% for larger volume\n`;
+    prompt += `- Focus on freezer-friendly dishes: Soups, stews, casseroles, curries, sauces, bolognese\n`;
+    prompt += `- Avoid: Dishes with ingredients that don't freeze well (raw lettuce, cream-based unless specified)\n\n`;
+
+    prompt += `FREEZING & STORAGE INSTRUCTIONS:\n`;
+    prompt += `- Cool recipe quickly within 2 hours before freezing (food safety critical)\n`;
+    prompt += `- Portion into individual or family-sized containers before freezing\n`;
+    prompt += `- Storage time: Up to 3 months in freezer (2 months for high-fat meats)\n`;
+    prompt += `- Include freezing instructions in the recipe description or final step\n`;
+    prompt += `- Label guidance: Include date, portion size, reheating instructions\n\n`;
+
+    prompt += `PORTIONING GUIDANCE:\n`;
+    prompt += `- Suggest dividing into 6-8 individual portions OR 2-3 family portions\n`;
+    prompt += `- Use freezer-safe containers or bags\n`;
+    prompt += `- Freeze flat to save freezer space and stack efficiently\n`;
+    prompt += `- For soups/stews: 1 full mug per adult, half for young children\n\n`;
+
+    prompt += `INGREDIENT CONSIDERATIONS:\n`;
+    prompt += `- Use ingredients that freeze well (root veg, beans, lentils, most meats)\n`;
+    prompt += `- Slightly undercook pasta/rice if including (prevents mushiness when reheated)\n`;
+    prompt += `- Add fresh herbs/dairy after reheating for best flavor\n`;
+    prompt += `- Season generously - flavors can dull slightly when frozen\n\n`;
+
+    prompt += `REHEATING INSTRUCTIONS:\n`;
+    prompt += `- Include clear reheating guidance in final step\n`;
+    prompt += `- Reheat method should match cooking method (oven-cooked → reheat in oven)\n`;
+    prompt += `- Ensure food is piping hot all the way through\n`;
+    prompt += `- From frozen: Defrost overnight in fridge OR reheat from frozen (longer time)\n\n`;
+
+    prompt += `INSTRUCTIONS FORMAT:\n`;
+    prompt += `1. Prep steps for larger quantities (chopping, measuring)\n`;
+    prompt += `2. Cooking steps\n`;
+    prompt += `3. Cooling instruction: "Allow to cool to room temperature within 2 hours"\n`;
+    prompt += `4. Portioning: "Divide into X portions using freezer-safe containers"\n`;
+    prompt += `5. Labeling: "Label with name, date, and portion size"\n`;
+    prompt += `6. Freezing: "Freeze flat for up to 3 months"\n`;
+    prompt += `7. Reheating: "Defrost overnight in fridge. Reheat in [method] until piping hot throughout"\n\n`;
+
+    prompt += `EXAMPLE TIMING:\n`;
+    prompt += `"prep_time": 45,  // Larger quantity prep work\n`;
+    prompt += `"cook_time": 90,  // E.g., 90 mins for large batch of stew\n`;
+    prompt += `"servings": 8,    // Makes 8 portions for freezing\n\n`;
   }
 
   prompt += `REQUIREMENTS:\n`;
