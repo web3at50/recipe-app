@@ -44,7 +44,13 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
     }
 
     if (userPreferences.cuisines_liked && userPreferences.cuisines_liked.length > 0) {
-      prompt += `- Preferred cuisines: ${userPreferences.cuisines_liked.join(', ')}\n`;
+      if (userPreferences.cuisines_liked.length === 1) {
+        // Single cuisine - be explicit and directive
+        prompt += `- Cuisine style: ${userPreferences.cuisines_liked[0]} (create a ${userPreferences.cuisines_liked[0]} recipe)\n`;
+      } else {
+        // Multiple cuisines - AI can choose
+        prompt += `- Preferred cuisines: ${userPreferences.cuisines_liked.join(', ')}\n`;
+      }
     }
 
     prompt += `\n`;

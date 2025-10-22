@@ -164,7 +164,10 @@ export default function GeneratePage() {
   }, []);
 
   // Generate recipe with a single model
-  const generateSingleRecipe = async (model: 'model_1' | 'model_2' | 'model_3' | 'model_4') => {
+  const generateSingleRecipe = async (
+    model: 'model_1' | 'model_2' | 'model_3' | 'model_4',
+    cuisineOverride?: string
+  ) => {
     const ingredients = ingredientsText
       .split('\n')
       .map((line) => line.trim())
@@ -191,7 +194,7 @@ export default function GeneratePage() {
         cooking_mode: cookingMode,
         difficulty: skillLevel || undefined,
         spice_level: spiceLevel || undefined,
-        favourite_cuisine: favouriteCuisine && favouriteCuisine !== 'any' ? favouriteCuisine : undefined,
+        favourite_cuisine: cuisineOverride || (favouriteCuisine && favouriteCuisine !== 'any' ? favouriteCuisine : undefined),
         // Override user preferences with temporary session values
         preferences: {
           allergies: effectiveAllergies,
@@ -233,6 +236,19 @@ export default function GeneratePage() {
       const models: Array<'model_1' | 'model_2' | 'model_3' | 'model_4'> = ['model_1', 'model_2', 'model_3', 'model_4'];
       const results: typeof generatedRecipes = { model_1: null, model_2: null, model_3: null, model_4: null };
 
+      // Get user's preferred cuisines and shuffle them for variety
+      const preferredCuisines = userPreferences?.cuisines_liked || [];
+      let shuffledCuisines: string[] = [];
+
+      if (preferredCuisines.length > 0) {
+        // Fisher-Yates shuffle algorithm for random distribution
+        shuffledCuisines = [...preferredCuisines];
+        for (let i = shuffledCuisines.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledCuisines[i], shuffledCuisines[j]] = [shuffledCuisines[j], shuffledCuisines[i]];
+        }
+      }
+
       try {
         for (let i = 0; i < models.length; i++) {
           const model = models[i];
@@ -246,7 +262,13 @@ export default function GeneratePage() {
 
           try {
             const startTime = Date.now();
-            const { recipe } = await generateSingleRecipe(model);
+
+            // Assign cuisine to this model (cycle if more models than cuisines)
+            const cuisineForModel = shuffledCuisines.length > 0
+              ? shuffledCuisines[i % shuffledCuisines.length]
+              : undefined;
+
+            const { recipe } = await generateSingleRecipe(model, cuisineForModel);
             const duration = ((Date.now() - startTime) / 1000).toFixed(0);
 
             results[model] = recipe;

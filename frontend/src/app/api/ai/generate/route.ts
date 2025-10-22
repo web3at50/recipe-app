@@ -61,6 +61,7 @@ export async function POST(request: Request) {
       cooking_mode,
       difficulty,
       spice_level,
+      favourite_cuisine,
       pantry_staples,
       model = 'openai'
     } = body;
@@ -132,6 +133,12 @@ export async function POST(request: Request) {
     const finalDifficulty = difficulty || userPreferences.cooking_skill || 'intermediate';
     const finalSpiceLevel = spice_level || userPreferences.spice_level || 'medium';
 
+    // Handle cuisine preference: if specific cuisine provided (for multi-model distribution),
+    // use it; otherwise use all preferred cuisines
+    const cuisinePreference = favourite_cuisine
+      ? [favourite_cuisine] // Single cuisine for this specific generation
+      : (userPreferences.cuisines_liked || []); // All cuisines (AI will choose)
+
     // Generate recipe prompt with user context
     const prompt = createRecipeGenerationPrompt({
       ingredients,
@@ -146,7 +153,7 @@ export async function POST(request: Request) {
       spiceLevel: finalSpiceLevel,
       userPreferences: {
         allergies: userAllergens,
-        cuisines_liked: userPreferences.cuisines_liked || [],
+        cuisines_liked: cuisinePreference,
       },
     });
 
