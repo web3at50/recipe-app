@@ -121,6 +121,53 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
     prompt += `EXAMPLE TIMING:\n`;
     prompt += `"prep_time": 20,  // Active hands-on prep work\n`;
     prompt += `"cook_time": 480, // 8 hours on LOW (or 240 for 4 hours on HIGH)\n\n`;
+  } else if (cookingMode === 'air_fryer') {
+    prompt += `\n⚠️ AIR FRYER MODE - SPECIAL INSTRUCTIONS:\n`;
+    prompt += `You MUST generate a recipe specifically designed for air fryer cooking.\n\n`;
+
+    prompt += `AIR FRYER REQUIREMENTS:\n`;
+    prompt += `- Recipe Structure: Provide TWO distinct time sets:\n`;
+    prompt += `  * Prep Time (prep_time): 5-15 minutes for chopping, seasoning, oil spraying\n`;
+    prompt += `  * Air Fry Time (cook_time): 8-25 minutes (FAST cooking)\n`;
+    prompt += `- Temperature: Specify exact temperature in description (325-400°F / 163-204°C)\n`;
+    prompt += `  * Most meats: 390-400°F for crispy exterior\n`;
+    prompt += `  * Vegetables: 350-375°F for tender-crisp\n`;
+    prompt += `  * Delicate items (eggs, fish): 325-350°F\n`;
+    prompt += `- Total time should be MUCH SHORTER than oven cooking (typically 20-25% less time)\n\n`;
+
+    prompt += `OIL SPRAY TECHNIQUE:\n`;
+    prompt += `- Use light oil spray/mist on food (NOT in basket)\n`;
+    prompt += `- Spray halfway through cooking for best crispiness\n`;
+    prompt += `- Use spray oil or brush lightly - avoid excess oil\n`;
+    prompt += `- Fatty meats (chicken thighs, burgers) may not need oil\n\n`;
+
+    prompt += `COOKING TECHNIQUE:\n`;
+    prompt += `- Preheat air fryer for 3-5 minutes at cooking temperature\n`;
+    prompt += `- Single layer only - don't overcrowd (air must circulate)\n`;
+    prompt += `- Leave space between pieces for even cooking\n`;
+    prompt += `- SHAKE basket or FLIP food halfway through cooking time\n`;
+    prompt += `- For best results, cook in batches if needed rather than overcrowding\n\n`;
+
+    prompt += `INGREDIENT CONSIDERATIONS:\n`;
+    prompt += `- Cut into even-sized pieces for uniform cooking\n`;
+    prompt += `- Pat food dry before seasoning for crispier results\n`;
+    prompt += `- Use breadcrumbs or coating for extra crunch\n`;
+    prompt += `- Avoid wet batters (use dry coatings instead)\n`;
+    prompt += `- Delicate leafy greens will blow around - avoid or weigh down\n\n`;
+
+    prompt += `INSTRUCTIONS FORMAT:\n`;
+    prompt += `1. Prep steps (chopping, seasoning, patting dry)\n`;
+    prompt += `2. Oil spray application (light mist on all sides)\n`;
+    prompt += `3. Preheat air fryer to [TEMP]°F for 3-5 minutes\n`;
+    prompt += `4. Arrange in single layer in basket with space between pieces\n`;
+    prompt += `5. Air fry for [X] minutes\n`;
+    prompt += `6. Shake basket (or flip food) halfway through cooking\n`;
+    prompt += `7. Optional: Spray with oil again at halfway point for extra crisp\n`;
+    prompt += `8. Check for doneness and serve immediately\n\n`;
+
+    prompt += `EXAMPLE TIMING:\n`;
+    prompt += `"prep_time": 10,  // Quick prep - chopping and seasoning\n`;
+    prompt += `"cook_time": 15,  // Fast air frying (e.g., 15 mins at 380°F)\n\n`;
   }
 
   prompt += `REQUIREMENTS:\n`;
