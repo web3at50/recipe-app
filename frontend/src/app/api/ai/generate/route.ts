@@ -119,7 +119,10 @@ export async function POST(request: Request) {
 
     // Use user preferences as defaults if not specified
     const finalServings = servings || userPreferences.household_size || 2;
-    const finalCookingMode = cooking_mode || userPreferences.cooking_mode || 'standard';
+
+    // Cooking mode is ONLY set per-recipe in /create-recipe (not stored in user preferences)
+    // If undefined, defaults to 'standard' in prompt generation
+    const finalCookingMode = cooking_mode || 'standard';
 
     // For slow cooker mode, ignore prepTimeMax constraint
     const finalPrepTimeMax = finalCookingMode === 'slow_cooker'

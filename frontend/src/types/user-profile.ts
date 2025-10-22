@@ -86,7 +86,7 @@ export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   household_size: 2,
   budget_per_meal: null,
   typical_cook_time: 30,
-  cooking_mode: 'standard',
+  // cooking_mode is NOT stored in user preferences - it's a per-recipe choice in /create-recipe only
   spice_level: 'medium',
   preferred_ai_model: 'anthropic'
 };

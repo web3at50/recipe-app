@@ -77,7 +77,7 @@ export default function GeneratePage() {
   const [pantryStaples, setPantryStaples] = useState<string[]>([]);
   const [skillLevel, setSkillLevel] = useState<string | null>(null);
   const [maxCookTime, setMaxCookTime] = useState<number | null>(null);
-  const [cookingMode, setCookingMode] = useState<'standard' | 'slow_cooker' | 'air_fryer' | 'batch_cook'>('standard');
+  const [cookingMode, setCookingMode] = useState<'slow_cooker' | 'air_fryer' | 'batch_cook' | undefined>(undefined);
   const [spiceLevel, setSpiceLevel] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [favouriteCuisine, setFavouriteCuisine] = useState<string | null>(null);
@@ -862,16 +862,16 @@ export default function GeneratePage() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="cookingMode" className="text-sm">Cooking Mode</Label>
+                        <Label htmlFor="cookingMode" className="text-sm">Cooking Mode (Optional)</Label>
                         <Select
-                          value={cookingMode}
-                          onValueChange={(value: 'standard' | 'slow_cooker' | 'air_fryer' | 'batch_cook') => setCookingMode(value)}
+                          value={cookingMode || 'none'}
+                          onValueChange={(value) => setCookingMode(value === 'none' ? undefined : value as 'slow_cooker' | 'air_fryer' | 'batch_cook')}
                         >
                           <SelectTrigger id="cookingMode">
-                            <SelectValue />
+                            <SelectValue placeholder="Traditional Cooking" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="standard">Standard Cooking</SelectItem>
+                            <SelectItem value="none">Traditional Cooking</SelectItem>
                             <SelectItem value="slow_cooker">Slow Cooker</SelectItem>
                             <SelectItem value="air_fryer">Air Fryer</SelectItem>
                             <SelectItem value="batch_cook">Batch Cooking</SelectItem>
