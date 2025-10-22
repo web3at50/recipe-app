@@ -8,6 +8,7 @@ export interface RecipeGenerationParams {
   dietary_preferences?: string[];
   servings?: number;
   prepTimeMax?: number;
+  cookingMode?: 'standard' | 'slow_cooker' | 'air_fryer' | 'batch_cook'; // Cooking method
   difficulty?: 'easy' | 'medium' | 'hard' | 'beginner' | 'intermediate' | 'advanced';
   spiceLevel?: 'mild' | 'medium' | 'hot'; // Elevated from nested object
   userPreferences?: {
@@ -25,6 +26,7 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
     dietary_preferences = [],
     servings = 4,
     prepTimeMax,
+    cookingMode = 'standard',
     difficulty,
     spiceLevel,
     userPreferences,
@@ -78,6 +80,49 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
     prompt += `Create a recipe that uses the available ingredients and matches the user's vision for the dish.\n\n`;
   }
 
+  // COOKING MODE INSTRUCTIONS
+  if (cookingMode === 'slow_cooker') {
+    prompt += `\n⚠️ SLOW COOKER MODE - SPECIAL INSTRUCTIONS:\n`;
+    prompt += `You MUST generate a recipe specifically designed for slow cooker cooking.\n\n`;
+
+    prompt += `SLOW COOKER REQUIREMENTS:\n`;
+    prompt += `- Recipe Structure: Provide TWO distinct time sets:\n`;
+    prompt += `  * Active Prep Time (prep_time): 10-30 minutes for chopping, browning, assembling\n`;
+    prompt += `  * Slow Cook Time (cook_time): 180-240 minutes (3-4 hours) on HIGH or 360-600 minutes (6-10 hours) on LOW\n`;
+    prompt += `- Temperature Setting: Include in description whether recipe uses LOW (6-10hrs) or HIGH (3-4hrs) setting\n`;
+    prompt += `- IGNORE any typical cooking time constraints - slow cooker recipes naturally take longer\n\n`;
+
+    prompt += `PREPARATION METHOD:\n`;
+    prompt += `- For MEAT dishes: Consider including an optional browning/searing step on hob before slow cooking\n`;
+    prompt += `  * If browning: Add as step 1, note it's optional but recommended for flavor\n`;
+    prompt += `  * Time: Add 10-15 mins to prep_time if browning included\n`;
+    prompt += `- For VEGETARIAN dishes: Usually direct to slow cooker, no pre-cooking needed\n`;
+    prompt += `- For dishes with AROMATICS (onions, garlic): Optional 5-min sauté improves flavor\n\n`;
+
+    prompt += `LIQUID REQUIREMENTS:\n`;
+    prompt += `- Slow cookers trap moisture - use LESS liquid than stovetop/oven recipes\n`;
+    prompt += `- Most recipes need only 150-300ml liquid (stock, wine, water)\n`;
+    prompt += `- EXCEPTION: Soups and stews can have more liquid (500ml+)\n\n`;
+
+    prompt += `INGREDIENT CONSIDERATIONS:\n`;
+    prompt += `- Vegetables: Cut into larger chunks (2-3cm) to prevent mushiness\n`;
+    prompt += `- Dairy: Add in last 30 minutes to prevent curdling\n`;
+    prompt += `- Fresh herbs: Add in last 30 minutes to preserve flavor\n`;
+    prompt += `- Dried herbs/spices: Add at start, flavors intensify over long cooking\n\n`;
+
+    prompt += `INSTRUCTIONS FORMAT:\n`;
+    prompt += `1. Prep steps (chopping, seasoning)\n`;
+    prompt += `2. [If applicable] Optional browning step on hob with timing\n`;
+    prompt += `3. Assembly in slow cooker with layering order\n`;
+    prompt += `4. Slow cooker setting (LOW 8hrs or HIGH 4hrs) - be specific in instructions\n`;
+    prompt += `5. [If applicable] Final additions in last 30 mins\n`;
+    prompt += `6. Serving suggestions\n\n`;
+
+    prompt += `EXAMPLE TIMING:\n`;
+    prompt += `"prep_time": 20,  // Active hands-on prep work\n`;
+    prompt += `"cook_time": 480, // 8 hours on LOW (or 240 for 4 hours on HIGH)\n\n`;
+  }
+
   prompt += `REQUIREMENTS:\n`;
   prompt += `- Servings: ${servings}\n`;
 
@@ -85,7 +130,8 @@ export function createRecipeGenerationPrompt(params: RecipeGenerationParams): st
     prompt += `- Dietary Requirements: ${dietary_preferences.join(', ')}\n`;
   }
 
-  if (prepTimeMax) {
+  // Only add time constraint for non-slow-cooker modes
+  if (cookingMode !== 'slow_cooker' && prepTimeMax) {
     prompt += `- Maximum Total Time: ${prepTimeMax} minutes (including prep and cook)\n`;
   }
 

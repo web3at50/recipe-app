@@ -204,6 +204,26 @@ export function PreferencesForm({ initialPreferences }: PreferencesFormProps) {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="cooking_mode">Cooking Mode</Label>
+              <Select
+                value={preferences.cooking_mode || 'standard'}
+                onValueChange={(value: 'standard' | 'slow_cooker' | 'air_fryer' | 'batch_cook') =>
+                  setPreferences({ ...preferences, cooking_mode: value })
+                }
+              >
+                <SelectTrigger id="cooking_mode">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="standard">Standard Cooking</SelectItem>
+                  <SelectItem value="slow_cooker">Slow Cooker</SelectItem>
+                  <SelectItem value="air_fryer">Air Fryer</SelectItem>
+                  <SelectItem value="batch_cook">Batch Cooking</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="household_size">Household Size</Label>
               <Input
                 id="household_size"

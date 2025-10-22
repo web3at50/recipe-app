@@ -58,6 +58,7 @@ export async function POST(request: Request) {
       dietary_preferences,
       servings,
       prepTimeMax,
+      cooking_mode,
       difficulty,
       spice_level,
       pantry_staples,
@@ -118,7 +119,13 @@ export async function POST(request: Request) {
 
     // Use user preferences as defaults if not specified
     const finalServings = servings || userPreferences.household_size || 2;
-    const finalPrepTimeMax = prepTimeMax || userPreferences.typical_cook_time || 30;
+    const finalCookingMode = cooking_mode || userPreferences.cooking_mode || 'standard';
+
+    // For slow cooker mode, ignore prepTimeMax constraint
+    const finalPrepTimeMax = finalCookingMode === 'slow_cooker'
+      ? undefined
+      : (prepTimeMax || userPreferences.typical_cook_time || 30);
+
     const finalDifficulty = difficulty || userPreferences.cooking_skill || 'intermediate';
     const finalSpiceLevel = spice_level || userPreferences.spice_level || 'medium';
 
@@ -131,6 +138,7 @@ export async function POST(request: Request) {
       dietary_preferences: mergedDietaryPrefs,
       servings: finalServings,
       prepTimeMax: finalPrepTimeMax,
+      cookingMode: finalCookingMode as 'standard' | 'slow_cooker' | 'air_fryer' | 'batch_cook',
       difficulty: finalDifficulty,
       spiceLevel: finalSpiceLevel,
       userPreferences: {

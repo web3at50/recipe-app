@@ -77,6 +77,7 @@ export default function GeneratePage() {
   const [pantryStaples, setPantryStaples] = useState<string[]>([]);
   const [skillLevel, setSkillLevel] = useState<string | null>(null);
   const [maxCookTime, setMaxCookTime] = useState<number | null>(null);
+  const [cookingMode, setCookingMode] = useState<'standard' | 'slow_cooker' | 'air_fryer' | 'batch_cook'>('standard');
   const [spiceLevel, setSpiceLevel] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [favouriteCuisine, setFavouriteCuisine] = useState<string | null>(null);
@@ -187,6 +188,7 @@ export default function GeneratePage() {
         ingredient_mode: ingredientMode,
         servings: servings || 4,
         prepTimeMax: maxCookTime || undefined,
+        cooking_mode: cookingMode,
         difficulty: skillLevel || undefined,
         spice_level: spiceLevel || undefined,
         favourite_cuisine: favouriteCuisine && favouriteCuisine !== 'any' ? favouriteCuisine : undefined,
@@ -860,18 +862,47 @@ export default function GeneratePage() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="maxTime" className="text-sm">Max Time (mins)</Label>
-                        <Input
-                          id="maxTime"
-                          type="number"
-                          min="10"
-                          max="180"
-                          step="5"
-                          placeholder={(userPreferences?.typical_cook_time || 30).toString()}
-                          value={maxCookTime ?? ''}
-                          onChange={(e) => setMaxCookTime(e.target.value ? parseInt(e.target.value) : null)}
-                        />
+                        <Label htmlFor="cookingMode" className="text-sm">Cooking Mode</Label>
+                        <Select
+                          value={cookingMode}
+                          onValueChange={(value: 'standard' | 'slow_cooker' | 'air_fryer' | 'batch_cook') => setCookingMode(value)}
+                        >
+                          <SelectTrigger id="cookingMode">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="standard">Standard Cooking</SelectItem>
+                            <SelectItem value="slow_cooker">Slow Cooker</SelectItem>
+                            <SelectItem value="air_fryer">Air Fryer</SelectItem>
+                            <SelectItem value="batch_cook">Batch Cooking</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
+
+                      {cookingMode !== 'slow_cooker' && (
+                        <div className="space-y-2">
+                          <Label htmlFor="maxTime" className="text-sm">Max Time (mins)</Label>
+                          <Input
+                            id="maxTime"
+                            type="number"
+                            min="10"
+                            max="180"
+                            step="5"
+                            placeholder={(userPreferences?.typical_cook_time || 30).toString()}
+                            value={maxCookTime ?? ''}
+                            onChange={(e) => setMaxCookTime(e.target.value ? parseInt(e.target.value) : null)}
+                          />
+                        </div>
+                      )}
+
+                      {cookingMode === 'slow_cooker' && (
+                        <div className="space-y-2 col-span-2">
+                          <div className="text-sm text-muted-foreground bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                            <p className="font-medium text-blue-900 dark:text-blue-100">Slow Cooker Mode</p>
+                            <p className="text-xs mt-1">Recipes will be designed for 3-10 hours of slow cooking. Time constraints are automatically adjusted.</p>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="space-y-2">
                         <Label htmlFor="skillLevel" className="text-sm">Skill Level</Label>

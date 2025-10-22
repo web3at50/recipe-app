@@ -11,6 +11,7 @@ export interface UserPreferences {
   household_size: number;
   budget_per_meal: number | null; // GBP
   typical_cook_time: number; // minutes
+  cooking_mode?: 'standard' | 'slow_cooker' | 'air_fryer' | 'batch_cook'; // Cooking method preference
   spice_level: 'mild' | 'medium' | 'hot';
   preferred_ai_model: 'anthropic' | 'openai' | 'gemini' | 'grok';
 }
@@ -85,6 +86,7 @@ export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   household_size: 2,
   budget_per_meal: null,
   typical_cook_time: 30,
+  cooking_mode: 'standard',
   spice_level: 'medium',
   preferred_ai_model: 'anthropic'
 };
