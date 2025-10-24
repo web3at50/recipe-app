@@ -209,7 +209,7 @@ export default function GeneratePage() {
     if (!response.ok) {
       const error = await response.json();
       if (error.error === 'Safety Warning' && error.conflicts) {
-        throw new Error(`⚠️ ALLERGEN WARNING:\n\n${error.message}\n\nPlease remove these ingredients and try again.`);
+        throw new Error(`⚠️ ALLERGEN WARNING:\n\n${error.message}`);
       }
       throw new Error(error.error || 'Failed to generate recipe');
     }

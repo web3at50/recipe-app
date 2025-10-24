@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import type { RecipeFormData } from '@/types/recipe';
+import { detectAllergensInIngredients, UK_ALLERGENS } from '@/lib/allergen-detector';
 
 // GET /api/recipes - List all user's recipes (JSONB schema)
 export async function GET(request: Request) {
@@ -89,6 +90,22 @@ export async function POST(request: Request) {
       instruction: inst.instruction
     }));
 
+    // Auto-detect allergens from ingredients (server-side validation)
+    const allAllergenIds = UK_ALLERGENS.map(a => a.id);
+    const ingredientTexts = body.ingredients.map((ing: { item: string }) => ing.item);
+    const detectedMatches = detectAllergensInIngredients(
+      ingredientTexts,
+      allAllergenIds
+    );
+
+    // Get unique allergen IDs
+    const detectedAllergens = [...new Set(detectedMatches.map(m => m.allergen))];
+
+    // Merge with provided allergens (if any)
+    const finalAllergens = [
+      ...new Set([...(body.allergens || []), ...detectedAllergens])
+    ];
+
     // Create recipe (everything in one insert!)
     const { data: recipe, error: recipeError} = await supabase
       .from('recipes')
@@ -106,7 +123,7 @@ export async function POST(request: Request) {
         ingredients: body.ingredients, // JSONB array
         instructions: instructions, // JSONB array
         tags: body.tags || [], // Simple array
-        allergens: body.allergens || [], // Simple array
+        allergens: finalAllergens, // Auto-detected + provided allergens
         nutrition: body.nutrition || null, // JSONB object
         cost_per_serving: body.cost_per_serving || null,
         image_url: body.image_url || null,

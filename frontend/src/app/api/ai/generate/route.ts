@@ -5,6 +5,7 @@ import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { createRecipeGenerationPrompt, parseRecipeFromAI } from '@/lib/ai/prompts';
 import { logAIUsage, generateRequestId, generateSessionId } from '@/lib/ai/usage-tracker';
+import { detectAllergensInText, detectAllergensInIngredients, groupMatchesByAllergen } from '@/lib/allergen-detector';
 
 export async function POST(request: Request) {
   // Start timing for performance tracking
@@ -75,19 +76,27 @@ export async function POST(request: Request) {
     }
 
     // Check for allergen conflicts - SAFETY CRITICAL
+    // Uses keyword-based detection from allergen-detector.ts
     const userAllergens = userPreferences.allergies || [];
     if (userAllergens.length > 0) {
-      const allergenConflicts = ingredients.filter((ingredient: string) =>
-        userAllergens.some((allergen: string) =>
-          ingredient.toLowerCase().includes(allergen.toLowerCase())
-        )
-      );
+      const allergenConflicts: string[] = [];
+      const allergenDetails: string[] = [];
+
+      ingredients.forEach((ingredient: string) => {
+        const matches = detectAllergensInText(ingredient, userAllergens);
+        if (matches.length > 0) {
+          allergenConflicts.push(ingredient);
+          matches.forEach(match => {
+            allergenDetails.push(`${match.allergenLabel}: "${ingredient}" contains "${match.matchedKeyword}"`);
+          });
+        }
+      });
 
       if (allergenConflicts.length > 0) {
         return NextResponse.json(
           {
             error: 'Safety Warning',
-            message: `The following ingredients conflict with your allergen profile: ${allergenConflicts.join(', ')}. Please remove them before generating.`,
+            message: `The following ingredients conflict with your allergen profile:\n\n${allergenDetails.join('\n')}\n\nPlease remove these ingredients and try again.`,
             conflicts: allergenConflicts,
           },
           { status: 400 }
@@ -298,36 +307,23 @@ export async function POST(request: Request) {
     const recipe = parseRecipeFromAI(text);
 
     // Post-generation allergen safety check
-    const allergenWarnings: string[] = [];
+    // Uses keyword-based detection from allergen-detector.ts
+    let allergenWarnings: string[] = [];
     if (userAllergens.length > 0 && recipe.ingredients) {
-      recipe.ingredients.forEach((ingredient) => {
-        const ingredientText = `${ingredient.item} ${ingredient.notes || ''}`.toLowerCase();
-        userAllergens.forEach((allergen: string) => {
-          const allergenLower = allergen.toLowerCase();
-          // Check for allergen matches in ingredient text
-          if (ingredientText.includes(allergenLower)) {
-            allergenWarnings.push(`⚠️ Allergen detected: "${ingredient.item}" may contain ${allergen}`);
-          }
-          // Check for common derivatives
-          const derivatives: Record<string, string[]> = {
-            'milk': ['dairy', 'cheese', 'butter', 'cream', 'yogurt', 'whey', 'casein'],
-            'eggs': ['egg', 'mayonnaise'],
-            'peanuts': ['peanut', 'groundnut'],
-            'tree_nuts': ['almond', 'walnut', 'cashew', 'pecan', 'pistachio', 'hazelnut', 'macadamia'],
-            'gluten': ['wheat', 'flour', 'bread', 'pasta', 'barley', 'rye', 'oats'],
-            'soy': ['soya', 'tofu', 'edamame', 'soy sauce', 'miso'],
-            'fish': ['salmon', 'tuna', 'cod', 'haddock', 'anchovy'],
-            'shellfish': ['prawn', 'shrimp', 'crab', 'lobster', 'mussel', 'oyster'],
-          };
+      // Extract ingredient text for detection
+      const ingredientTexts = recipe.ingredients.map(ing => ing.item);
 
-          const derivativeList = derivatives[allergenLower] || [];
-          derivativeList.forEach((derivative) => {
-            if (ingredientText.includes(derivative)) {
-              allergenWarnings.push(`⚠️ Allergen detected: "${ingredient.item}" contains ${allergen} (${derivative})`);
-            }
-          });
-        });
-      });
+      const allergenMatches = detectAllergensInIngredients(
+        ingredientTexts,
+        userAllergens
+      );
+
+      if (allergenMatches.length > 0) {
+        const grouped = groupMatchesByAllergen(allergenMatches);
+        allergenWarnings = Object.entries(grouped).map(([allergen, ingredients]) =>
+          `⚠️ ${allergen}: ${ingredients.join(', ')}`
+        );
+      }
     }
 
     // Add source metadata
