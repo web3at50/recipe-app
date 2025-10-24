@@ -28,14 +28,22 @@
 [ ] Duplicate meal to another day
 
 
+- From this page add a "Add to Shopping List"
 
-- Work on pre auth side - do last I think
+https://www.platewise.xyz/recipes/ce98215a-717b-49a4-9881-b9a08f45e2a5
+
+
+- Add slow cooker functionality. Also align page
+
+
 
 - Amend icons - hate sparkle from lucide react - better libraries?
 
-- App logo. Favicon okay but main logo didn't really work so look at again
 
+- Change this wording
 
+Ingredient Mode: Flexible
+Recipe Preferences: Saved
 
 - Security review - is AI having direct access to use info? If so which and how 
 
@@ -51,10 +59,13 @@
 - Add C:\Users\bryn\Documents\recipeapp\Master Plan Oct 25 to gitignore and then delete from githb
 
 
+- UPdate reporting dashboard with customer feedback and also add some sort of rating system of chefs
 
 - What does personalized recommendations do on the onboard process? Active yet or just as precaution should be add
 
  - Need to sort google search console and sitemap and bing etc
+
+- add tagging to recipe page.  Vegetarian, Curry, chicken, CHEF NAME
 
 
 - Plan to get user feedback on models they prefer
@@ -86,3 +97,62 @@ Gemini 2.5 Flash Image - mentioned in C:\Users\bryn\Documents\recipeapp\Master P
 page - https://ai.google.dev/gemini-api/docs/image-generation
 
 
+
+
+
+
+
+7. Pre-Auth Content Strategy (Beyond Recipes)
+You said: "recipe generation is one idea... I just want a pre-auth presence" Content Types to Consider: High SEO Value, Medium Effort:
+
+Recipe Guides (you mentioned these)
+"10 Budget Meals Under £5 Per Serving"
+"Batch Cooking for Beginners: 5 Freezer-Friendly Recipes"
+"Quick Weeknight Dinners (Under 20 Minutes)"
+
+
+Educational Content
+"How AI Recipe Generators Work: Behind the Scenes"
+"4 AI Styles Explained: Which is Right for You?"
+"Natasha's Law: Complete Guide for Home Cooks"
+
+
+Comparison Content
+"PlateWise vs Traditional Recipe Sites"
+"AI Recipe Generators Compared (2025)"
+"Meal Planning Apps: Which is Best for UK Families?"
+
+
+Tools/Calculators (VERY high SEO value)
+"Recipe Cost Calculator (UK Prices)"
+"Meal Plan Generator (Free Preview)"
+"Food Waste Calculator"
+Interactive = high engagement = better rankings
+
+
+Medium SEO Value, Low Effort: 5. FAQ Pages
+"Common Cooking Questions Answered"
+"Allergen Safety FAQs"
+"Budget Cooking Tips"
+
+My Top 3 Recommendations (after recipes):
+✅ Interactive Tool: "Try PlateWise Free - Generate 1 Recipe" (no signup, preview mode)
+✅ Guide: "Natasha's Law & Food Allergen Safety Guide" (unique to UK, demonstrates your allergen features)
+✅ Comparison: "How PlateWise Works: 4 AI Styles Explained"
+
+
+Which content types interest you most?
+
+
+
+
+
+
+
+
+
+
+
+https://claude.ai/settings/capabilities
+https://support.claude.com/en/articles/12512198-how-to-create-custom-skills
+https://github.com/anthropics/skills

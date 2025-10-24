@@ -1,0 +1,137 @@
+Optimised version lower donw
+
+
+
+I want to work on the public pre auth recipes page/menu /recipes etc. Which ties in with my admin menu admin/recipe-review
+
+The overall goal is two fold
+
+ - Make it even better for SEO
+ - Make it even better for users
+
+We have 8 categories and I want to expand or evolve this. Maybe its tags not categories I don't know. Its two fold.  Enhance categories but then from the back of that enhance the actual recipe pages.  So the recipe pages have more front end and backned data for seo search engines and LLMs
+
+https://validator.schema.org/
+https://www.opengraph.xyz/
+https://search.google.com/test/rich-results
+https://platewise.xyz/sitemap.xml
+
+etc etc
+
+Additions can be more specific and useful and probably search intent related such as vegan recipes, vegetarian recipes, pescatarian recipes, no dairy recipes, any of the 14 allergens outlined by natasha UK law (screenshot attached).  
+
+We need and I would like a category overhaul and expansion/rethinks to improve its solid foundation we already have . Lets think about users and what they may like.  Expand this to the recipe page then too and include all the extra info in the above formats for seo too
+
+These would be good specific searches and also tied in with our site functionality
+
+More you can think of too please
+
+So these are all in the recipe page and available for sea using the above tools and lie our existing setup to be fair (please review the codebase in frontend directory and supabase directory for the wonderful foundation you and I have built already)
+
+On the individual recipe pages I would like FAQ schema for schema.org and seo structured data for search engines and llms
+
+It would be  good if you could assign a separate specialist agent with websearch capabilities to search for live keyword data from the likes of Google, Ahrefs, or SEMrush to validate search volume and competition. UK specific data o google.co.uk etc. This should be done first before thinking about the structure and additions above as it will give us what we are aiming to add?
+
+I think a good summary of what I want is two fold
+
+
+Task 1:
+
+Assign an agent to find search terms in the UK market for what recipes people are searching for and how
+
+Task 2
+
+Re design and / or enhance our categories and recipe pages to accommodate this so that the keywords and structure and everything seo related is geared towards users search intent 
+
+
+Agent first so have the live information required
+
+
+Does this make sense?
+
+
+This is optimised version
+
+
+Project Brief: Recipe Pages & Categories SEO Enhancement
+
+I need help improving the public recipes section (/recipes and related pages) and the admin recipe review system (/admin/recipe-review) in our recipe application codebase.
+
+Project Context:
+
+Frontend codebase is in the frontend directory
+Database schema is in the supabase directory
+We currently have 8 recipe categories
+Site URL: https://platewise.xyz
+We have a solid foundation already built that should be reviewed before proceeding
+Overall Goals:
+
+Enhance SEO optimization for search engines and LLMs
+Improve user experience and search intent alignment
+SEO Validation Tools to Consider:
+
+https://validator.schema.org/
+https://www.opengraph.xyz/
+https://search.google.com/test/rich-results
+Our sitemap: https://platewise.xyz/sitemap.xml
+Specific Requirements:
+
+TASK 1 - Market Research (DO THIS FIRST): Launch a specialized web search agent to research UK-specific recipe search data:
+
+Find popular recipe search terms and patterns in the UK market (google.co.uk)
+Analyze search volume and competition data
+Identify user search intent patterns
+Look for data from sources like Google Keyword Planner, Ahrefs, or SEMrush
+Focus on dietary and allergen-related searches
+This research should inform all subsequent decisions.
+
+TASK 2 - Implementation (After Task 1 completes):
+
+Based on the research findings, enhance the following:
+
+A. Category System Overhaul:
+
+Review current 8-category structure
+Expand/redesign to include search intent-driven categories such as:
+Vegan recipes
+Vegetarian recipes
+Pescatarian recipes
+No dairy recipes
+All 14 UK allergens per Natasha's Law (see attached screenshot if provided)
+Additional categories based on keyword research findings
+Consider whether tags, categories, or both are optimal
+Ensure categories align with actual user search patterns from Task 1
+B. Recipe Page Enhancements:
+
+Add comprehensive structured data for SEO:
+Schema.org markup (especially FAQ schema)
+Open Graph tags
+Rich results optimization
+Add frontend and backend fields to support:
+Dietary classifications (vegan, vegetarian, etc.)
+Allergen information (all 14 UK allergens)
+Search intent-optimized metadata
+Additional SEO fields identified in keyword research
+Ensure all data is properly indexed for search engines and LLMs
+C. Database Schema Updates:
+
+Update Supabase schema to accommodate new category/tag structure
+Add fields for allergens, dietary preferences, and SEO metadata
+Ensure proper relationships between recipes, categories, and tags
+Deliverables:
+
+UK recipe search keyword research report (from specialized agent)
+Updated category/taxonomy structure
+Enhanced recipe page schema with FAQ and rich results support
+Database migrations for new fields
+Updated admin interface to manage new taxonomy and metadata
+Important Notes:
+
+Review existing codebase foundation in frontend and supabase directories before starting
+All changes should maintain compatibility with existing functionality
+Prioritize UK search market data (google.co.uk)
+Focus on actual user search intent from real data
+Please start with Task 1 (keyword research) before designing any structural changes.
+
+
+

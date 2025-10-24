@@ -1,0 +1,9 @@
+Need to sort out allergens
+
+1: Sort out what happens when enter milk when milk is an allergen - nicer exit. Works for when  one recipe selected but ugly on all 4
+
+2: need to figure out how to handle coconut milk being entered as ingredient and being blocked when milk is the allergen (might have to leave this as quirk)
+
+3: Better solution that allergen showing in recipe card when coconut milk added as entred in description
+
+4: british, Indian. Chinese etc image showing in my-recipes

@@ -1,0 +1,97 @@
+Fix what can here but then maybe create prompt again to review seo setup and tweak by editing categories and targeting search terms so use tags etc - tweak or redo this prompt in this file - SEO prompt before and after optimising.txt
+
+
+
+1: We added a hamburger for mobile on the pre auth side of the site and it has made it have a slight need for horizontal scroll which I would like to fix please. See screenshot
+
+2: We had discussed previously as well as adding individual pages for recipes we were going to have a page or pages published which highlighted and visualised etc the functionality of producing 4 recipes in one go with four different versions. I cant see this option anywhere in my admin/recipe-review dashboard  ****this has a recipe_comparisons table in supabase and not sure why!******
+
+Is it anywhere in C:\Users\bryn\Documents\recipeapp\Markdown Docs\Marketing\auto recipes and content creation\Phase_1_MVP_Implementation_Plan.md or C:\Users\bryn\Documents\recipeapp\Markdown Docs\Marketing\auto recipes and content creation\zFuture_Phases_Roadmap.md or maybe even already in teh codebase just not used/revealed etc
+
+
+13: Are pages seo friendly for LLM.  Can we add FAQ to the recipe pages as LLM like that.  How many servings, how long to cook, vegetarian, etc etc
+
+
+
+3: Fix supabase issues
+
+4: Placeholder text on about us etc
+
+5: page wider on public side
+
+6: MOre categories like allergens and dietry requriements. How are / were the 8 categories decided upon and created and can they be added/deleted etc. Revie
+
+7: Add facility for users to authorise their recipes to go to my admin for review
+
+8: make public page clickable so can enlarge to read and use on mobile
+
+9: merge with ideas on Future_Phases_Roadmap.md
+
+10: Can AI think of imprvoements to (a) get people here and (b) engage when here.  Expanding this flow
+
+
+12: Natahas law page
+
+13: Are pages seo friendly for LLM.  Can we add FAQ to the recipe pages as LLM like that.  How many servings, how long to cook, vegetarian, etc etc
+
+9: why seo_keywords not populated in recipes database table?
+
+14: when signed in want to see receipes public see too ! Have that menu ? SO auth side needs sidebar ad header bar?
+
+25 Work on prompt to generate ideas
+
+
+15: Good ideas  Future_SEO_Enhancements.md
+Have doc for these in folder
+
+
+These looked good
+
+Future Features Explained
+⏸️ Category Settings Admin Page
+What it is: A dedicated admin page (e.g., /admin/category-settings) where you manage category-level metadata beyond just images. Features it could include:
+Custom Images: Upload hero images for each category (what we're building now in Phase 2)
+Custom Descriptions: Override default category descriptions with SEO-optimized text
+Featured Recipes: Pin 3-4 "hero" recipes to top of each category
+Category SEO:
+Custom meta title/description per category
+Custom keywords
+Schema.org markup overrides
+Category Status: Enable/disable categories (hide empty ones)
+Sort Order: Change the order categories appear on /recipes
+Why separate page: Keeps recipe-review dashboard focused on recipes, not category management.
+⏸️ WebSite Schema with Search Box
+What it is: Schema.org markup that enables Google's "Search this site" feature in search results. Visual example in Google:
+PlateWise - AI Recipe Manager
+https://platewise.xyz
+[Search PlateWise  🔍]  ← This search box appears!
+Requirements:
+Add WebSite schema to homepage:
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "PlateWise",
+  "url": "https://platewise.xyz",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://platewise.xyz/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+Build search page: /search that accepts ?q= parameter
+Search functionality: Search recipes by name, ingredients, tags
+SEO Benefit:
+Users can search your site directly from Google results
+Increases brand visibility
+Higher engagement (users find specific recipes faster)
+
+
+
+
+
+
+
+
+
+
+
