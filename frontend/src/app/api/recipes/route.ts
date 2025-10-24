@@ -92,9 +92,8 @@ export async function POST(request: Request) {
 
     // Auto-detect allergens from ingredients (server-side validation)
     const allAllergenIds = UK_ALLERGENS.map(a => a.id);
-    const ingredientTexts = body.ingredients.map((ing: { item: string }) => ing.item);
     const detectedMatches = detectAllergensInIngredients(
-      ingredientTexts,
+      body.ingredients,
       allAllergenIds
     );
 
