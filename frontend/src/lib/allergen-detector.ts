@@ -1,19 +1,55 @@
-// UK 14 Major Allergens - Natasha's Law compliance
+/**
+ * UK 14 Major Allergens - Natasha's Law Compliance
+ *
+ * SINGLE SOURCE OF TRUTH for all allergen definitions across the application.
+ *
+ * DUAL PURPOSE:
+ * 1. User Safety Protection: Detect allergens in user's personal allergy list
+ *    to block recipe generation that conflicts with their allergies
+ *
+ * 2. Recipe Discovery Tagging: Detect ALL allergens present in recipes for
+ *    public filtering and search (e.g., "gluten-free", "dairy-free")
+ *
+ * STRUCTURE:
+ * - id: Unique identifier (stored in database as TEXT[])
+ * - label: Display name for UI components
+ * - description: User-friendly explanation (shown in onboarding/settings)
+ * - keywords: Detection terms for ingredient matching (case-insensitive)
+ *
+ * USAGE:
+ * Import this constant in any component or API that needs allergen data:
+ * ```typescript
+ * import { UK_ALLERGENS } from '@/lib/allergen-detector';
+ * ```
+ *
+ * MAINTENANCE:
+ * - Add new allergen: Update this array only, changes propagate everywhere
+ * - Add keyword: Update relevant allergen's keywords array
+ * - Update description: Change here, reflects in all UI
+ * - All components import this constant - no duplication needed
+ *
+ * LEGAL COMPLIANCE:
+ * Based on UK Food Standards Agency (FSA) guidance for food allergen labeling.
+ * Complies with Natasha's Law requirements for allergen information.
+ *
+ * @see https://www.food.gov.uk/business-guidance/allergen-guidance-for-food-businesses
+ * @see https://www.food.gov.uk/safety-hygiene/food-allergy-and-intolerance
+ */
 export const UK_ALLERGENS = [
-  { id: 'peanuts', label: 'Peanuts', keywords: ['peanut', 'groundnut'] },
-  { id: 'tree_nuts', label: 'Tree Nuts', keywords: ['almond', 'walnut', 'cashew', 'pecan', 'pistachio', 'hazelnut', 'macadamia', 'brazil nut'] },
-  { id: 'milk', label: 'Milk/Dairy', keywords: ['milk', 'dairy', 'cheese', 'butter', 'cream', 'yogurt', 'whey', 'casein'] },
-  { id: 'eggs', label: 'Eggs', keywords: ['egg', 'mayonnaise'] },
-  { id: 'fish', label: 'Fish', keywords: ['fish', 'salmon', 'tuna', 'cod', 'haddock', 'anchovy'] },
-  { id: 'shellfish', label: 'Shellfish', keywords: ['shellfish', 'prawn', 'shrimp', 'crab', 'lobster', 'crayfish'] },
-  { id: 'molluscs', label: 'Molluscs', keywords: ['mollusc', 'mussel', 'oyster', 'squid', 'snail', 'winkle'] },
-  { id: 'soy', label: 'Soya', keywords: ['soy', 'soya', 'tofu', 'edamame', 'soy sauce', 'miso'] },
-  { id: 'gluten', label: 'Gluten', keywords: ['gluten', 'wheat', 'flour', 'bread', 'pasta', 'barley', 'rye', 'oat'] },
-  { id: 'sesame', label: 'Sesame', keywords: ['sesame', 'tahini'] },
-  { id: 'celery', label: 'Celery', keywords: ['celery', 'celeriac'] },
-  { id: 'mustard', label: 'Mustard', keywords: ['mustard'] },
-  { id: 'lupin', label: 'Lupin', keywords: ['lupin'] },
-  { id: 'sulphites', label: 'Sulphites', keywords: ['sulphite', 'sulfite', 'sulphur dioxide', 'sulfur dioxide'] },
+  { id: 'peanuts', label: 'Peanuts', description: 'Peanuts and peanut products', keywords: ['peanut', 'groundnut'] },
+  { id: 'tree_nuts', label: 'Tree Nuts', description: 'Almonds, hazelnuts, walnuts, cashews, pecans, pistachios, macadamia', keywords: ['almond', 'walnut', 'cashew', 'pecan', 'pistachio', 'hazelnut', 'macadamia', 'brazil nut'] },
+  { id: 'milk', label: 'Milk/Dairy', description: 'Milk, cheese, butter, cream, yogurt', keywords: ['milk', 'dairy', 'cheese', 'butter', 'cream', 'yogurt', 'whey', 'casein'] },
+  { id: 'eggs', label: 'Eggs', description: 'Eggs and egg products', keywords: ['egg', 'mayonnaise'] },
+  { id: 'fish', label: 'Fish', description: 'All fish and fish products', keywords: ['fish', 'salmon', 'tuna', 'cod', 'haddock', 'anchovy'] },
+  { id: 'shellfish', label: 'Shellfish', description: 'Crustaceans (prawns, crab, lobster)', keywords: ['shellfish', 'prawn', 'shrimp', 'crab', 'lobster', 'crayfish'] },
+  { id: 'molluscs', label: 'Molluscs', description: 'Squid, snails, mussels, oysters', keywords: ['mollusc', 'mussel', 'oyster', 'squid', 'snail', 'winkle'] },
+  { id: 'soy', label: 'Soya', description: 'Soya beans and soya products', keywords: ['soy', 'soya', 'tofu', 'edamame', 'soy sauce', 'miso'] },
+  { id: 'gluten', label: 'Gluten', description: 'Wheat, rye, barley, oats', keywords: ['gluten', 'wheat', 'flour', 'bread', 'pasta', 'barley', 'rye', 'oat'] },
+  { id: 'sesame', label: 'Sesame', description: 'Sesame seeds and sesame products', keywords: ['sesame', 'tahini'] },
+  { id: 'celery', label: 'Celery', description: 'Celery and celeriac', keywords: ['celery', 'celeriac'] },
+  { id: 'mustard', label: 'Mustard', description: 'Mustard seeds, powder, and products', keywords: ['mustard'] },
+  { id: 'lupin', label: 'Lupin', description: 'Lupin beans and flour', keywords: ['lupin'] },
+  { id: 'sulphites', label: 'Sulphites', description: 'Sulphur dioxide (often in wine, dried fruit)', keywords: ['sulphite', 'sulfite', 'sulphur dioxide', 'sulfur dioxide'] },
 ];
 
 export interface AllergenMatch {

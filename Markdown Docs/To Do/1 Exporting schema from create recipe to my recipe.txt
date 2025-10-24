@@ -1,4 +1,6 @@
 
+Before this get security review to fix injection in ingredients and fre flow box and also max text size limits and then also introduce the 40 recipes rate limiting
+
 Exporting schema from /create-recipe to /my-recipe and beyond
 
 

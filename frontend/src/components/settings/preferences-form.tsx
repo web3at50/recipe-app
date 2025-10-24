@@ -11,27 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { AlertTriangle, Save } from 'lucide-react';
 import type { UserPreferences } from '@/types/user-profile';
+import { UK_ALLERGENS } from '@/lib/allergen-detector';
 
 interface PreferencesFormProps {
   initialPreferences: UserPreferences;
 }
-
-const UK_ALLERGENS = [
-  { id: 'peanuts', label: 'Peanuts' },
-  { id: 'tree_nuts', label: 'Tree Nuts' },
-  { id: 'milk', label: 'Milk/Dairy' },
-  { id: 'eggs', label: 'Eggs' },
-  { id: 'fish', label: 'Fish' },
-  { id: 'shellfish', label: 'Shellfish' },
-  { id: 'soy', label: 'Soya' },
-  { id: 'gluten', label: 'Gluten' },
-  { id: 'sesame', label: 'Sesame' },
-  { id: 'celery', label: 'Celery' },
-  { id: 'mustard', label: 'Mustard' },
-  { id: 'lupin', label: 'Lupin' },
-  { id: 'sulphites', label: 'Sulphites' },
-  { id: 'molluscs', label: 'Molluscs' }
-];
 
 const DIETARY_OPTIONS = [
   { id: 'vegetarian', label: 'Vegetarian' },

@@ -21,24 +21,7 @@ import type { IngredientMode } from '@/types';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { FeedbackButton } from '@/components/feedback-button';
 import { MODEL_STYLES, getStyleName, getStyleIcon, getStyleDisplay } from '@/lib/model-styles';
-
-// UK Allergen list (from preferences-form.tsx)
-const UK_ALLERGENS = [
-  { id: 'peanuts', label: 'Peanuts' },
-  { id: 'tree_nuts', label: 'Tree Nuts' },
-  { id: 'milk', label: 'Milk/Dairy' },
-  { id: 'eggs', label: 'Eggs' },
-  { id: 'fish', label: 'Fish' },
-  { id: 'shellfish', label: 'Shellfish' },
-  { id: 'soy', label: 'Soya' },
-  { id: 'gluten', label: 'Gluten' },
-  { id: 'sesame', label: 'Sesame' },
-  { id: 'celery', label: 'Celery' },
-  { id: 'mustard', label: 'Mustard' },
-  { id: 'lupin', label: 'Lupin' },
-  { id: 'sulphites', label: 'Sulphites' },
-  { id: 'molluscs', label: 'Molluscs' }
-];
+import { UK_ALLERGENS } from '@/lib/allergen-detector';
 
 // Dietary restriction options (from preferences-form.tsx)
 const DIETARY_OPTIONS = [

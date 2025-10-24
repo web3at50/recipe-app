@@ -3,24 +3,7 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle } from 'lucide-react';
-
-// UK 14 Major Allergens (Natasha's Law)
-const UK_ALLERGENS = [
-  { id: 'peanuts', label: 'Peanuts', description: 'Peanuts and peanut products' },
-  { id: 'tree_nuts', label: 'Tree Nuts', description: 'Almonds, hazelnuts, walnuts, cashews, pecans, pistachios, macadamia' },
-  { id: 'milk', label: 'Milk/Dairy', description: 'Milk, cheese, butter, cream, yogurt' },
-  { id: 'eggs', label: 'Eggs', description: 'Eggs and egg products' },
-  { id: 'fish', label: 'Fish', description: 'All fish and fish products' },
-  { id: 'shellfish', label: 'Shellfish', description: 'Crustaceans (prawns, crab, lobster) and molluscs (mussels, oysters)' },
-  { id: 'soy', label: 'Soya', description: 'Soya beans and soya products' },
-  { id: 'gluten', label: 'Gluten', description: 'Wheat, rye, barley, oats' },
-  { id: 'sesame', label: 'Sesame', description: 'Sesame seeds and sesame products' },
-  { id: 'celery', label: 'Celery', description: 'Celery and celeriac' },
-  { id: 'mustard', label: 'Mustard', description: 'Mustard seeds, powder, and products' },
-  { id: 'lupin', label: 'Lupin', description: 'Lupin beans and flour' },
-  { id: 'sulphites', label: 'Sulphites', description: 'Sulphur dioxide (often in wine, dried fruit)' },
-  { id: 'molluscs', label: 'Molluscs', description: 'Squid, snails, mussels, oysters' }
-];
+import { UK_ALLERGENS } from '@/lib/allergen-detector';
 
 interface AllergyStepProps {
   selected: string[];
