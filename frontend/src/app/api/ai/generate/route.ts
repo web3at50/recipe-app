@@ -310,11 +310,8 @@ export async function POST(request: Request) {
     // Uses keyword-based detection from allergen-detector.ts
     let allergenWarnings: string[] = [];
     if (userAllergens.length > 0 && recipe.ingredients) {
-      // Extract ingredient text for detection
-      const ingredientTexts = recipe.ingredients.map(ing => ing.item);
-
       const allergenMatches = detectAllergensInIngredients(
-        ingredientTexts,
+        recipe.ingredients,
         userAllergens
       );
 
