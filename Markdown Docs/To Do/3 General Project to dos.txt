@@ -1,4 +1,10 @@
- - Tidy up pre auth after extensive review - pushing to launch
+- Security review to fix injection in ingredients and free flow box and also max text size limits and then also introduce the 40 recipes rate limiting 
+
+- We have disclaimer text here for allergen disclaimer page
+
+C:\Users\bryn\Documents\recipeapp\Markdown Docs\Prompt & Knowledge MD Docs to implement\Allergen text for page when create.md
+
+- Tidy up pre auth after extensive review - pushing to launch
 
  - Add basic natasha age before lauch - just link from onboarding flow - Natasha law page and link to from onboarding flow. Need to create page and write content and link to from onboarding flow
 
@@ -33,11 +39,15 @@
 https://www.platewise.xyz/recipes/ce98215a-717b-49a4-9881-b9a08f45e2a5
 
 
-- Add slow cooker functionality. Also align page
+- Good info
+
+File: frontend/src/app/api/ai/generate/route.ts calls detectAllergensInText() in  C:\Users\bryn\Documents\recipeapp\frontend\src\lib\allergen-detector.ts which  uses frontend/src/lib/allergen-detector.ts and frontend/src/lib/allergen-taxonomies.ts
 
 
 
 - Amend icons - hate sparkle from lucide react - better libraries?
+
+ - Make error messages prettier when warning about ingredients on create page - coloured bottom right as opposed to bigger uglier ones in middle of page
 
 
 - Change this wording
