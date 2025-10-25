@@ -59,8 +59,20 @@ export interface AllergenMatch {
   matchedKeyword: string; // e.g., 'peanut'
 }
 
+// Import allergen taxonomies for smart detection
+import { ALLERGEN_TAXONOMIES } from './allergen-taxonomies';
+
 /**
  * Detects allergens in ingredient text based on user's allergen profile
+ *
+ * DETECTION STRATEGY (3-step process):
+ * 1. Check SAFE taxonomy list first → if found, allow ingredient (skip allergen entirely)
+ * 2. Check UNSAFE taxonomy list → if found, block ingredient
+ * 3. Fallback to keyword matching → for items not in taxonomy
+ *
+ * This prevents false positives (e.g., buckwheat for gluten, coconut milk for dairy)
+ * while maintaining safety through explicit blocklists and keyword fallback.
+ *
  * @param ingredientText - The ingredient text to check (e.g., "peanut butter", "2 cups milk")
  * @param userAllergens - Array of allergen IDs the user is allergic to (e.g., ['peanuts', 'milk'])
  * @returns Array of allergen matches found
@@ -77,7 +89,49 @@ export function detectAllergensInText(
     const allergenDef = UK_ALLERGENS.find((a) => a.id === userAllergen);
     if (!allergenDef) return;
 
-    // Check if any keyword matches
+    // Get taxonomy for this allergen (if available)
+    const taxonomy = ALLERGEN_TAXONOMIES[userAllergen];
+
+    // STEP 1: Check SAFE list first (explicit allowlist)
+    // If ingredient is explicitly safe, skip this allergen entirely
+    if (taxonomy?.safe) {
+      const isSafe = taxonomy.safe.some((safeItem) =>
+        textLower.includes(safeItem.toLowerCase())
+      );
+
+      if (isSafe) {
+        // Ingredient is explicitly safe for this allergen - don't check further
+        return;
+      }
+    }
+
+    // STEP 2: Check UNSAFE list (explicit blocklist)
+    // If ingredient is explicitly unsafe, add matches
+    if (taxonomy?.unsafe) {
+      const unsafeMatches: string[] = [];
+
+      taxonomy.unsafe.forEach((unsafeItem) => {
+        if (textLower.includes(unsafeItem.toLowerCase())) {
+          unsafeMatches.push(unsafeItem);
+        }
+      });
+
+      // If we found matches in taxonomy, add them and skip keyword matching
+      if (unsafeMatches.length > 0) {
+        unsafeMatches.forEach((matchedItem) => {
+          matches.push({
+            allergen: allergenDef.id,
+            allergenLabel: allergenDef.label,
+            ingredient: ingredientText,
+            matchedKeyword: matchedItem,
+          });
+        });
+        return; // Don't check keywords - we have taxonomy matches
+      }
+    }
+
+    // STEP 3: Fallback to keyword matching
+    // For allergens without taxonomy or items not found in taxonomy
     allergenDef.keywords.forEach((keyword) => {
       if (textLower.includes(keyword)) {
         matches.push({
