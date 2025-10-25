@@ -1,5 +1,22 @@
 
-Before this get security review to fix injection in ingredients and fre flow box and also max text size limits and then also introduce the 40 recipes rate limiting
+1: Before this get security review to fix injection in ingredients and fre flow box and also max text size limits and then also introduce the 40 recipes rate limiting
+
+2: Please again just high level explain - think I understand tbh but keep this as good as mentions relevant files
+
+File: frontend/src/app/api/ai/generate/route.ts calls detectAllergensInText() in  C:\Users\bryn\Documents\recipeapp\frontend\src\lib\allergen-detector.ts which  uses frontend/src/lib/allergen-detector.ts and frontend/src/lib/allergen-taxonomies.ts
+
+File: frontend/src/app/api/ai/generate/route.ts calls 
+C:\Users\bryn\Documents\recipeapp\frontend\src\lib\allergen-detector.ts
+maybe get to call taxonomy files - needs nuance at creation stage not later at prompting stage
+
+frontend/src/lib/allergen-detector.ts and frontend/src/lib/allergen-taxonomies.ts
+
+
+3: Make error messages prettier - coloured bottom right as opposed to bigger ones
+
+4:  When things get flagged as allergens in my-recipe (coconut milk example) - where powered and improve
+
+5: Explain frontend/src/app/api/ai/generate/route.ts and then what next and how inks with prompt.ts for example and how to use taxonomy on prompt.ts
 
 Exporting schema from /create-recipe to /my-recipe and beyond
 
