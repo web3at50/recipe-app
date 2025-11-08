@@ -31,7 +31,7 @@ export function generateRecipeFAQs(recipeData: RecipeFAQData): FAQ[] {
   const faqs: FAQ[] = [];
 
   // 1. ALLERGEN FAQ (always included)
-  faqs.push(...generateAllergenFAQ(recipeData.allergens, recipeData.name));
+  faqs.push(..._generateAllergenFAQInternal(recipeData.allergens, recipeData.name));
 
   // 2. COOKING TIME FAQ (if time data available)
   faqs.push(...generateCookingTimeFAQ(recipeData.name, recipeData.prep_time, recipeData.cook_time));
@@ -50,12 +50,12 @@ export function generateRecipeFAQs(recipeData: RecipeFAQData): FAQ[] {
 }
 
 /**
- * Generates an FAQ about allergens in the recipe
+ * Internal function to generate allergen FAQ
  * @param allergens - Array of allergen identifiers (e.g., ['dairy', 'gluten'])
  * @param recipeName - Recipe name for contextual FAQ
  * @returns FAQ array with allergen information
  */
-function generateAllergenFAQ(
+function _generateAllergenFAQInternal(
   allergens: string[] | null | undefined,
   recipeName: string
 ): FAQ[] {
