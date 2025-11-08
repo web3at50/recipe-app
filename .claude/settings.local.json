@@ -45,7 +45,8 @@
       "Bash(powershell 'Remove-Item -Path \"\"\\\\?\\$((Get-Location).Path)\\nul\"\" -Force')",
       "Bash(mkdir:*)",
       "Bash(move \"(dashboard)\\recipes\" \"(dashboard)\\my-recipes\")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(nul)"
     ],
     "deny": [],
     "ask": []
