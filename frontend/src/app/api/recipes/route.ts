@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import type { RecipeFormData } from '@/types/recipe';
 import { detectAllergensInIngredients, UK_ALLERGENS } from '@/lib/allergen-detector';
+import { generateAllergenFAQ } from '@/lib/faq-generator';
 
 // GET /api/recipes - List all user's recipes (JSONB schema)
 export async function GET(request: Request) {
@@ -105,6 +106,9 @@ export async function POST(request: Request) {
       ...new Set([...(body.allergens || []), ...detectedAllergens])
     ];
 
+    // Generate FAQs for LLM optimization (allergen information)
+    const generatedFAQs = generateAllergenFAQ(finalAllergens, body.name);
+
     // Create recipe (everything in one insert!)
     const { data: recipe, error: recipeError} = await supabase
       .from('recipes')
@@ -123,6 +127,7 @@ export async function POST(request: Request) {
         instructions: instructions, // JSONB array
         tags: body.tags || [], // Simple array
         allergens: finalAllergens, // Auto-detected + provided allergens
+        faqs: generatedFAQs, // FAQ for LLM optimization
         nutrition: body.nutrition || null, // JSONB object
         cost_per_serving: body.cost_per_serving || null,
         image_url: body.image_url || null,

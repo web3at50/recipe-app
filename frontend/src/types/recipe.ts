@@ -22,6 +22,12 @@ export interface Nutrition {
   fat?: number; // grams
 }
 
+// FAQ stored as JSONB (for LLM optimization)
+export interface FAQ {
+  question: string;
+  answer: string;
+}
+
 // AI Model type for recipe generation
 export type AIModel = 'model_1' | 'model_2' | 'model_3' | 'model_4';
 
@@ -50,6 +56,9 @@ export interface Recipe {
   // Simple arrays (no junction tables)
   tags: string[]; // ['quick', 'vegetarian', 'batch-cooking']
   allergens: string[]; // ['dairy', 'gluten', 'nuts']
+
+  // FAQ for LLM optimization (JSONB)
+  faqs: FAQ[] | null; // [{"question": "...", "answer": "..."}]
 
   // Nutrition as JSONB
   nutrition: Nutrition | null;

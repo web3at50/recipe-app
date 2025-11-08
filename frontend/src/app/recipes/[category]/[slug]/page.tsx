@@ -255,6 +255,21 @@ export default async function RecipePage({ params }: Props) {
           </div>
         )}
 
+        {/* FAQ Section - For LLM Optimization */}
+        {recipe.faqs && recipe.faqs.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-2xl font-semibold mb-6">Frequently Asked Questions</h2>
+            <div className="space-y-6">
+              {recipe.faqs.map((faq: { question: string; answer: string }, index: number) => (
+                <div key={index} className="border-l-4 border-primary/20 pl-4">
+                  <h3 className="font-semibold text-lg mb-2">{faq.question}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* CTA Section */}
         <div className="mt-12">
           <RecipeCTA />

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 import type { RecipeFormData } from '@/types/recipe';
+import { detectAllergensInIngredients, UK_ALLERGENS } from '@/lib/allergen-detector';
+import { generateAllergenFAQ } from '@/lib/faq-generator';
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -69,6 +71,24 @@ export async function PUT(
       return NextResponse.json({ error: 'Recipe not found' }, { status: 404 });
     }
 
+    // Auto-detect allergens from ingredients (server-side validation)
+    const allAllergenIds = UK_ALLERGENS.map(a => a.id);
+    const detectedMatches = detectAllergensInIngredients(
+      body.ingredients,
+      allAllergenIds
+    );
+
+    // Get unique allergen IDs
+    const detectedAllergens = [...new Set(detectedMatches.map(m => m.allergen))];
+
+    // Merge with provided allergens (if any)
+    const finalAllergens = [
+      ...new Set([...(body.allergens || []), ...detectedAllergens])
+    ];
+
+    // Generate FAQs for LLM optimization (allergen information)
+    const generatedFAQs = generateAllergenFAQ(finalAllergens, body.name);
+
     // Update recipe (single update, all data in JSONB)
     const { data: recipe, error: updateError } = await supabase
       .from('recipes')
@@ -83,7 +103,8 @@ export async function PUT(
         ingredients: body.ingredients, // JSONB
         instructions: body.instructions, // JSONB
         tags: body.tags || [], // Array
-        allergens: body.allergens || [], // Array
+        allergens: finalAllergens, // Auto-detected + provided allergens
+        faqs: generatedFAQs, // FAQ for LLM optimization
         nutrition: body.nutrition || null, // JSONB
         cost_per_serving: body.cost_per_serving || null,
         image_url: body.image_url || null,
