@@ -380,16 +380,17 @@ AI costs can spiral quickly. Tracking lets me make data-driven decisions about w
    # Clerk Authentication
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
    CLERK_SECRET_KEY=your_clerk_secret
+   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
    # Supabase
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_key
 
    # AI Providers (at least one required)
    OPENAI_API_KEY=your_openai_key
    ANTHROPIC_API_KEY=your_anthropic_key
-   GOOGLE_GENERATIVE_AI_API_KEY=your_google_key
+   GOOGLE_GEMINI_API_KEY=your_google_key
    XAI_API_KEY=your_xai_key
 
    # Vercel Blob Storage
@@ -397,6 +398,7 @@ AI costs can spiral quickly. Tracking lets me make data-driven decisions about w
 
    # Admin Access
    ADMIN_USER_IDS=comma,separated,clerk,user,ids
+   AUTOMATION_USER_IDS=comma,separated,clerk,user,ids
    ```
 
 4. **Set up Supabase database**
