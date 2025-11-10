@@ -1,314 +1,352 @@
 # PlateWise - AI Recipe Manager
 
-> **UK-focused recipe generation platform with multi-LLM comparison and intelligent cost optimization**
+> **UK-focused recipe generation platform with multi-AI comparison and cost tracking**
 
-[![Live Demo](https://img.shields.io/badge/demo-live-green)](https://recipe-app-lime-mu.vercel.app)
+[![Live Demo](https://img.shields.io/badge/demo-live-green)](https://platewise.xyz)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-88.1%25-blue)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green)](https://supabase.com/)
 
-## Overview
+## ⚠️ Demo Project Notice
 
-PlateWise is a production-grade SaaS application that generates personalized recipes using AI, specifically targeting UK home cooks. Users input available ingredients and dietary restrictions, then receive four different recipe styles in approximately 30 seconds, allowing them to choose their preferred approach.
+**This is a portfolio demonstration project.** The application is fully functional and deployed, but is **not commercially available**. AI-generated recipes have not been tested in real kitchens and should not be used for actual cooking or relied upon for allergen safety.
 
-**Project Status:** Live in production with core features complete. Development paused to evaluate UK allergen labeling regulations (Natasha's Law) for potential commercial deployment.
+[Live Demo](https://platewise.xyz) (view only - recipes are AI-generated and untested)
 
-### Key Technical Achievements
+---
 
-- 🤖 **Multi-LLM Integration**: Unified interface across OpenAI, Anthropic Claude, Google Gemini, and XAI Grok
-- 💰 **Intelligent Cost Optimization**: Complexity-based routing reduces AI costs by ~40% while prioritizing safety
-- 🔒 **Enterprise Security**: Three-layer defense with JWT authentication, API verification, and database RLS
-- 📊 **Business Intelligence**: Real-time cost tracking, user profitability analysis, and provider performance metrics
-- 🔍 **SEO Excellence**: Dynamic sitemaps, Schema.org markup, and automated slug generation for discoverability
-- 🇬🇧 **UK Market Focus**: Metric measurements, British ingredient terminology, and Natasha's Law allergen compliance
+## Project Overview
+
+PlateWise generates personalized recipes using AI, specifically targeting UK home cooks. Users input available ingredients and dietary restrictions, then receive four different recipe styles in approximately 30 seconds from different AI providers, allowing them to choose their preferred approach.
+
+**Project Status:** Feature-complete MVP deployed for demonstration purposes. Not commercially launched as AI-generated recipes require human kitchen testing and safety validation before publication. Development paused pending implementation of testing protocols.
+
+### Why I Built This
+
+I wanted to demonstrate my ability to:
+- Architect and direct a full-stack SaaS application using AI assistance
+- Integrate multiple AI providers with intelligent routing
+- Implement proper authentication and data security
+- Build comprehensive admin tools and analytics
+- Deploy a production-ready application to the web
+
+### What I Learned
+
+This project taught me how to:
+- Work with multiple AI provider SDKs simultaneously
+- Design database schemas that evolve over time (31 migrations)
+- Integrate modern authentication (Clerk + Supabase 2025 approach)
+- Set up automated jobs and background processes
+- Make architectural decisions balancing features vs. complexity
+- Identify when to pause development (regulatory/safety considerations)
 
 ---
 
 ## Screenshots
 
-### Recipe Generation (4 AI Styles)
-![Recipe Generation showing 4 different AI model outputs side-by-side](screenshots/01-recipe-generation.png)
+### Recipe Generation (4 AI Providers)
+![Recipe generation showing 4 different AI-generated recipe styles side-by-side](screenshots/01-recipe-generation.png)
+*Four different AI providers generate unique variations of the same dish*
 
-### AI Cost Analytics Dashboard
-![Real-time cost tracking dashboard showing provider performance metrics](screenshots/02-analytics-dashboard.png)
+### Cost Tracking Dashboard
+![Admin dashboard showing AI usage costs and provider performance](screenshots/02-analytics-dashboard.png)
+*Real-time tracking of AI usage, costs, and provider comparison*
 
-### Admin Recipe Review Workflow
-![Admin dashboard for reviewing and publishing AI-generated recipes](screenshots/03-admin-review.png)
+### Admin Recipe Review
+![Admin workflow for reviewing and managing AI-generated recipes](screenshots/03-admin-review.png)
+*Review interface for managing recipe publication and SEO metadata*
 
-### Meal Planning Calendar
-![Weekly meal planner with drag-and-drop recipe scheduling](screenshots/04-meal-planner.png)
+### Meal Planning
+![Weekly meal planner with recipe scheduling](screenshots/04-meal-planner.png)
+*Complete meal planning workflow from generation to calendar*
 
 ---
 
 ## Tech Stack
 
-### Frontend
-- **Next.js 15** with App Router (Server Components, RSC)
-- **TypeScript** (88.1% type coverage across codebase)
-- **Tailwind CSS** + **Radix UI** for accessible component primitives
-- **React Hook Form** + **Zod** for type-safe form validation
-- **Next/Font** (Geist, Lora, Poppins) with automatic optimization
+### Core Technologies
 
-### AI Integration
-- **OpenAI** (GPT-4.1, GPT-4.1-mini) via Vercel AI SDK
-- **Anthropic** (Claude Haiku 4.5) via direct SDK integration
-- **Google Gemini** (2.5 Flash) via GenAI SDK
-- **XAI** (Grok 4) via OpenAI-compatible SDK
+**Frontend**
+- Next.js 15 (App Router with React Server Components)
+- TypeScript (88.1% of codebase)
+- Tailwind CSS + Radix UI
+- React Hook Form + Zod validation
 
-### Backend & Infrastructure
-- **Supabase** (PostgreSQL database, Edge Functions, scheduled jobs)
-- **Clerk** (JWT-based authentication with Google SSO)
-- **Vercel** (hosting, serverless functions, deployment)
-- **Vercel Blob Storage** (image hosting and optimization)
-- **pg_cron** (scheduled database maintenance and analytics)
+**AI Integration**
+- OpenAI (GPT-4.1 and GPT-4.1-mini)
+- Anthropic (Claude Haiku 4.5)
+- Google (Gemini 2.5 Flash)
+- XAI (Grok 4)
 
-### Database
-- **PostgreSQL** with advanced features:
-  - Row-Level Security (RLS) for data isolation
-  - Materialized views for analytics performance
-  - JSONB for flexible nested data structures
-  - Custom functions for business intelligence
-  - 31 migrations showing iterative schema refinement
+**Backend & Database**
+- Supabase (PostgreSQL database + Edge Functions)
+- Clerk (Authentication with Google SSO)
+- Vercel (Hosting and deployment)
+- Vercel Blob Storage (Image hosting)
 
----
+### Why These Choices?
 
-## System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                          User Interface                          │
-│                    Next.js 15 (App Router)                       │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      API Routes Layer                            │
-│           Authentication, Validation, Request Handling           │
-└──────┬──────────────────────────────────────────────────────┬───┘
-       │                                                       │
-       ▼                                                       ▼
-┌─────────────────────────────┐         ┌────────────────────────┐
-│     AI Provider Router      │         │   Supabase Database    │
-│  ┌────────┐  ┌──────────┐  │         │   - User profiles      │
-│  │ OpenAI │  │Anthropic │  │         │   - Recipes (JSONB)    │
-│  └────────┘  └──────────┘  │         │   - AI usage logs      │
-│  ┌────────┐  ┌──────────┐  │         │   - Meal plans         │
-│  │ Gemini │  │   Grok   │  │         │   - Shopping lists     │
-│  └────────┘  └──────────┘  │         │   - RLS policies       │
-└──────────┬──────────────────┘         └───────────┬────────────┘
-           │                                        │
-           └────────────────┬───────────────────────┘
-                            ▼
-                   ┌────────────────────┐
-                   │  Analytics Engine  │
-                   │  - Cost tracking   │
-                   │  - Profitability   │
-                   │  - Performance     │
-                   └────────────────────┘
-```
+- **4 AI Providers**: Gives users variety and lets me compare performance/cost
+- **Next.js 15**: Modern React framework with server components for performance
+- **Clerk + Supabase**: Recommended 2025 integration approach for auth
+- **TypeScript**: Type safety helps catch errors during development
+- **Vercel**: Easy deployment with good free tier for demos
 
 ---
 
-## Core Features
+## Key Features
 
-### 1. Multi-LLM Routing with Cost Optimization
+### 1. Multi-AI Recipe Generation
 
-**Intelligent model selection based on request complexity:**
+**What it does:**
+Users get four different recipe variations generated simultaneously by different AI providers, each with a distinct style:
+- **Balanced** (OpenAI): Well-rounded recipes with standard instructions
+- **Guided** (Anthropic): Detailed step-by-step guidance for beginners
+- **Streamlined** (Gemini): Quick, efficient recipes for experienced cooks
+- **Essential** (XAI): Minimalist approach with core ingredients only
 
-```typescript
-// Complexity scoring algorithm
-const complexity =
-  (ingredientCount * 0.5) +       // More ingredients = more complex
-  (allergenCount * 3) +            // Safety-critical (3x weight)
-  (dietaryRestrictions * 2) +      // Dietary needs important
-  (hasUserDescription ? 2 : 0);    // Context bonus
-
-// Dynamic model routing
-const selectedModel = complexity > 8
-  ? 'gpt-4.1-2025-04-14'           // Full capability for complex requests
-  : 'gpt-4.1-mini-2025-04-14';     // Cost-optimized for simple requests
-```
+**How it works:**
+- User inputs ingredients, dietary restrictions, and allergies
+- Request is sent to all 4 AI providers in parallel
+- Each AI generates a unique recipe based on the same requirements
+- Results display side-by-side for easy comparison
 
 **Why this matters:**
-- Allergens get 3x weight for safety-critical accuracy
-- Reduces costs by ~40% without compromising quality
-- All usage tracked with token counts and costs per request
-- Enables data-driven optimization of provider selection
+Different AI models have different strengths. Letting users compare helps them find their preferred style.
 
-### 2. Three-Tier Allergen Detection System
+### 2. Complexity-Based Prioritization
 
-**Safety-first approach with minimal false positives:**
+**What it does:**
+Requests with allergens or complex dietary restrictions are treated as higher priority and may be routed to more capable AI models.
 
-1. **Safe List Check**: Ingredients known to be safe (e.g., buckwheat is gluten-free despite the name)
-2. **Unsafe List Check**: Ingredients definitively containing allergens (e.g., wheat flour contains gluten)
-3. **Keyword Fallback**: Comprehensive scanning for allergen-related terms
+**How it works:**
+- Each request gets a complexity score based on:
+  - Number of ingredients
+  - Number of allergens (weighted higher for safety)
+  - Number of dietary restrictions
+  - Presence of user description
+- Higher complexity scores ensure safety-critical requests get appropriate AI capacity
 
-**Compliance:** Designed to meet UK Natasha's Law requirements for allergen labeling.
+**Why this matters:**
+Allergen safety is non-negotiable. This system prioritizes accuracy where it matters most.
 
-### 3. Real-Time Business Intelligence
+### 3. Cost Tracking & Analytics
 
-**PostgreSQL functions for cost analysis and profitability:**
+**What it does:**
+Every AI request is logged with provider, model, token usage, and calculated cost.
 
-- `get_daily_cost_summary()` - Daily aggregates by AI provider and model
-- `get_user_profitability()` - Economics analysis at £9.99 and £14.99 pricing tiers
-- `get_provider_performance()` - 7-day comparison across all models (cost, speed, reliability)
-- `get_cost_projection()` - Financial modeling for scaling user base
-- `get_hourly_usage_patterns()` - Peak usage identification for infrastructure planning
+**How it works:**
+- Each recipe generation writes to a usage log table in PostgreSQL
+- Admin dashboard queries this data to show:
+  - Total costs by provider and model
+  - Average cost per recipe
+  - Token usage patterns
+  - Provider performance comparison
+- Edge Function runs daily (via cron) to aggregate historical data
 
-**Automated daily reporting:**
-- Supabase Edge Function runs at 8:30 AM daily via pg_cron
-- Refreshes materialized views for performance
-- Identifies cheapest, fastest, and most reliable AI providers
-- Calculates net profit margins per user tier
+**Why this matters:**
+Understanding AI costs is critical for any production app. This data helps make informed decisions about which providers to use.
 
-### 4. Comprehensive SEO Implementation
+### 4. Admin Review Workflow
 
-**Technical SEO for organic discovery:**
+**What it does:**
+Admin users can review AI-generated recipes, edit metadata, and manage publication.
 
-- **Schema.org Recipe Markup**: Rich snippets with ingredients, instructions, nutrition, cooking times
-- **Dynamic Sitemap Generation**: Automatically includes all published recipes from database
-- **Automated Slug Creation**: URL-friendly slugs with uniqueness validation
-- **Category Landing Pages**: Custom metadata for breakfast, dinner, desserts, etc.
-- **OpenGraph Images**: Social media sharing optimization
+**How it works:**
+- Clerk authentication with user metadata determines admin status
+- Admins see all recipes from automation accounts
+- Can edit SEO metadata, categories, allergen tags
+- Can publish recipes to public pages or keep private
+- Automatic FAQ generation for published recipes
 
-**Results-focused approach:**
-- No fake ratings (violates Google guidelines)
-- Proper structured data for rich results
-- UK-focused keywords and content
+**Why this matters:**
+AI-generated content needs human review before public use. This workflow makes that manageable.
 
-### 5. Admin Review Workflow
+### 5. Complete User Journey
 
-**Role-based access control with JWT claims:**
+**What it does:**
+Beyond recipe generation, includes meal planning, shopping lists, and pantry management.
 
-```typescript
-// Environment-based admin configuration (not hardcoded)
-const ADMIN_USER_IDS = process.env.ADMIN_USER_IDS?.split(',') || [];
-
-// Multi-layer authorization
-1. Middleware: Route protection via Clerk
-2. API: User verification and role check
-3. Database: RLS policies enforce data isolation
-```
-
-**Workflow:**
-- Admins review recipes from automation accounts
-- Edit SEO metadata, category, allergen tags
-- Generate FAQ sections for each recipe
-- Publish to public SEO pages
-- One-click PDF export for recipes
-
-### 6. Additional Features
-
-- **Meal Planner**: Weekly calendar with drag-and-drop recipe scheduling
+**Features:**
+- **Meal Planner**: Weekly calendar for scheduling recipes
 - **Shopping Lists**: Auto-generated from meal plans with ingredient aggregation
-- **Pantry Management**: Track staple ingredients to exclude from suggestions
-- **User Preferences**: Onboarding flow captures cuisines, allergies, skill level, household size
-- **Credit System**: Freemium model with 40 free recipes, then £9.99 lifetime access
-- **GDPR Compliance**: Granular user consent management (essential, personalization, analytics)
+- **Pantry Staples**: Track ingredients you always have on hand
+- **User Preferences**: Onboarding flow captures dietary needs, cuisines, skill level
+
+**Why this matters:**
+Shows ability to build complete product experiences, not just isolated features.
+
+### 6. UK Market Focus
+
+**What it does:**
+All recipes use British measurements, ingredient names, and cooking terminology.
+
+**Examples:**
+- Metric measurements (grams, ml, °C) not imperial (cups, Fahrenheit)
+- British ingredient names (courgette not zucchini, aubergine not eggplant)
+- References to UK supermarkets (Tesco, Sainsbury's, Asda)
+- Cooking terminology UK users expect
+
+**Why this matters:**
+Demonstrates market research and localization skills. Most recipe apps are US-focused, leaving UK users underserved.
+
+### 7. Mobile-First Design
+
+**What it does:**
+Fully responsive interface optimized for mobile devices with touch-friendly interactions.
+
+**Mobile-specific features:**
+- Hamburger navigation menu for compact mobile layout
+- Card-based layouts that stack beautifully on small screens
+- Touch-optimized controls for recipe browsing and meal planning
+- Every page tested and refined for mobile user experience
+- Consistent design language across all device sizes
+
+**Why this matters:**
+Most users access recipe apps on mobile while cooking. A mobile-first approach ensures the best experience where it's needed most.
 
 ---
 
-## Database Schema Highlights
+## Technical Architecture
 
-### Key Design Decisions
+### System Overview
 
-**31 migrations showing iterative development:**
-- Progressive schema refinement based on real-world usage
-- Demonstrates professional database evolution practices
-- Includes rollback migrations for safe deployments
-
-**JSONB for denormalized storage:**
-```sql
-CREATE TABLE recipes (
-  -- ... other fields
-  ingredients JSONB NOT NULL,    -- [{ quantity, unit, item, notes }]
-  instructions JSONB NOT NULL,   -- [{ step, instruction }]
-  nutrition JSONB,               -- { calories, protein, carbs, fat }
-  faqs JSONB                     -- [{ question, answer }]
-);
+```
+┌──────────────────────────────────────────────────────┐
+│                   User Interface                      │
+│              Next.js App Router (RSC)                 │
+└────────────────────┬─────────────────────────────────┘
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────┐
+│                 API Routes Layer                      │
+│        (Authentication, Validation, Routing)          │
+└──────┬────────────────────────────────────────┬──────┘
+       │                                         │
+       ▼                                         ▼
+┌─────────────────┐                  ┌──────────────────┐
+│  AI Providers   │                  │   Supabase DB    │
+│  ┌────────────┐ │                  │   - Recipes      │
+│  │  OpenAI    │ │                  │   - Users        │
+│  │  Anthropic │ │                  │   - Usage Logs   │
+│  │  Gemini    │ │                  │   - Meal Plans   │
+│  │  XAI       │ │                  │   - Admin Data   │
+│  └────────────┘ │                  └──────────────────┘
+└─────────────────┘
+         │
+         ▼
+┌──────────────────────────────────────────────────────┐
+│           Edge Functions (Scheduled Jobs)             │
+│        Daily aggregation, cleanup, analytics          │
+└──────────────────────────────────────────────────────┘
 ```
 
-**Why JSONB?**
-- Eliminates joins for recipe queries (3x faster)
-- Flexible schema for varying recipe structures
-- Built-in PostgreSQL indexing and querying
-- Trade-off: Denormalization for read performance
+### Data Flow
 
-**Row-Level Security for all tables:**
-```sql
--- Users can only access their own data (unless public)
-CREATE POLICY "User isolation"
-ON recipes FOR SELECT
-USING (
-  user_id = auth.jwt()->>'sub'
-  OR is_public = true
-  OR (auth.jwt()->>'is_admin')::boolean = true
-);
-```
-
-**Strategic indexing for hot paths:**
-```sql
--- User-specific queries
-CREATE INDEX idx_recipes_user_id ON recipes(user_id);
-CREATE INDEX idx_recipes_favorites ON recipes(user_id, is_favorite)
-  WHERE is_favorite = true;
-
--- Public/SEO queries
-CREATE INDEX idx_recipes_public ON recipes(is_public, category)
-  WHERE is_public = true;
-CREATE UNIQUE INDEX idx_recipes_seo_slug ON recipes(seo_slug)
-  WHERE is_public = true;
-
--- Analytics queries
-CREATE INDEX idx_ai_usage_cost ON ai_usage_logs(ai_provider, ai_model, created_at);
-```
-
-**Materialized views for analytics:**
-- Nightly refresh via pg_cron
-- Aggregates expensive calculations
-- Serves analytics dashboard without impacting production queries
+1. **User Authentication**: Clerk handles sign-in with Google SSO support
+2. **Recipe Generation**: User submits request → API validates → Routes to 4 AI providers
+3. **Data Storage**: Recipes and usage logs saved to Supabase PostgreSQL
+4. **Admin Access**: Clerk user metadata determines admin privileges
+5. **Background Jobs**: Cron-scheduled Edge Functions aggregate analytics daily
 
 ---
 
-## Security Architecture
+## Database Design
 
-### Defense in Depth (Three Layers)
+### Schema Highlights
 
-**Layer 1: Middleware Protection**
-```typescript
-export default clerkMiddleware(async (auth, request) => {
-  const isPublicRoute = publicRoutes.includes(pathname);
-  if (!isPublicRoute) {
-    await auth.protect(); // Redirect to login if not authenticated
-  }
-});
-```
+**31 Migrations**: The database schema evolved over time as requirements became clearer. These migrations show iterative development and professional database management practices.
 
-**Layer 2: API Authentication**
-```typescript
-const { userId } = await auth();
-if (!userId) {
-  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-}
-```
+**Key Tables:**
+- `recipes` - Recipe data with JSONB for flexible ingredient/instruction storage
+- `user_profiles` - User preferences, dietary restrictions, allergen information
+- `ai_usage_logs` - Every AI request logged with tokens, costs, and performance
+- `meal_plans` & `meal_plan_items` - Weekly meal scheduling
+- `shopping_lists` & `shopping_list_items` - Auto-generated shopping lists
+- `user_pantry_staples` - Ingredients users always have available
 
-**Layer 3: Database Row-Level Security**
-```sql
--- PostgreSQL enforces data isolation even if API is compromised
-CREATE POLICY "User data isolation"
-ON recipes FOR ALL
-USING (user_id = auth.jwt()->>'sub')
-WITH CHECK (user_id = auth.jwt()->>'sub');
-```
+**Security:**
+- Row-Level Security (RLS) policies ensure users can only access their own data
+- Public recipes visible to all users
+- Admin access controlled via Clerk session metadata
 
-### Security Best Practices
+**Automated Jobs:**
+- Daily analytics aggregation via pg_cron
+- Edge Functions for background processing
+- Scheduled cleanup tasks
 
-✅ **No hardcoded credentials**: All secrets in environment variables
-✅ **Service role isolation**: Admin features use environment-configured user IDs
-✅ **JWT claims for authorization**: Admin status via Clerk metadata, not database
-✅ **Input validation**: Zod schemas on all forms and API endpoints
-✅ **SQL injection prevention**: Supabase parameterized queries
-✅ **XSS protection**: React automatic escaping + Content Security Policy headers
+---
+
+## Authentication & Security
+
+### Clerk + Supabase Integration
+
+**Approach:** Using the 2025 recommended Clerk-Supabase integration method (new approach, not the deprecated 2024 version)
+
+**Authentication Flow:**
+1. Users sign in via Clerk (email or Google SSO)
+2. Clerk issues JWT tokens
+3. Supabase reads JWT for user identification
+4. Row-Level Security policies enforce data isolation
+
+**Admin Access:**
+- Configured in Clerk dashboard using Sessions customization
+- User metadata determines admin status
+- No hardcoded admin credentials in code
+- Environment variables define admin user IDs for additional control
+
+**What I Configured:**
+- Google SSO in Clerk dashboard
+- Clerk-Supabase JWT integration
+- Session claims for admin users
+- RLS policies in Supabase
+- Middleware route protection in Next.js
+
+---
+
+## Cost Tracking Implementation
+
+### How It Works
+
+**Logging:**
+Every recipe generation request logs:
+- AI provider used (OpenAI, Anthropic, Gemini, XAI)
+- Specific model (GPT-4.1, Claude Haiku, etc.)
+- Input tokens and output tokens
+- Calculated cost based on provider pricing
+- Response time in milliseconds
+- Whether recipe generation succeeded
+
+**Analytics:**
+- Admin dashboard displays aggregated data
+- Daily Edge Function summarizes usage patterns
+- Identifies most/least expensive providers
+- Tracks average cost per recipe
+- Monitors success/failure rates
+
+**Why This Matters:**
+AI costs can spiral quickly. Tracking lets me make data-driven decisions about which providers to use and when.
+
+---
+
+## SEO Implementation
+
+### Public Recipe Pages
+
+**Features:**
+- Dynamic sitemap generated from published recipes database
+- Schema.org Recipe markup for Google rich snippets
+- Automatic URL slug generation
+- OpenGraph metadata for social sharing
+- Category landing pages (breakfast, lunch, dinner, desserts, etc.)
+
+**Approach:**
+- AI generates recipe, admin reviews and adds SEO metadata
+- Published recipes get unique URLs: `/recipes/[category]/[slug]`
+- FAQ sections auto-generated for SEO value
+- No fake ratings (follows Google guidelines)
+
+**Note:** This is a demonstration of SEO knowledge. The site is not being actively optimized for search traffic since it's a portfolio piece.
 
 ---
 
@@ -317,10 +355,9 @@ WITH CHECK (user_id = auth.jwt()->>'sub');
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn package manager
-- Supabase account (free tier sufficient)
-- Clerk account (free tier sufficient)
-- API keys for at least one AI provider (OpenAI, Anthropic, Google, or XAI)
+- Supabase account
+- Clerk account
+- At least one AI provider API key (OpenAI, Anthropic, Google, or XAI)
 
 ### Installation
 
@@ -335,232 +372,143 @@ WITH CHECK (user_id = auth.jwt()->>'sub');
    npm install
    ```
 
-3. **Set up environment variables**
+3. **Configure environment variables**
 
-   Create `.env.local` file in the `frontend` directory:
+   Create `.env.local` in the frontend directory:
 
    ```env
    # Clerk Authentication
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-   CLERK_SECRET_KEY=sk_test_...
-   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
+   CLERK_SECRET_KEY=your_clerk_secret
 
    # Supabase
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_key
 
-   # AI Providers (configure at least one)
-   OPENAI_API_KEY=sk-...
-   ANTHROPIC_API_KEY=sk-ant-...
-   GOOGLE_GENERATIVE_AI_API_KEY=...
-   XAI_API_KEY=...
+   # AI Providers (at least one required)
+   OPENAI_API_KEY=your_openai_key
+   ANTHROPIC_API_KEY=your_anthropic_key
+   GOOGLE_GENERATIVE_AI_API_KEY=your_google_key
+   XAI_API_KEY=your_xai_key
 
    # Vercel Blob Storage
-   BLOB_READ_WRITE_TOKEN=vercel_blob_...
+   BLOB_READ_WRITE_TOKEN=your_blob_token
 
-   # Admin Configuration
-   ADMIN_USER_IDS=user_abc123,user_def456  # Clerk user IDs
-   AUTOMATION_USER_IDS=user_automation123   # For admin review workflow
+   # Admin Access
+   ADMIN_USER_IDS=comma,separated,clerk,user,ids
    ```
 
 4. **Set up Supabase database**
 
-   Run migrations in order from `supabase/migrations/` directory:
-   ```bash
-   # Using Supabase CLI
-   supabase db push
-
-   # Or manually via Supabase SQL editor
-   # Execute each migration file in numerical order
-   ```
+   Run migrations from the `supabase/migrations/` directory using Supabase CLI or SQL editor.
 
 5. **Run development server**
    ```bash
    npm run dev
    ```
 
-6. **Open in browser**
-   ```
-   http://localhost:3000
-   ```
+   Open http://localhost:3000
 
-### First-Time Setup
+### Important Notes
 
-1. Sign up via Clerk authentication
-2. Complete onboarding flow (dietary preferences, allergies, cuisines)
-3. Generate your first recipe from the "Create Recipe" page
-4. Explore meal planner, shopping lists, and pantry features
-
----
-
-## Key Learnings & Technical Insights
-
-### 1. AI Cost Management
-**Challenge**: Multiple AI providers with varying pricing structures
-**Solution**: Implemented complexity scoring to route simple requests to cheaper models
-**Result**: 40% cost reduction while maintaining quality for complex/safety-critical requests
-
-**Takeaway**: Always track AI usage at a granular level (tokens, costs, model, timestamp). This data is invaluable for optimization.
-
-### 2. Allergen Safety vs. False Positives
-**Challenge**: Comprehensive allergen detection without flagging safe ingredients
-**Solution**: Three-tier system with safe list, unsafe list, and keyword fallback
-**Result**: Accurate detection with minimal false positives (e.g., buckwheat correctly identified as gluten-free)
-
-**Takeaway**: Safety-critical features require explicit allowlists, not just blocklists or keyword matching.
-
-### 3. Database Denormalization Trade-offs
-**Challenge**: Ingredient/instruction queries required multiple joins, slowing page loads
-**Solution**: JSONB storage for nested data structures
-**Result**: 3x faster recipe queries, simplified API logic
-
-**Takeaway**: Denormalization is acceptable for read-heavy workloads when data rarely changes independently.
-
-### 4. JWT-Based Authorization vs. Database Roles
-**Challenge**: Admin access needed without exposing service role credentials
-**Solution**: Clerk JWT claims combined with environment-configured user IDs
-**Result**: Secure admin access without hardcoded roles or exposed secrets
-
-**Takeaway**: Leverage your auth provider's JWT metadata instead of managing roles in your database.
-
-### 5. SEO for AI-Generated Content
-**Challenge**: Search engines may devalue AI-generated content
-**Solution**: Human review workflow, Schema.org markup, no fake ratings, UK-focused targeting
-**Result**: Recipes ranking in Google with rich snippets
-
-**Takeaway**: AI-generated content can rank well if it's reviewed, structured properly, and genuinely useful.
-
-### 6. Progressive Development via Migrations
-**Challenge**: Requirements evolved significantly during development
-**Solution**: 31 incremental migrations with rollback support
-**Result**: Clean schema history showing decision-making process
-
-**Takeaway**: Small, focused migrations are easier to review, test, and debug than large schema changes.
-
----
-
-## Performance Optimizations
-
-- ✅ **Next.js Server Components**: Zero client-side JavaScript for initial page loads
-- ✅ **Image Optimization**: Automatic WebP conversion and responsive sizing via next/image
-- ✅ **Database Indexing**: Strategic indexes on user_id, created_at, seo_slug, and composite queries
-- ✅ **Materialized Views**: Pre-aggregated analytics refresh nightly instead of on-demand
-- ✅ **JSONB Denormalization**: Eliminates joins for recipe detail queries
-- ✅ **Edge Functions**: Supabase Edge Functions for background jobs (daily reports, cleanup)
-- ✅ **Vercel Edge Network**: Global CDN distribution for static assets and API routes
-
----
-
-## Future Enhancements
-
-### Potential Next Steps (If Resuming Development)
-
-1. **Enhanced Analytics Dashboard**
-   - Real-time cost tracking for end users (not just admins)
-   - Recipe performance metrics (saves, shares, print frequency)
-   - A/B testing framework for prompt optimization
-
-2. **Social Features**
-   - Recipe sharing with custom URLs
-   - User-submitted recipe reviews and ratings
-   - Community recipe collections
-
-3. **Advanced AI Features**
-   - Ingredient substitution suggestions
-   - Leftover utilization (what can I make with these 3 ingredients?)
-   - Nutritional goal optimization (high protein, low carb, etc.)
-
-4. **Business Features**
-   - Stripe integration for premium tier
-   - Email automation for meal planning reminders
-   - Affiliate links to UK supermarkets for ingredients
-
-5. **Technical Improvements**
-   - Server-side PDF generation (vs. browser print)
-   - WebSocket for live recipe generation progress
-   - Redis caching layer for repeated recipe queries
-   - Comprehensive test suite (unit, integration, E2E)
+- The app will work with just one AI provider configured, but you'll only get one recipe style
+- Admin features require configuring ADMIN_USER_IDS with your Clerk user ID
+- See Supabase and Clerk documentation for detailed setup instructions
 
 ---
 
 ## Project Statistics
 
-- **Commits**: 134 showing iterative development
-- **TypeScript Coverage**: 88.1% of codebase
+- **Commits**: 134 showing real iterative development
+- **TypeScript**: 88.1% of codebase
 - **Database Migrations**: 31 schema evolutions
-- **AI Providers**: 4 integrated with unified interface
-- **API Routes**: 8 endpoints for recipes, meal plans, shopping lists, analytics
-- **Database Tables**: 12 with comprehensive RLS policies
-- **SQL Functions**: 6 for business intelligence and analytics
+- **AI Providers**: 4 integrated (OpenAI, Anthropic, Google, XAI)
+- **Main Features**: Recipe generation, meal planning, shopping lists, admin review, cost tracking
+- **Tables**: 12+ with comprehensive RLS policies
+- **Deployment**: Live on Vercel at platewise.xyz
 
 ---
 
-## Technologies Demonstrated
+## What This Project Demonstrates
 
-This project showcases production-ready skills across multiple domains:
+### Technical Skills
 
-**Frontend Development**
-- Next.js 15 App Router with React Server Components
-- TypeScript for type safety and developer experience
-- Tailwind CSS + Radix UI for accessible, responsive design
-- Form validation with React Hook Form and Zod
+✅ **Full-Stack Development**: Next.js frontend, API routes, database design
+✅ **AI Integration**: Multiple provider SDKs with intelligent routing
+✅ **Authentication**: Modern auth approach (Clerk + Supabase 2025 method)
+✅ **Database Management**: PostgreSQL with migrations, RLS, and scheduled jobs
+✅ **Deployment**: Production deployment on Vercel with custom domain
+✅ **Type Safety**: TypeScript throughout for error prevention
 
-**Backend Engineering**
-- RESTful API design with Next.js route handlers
-- Multi-provider AI integration with error handling
-- Webhook processing (Clerk user sync)
-- Edge Functions for background jobs
+### Product & Design Skills
 
-**Database Engineering**
-- PostgreSQL schema design with 31 migrations
-- Row-Level Security for multi-user data isolation
-- JSONB for flexible nested data structures
-- Materialized views and custom functions for analytics
-- Strategic indexing for query performance
+✅ **Market Research**: Identified UK market gap and localized accordingly
+✅ **User Experience**: Complete journey from generation to meal planning
+✅ **Feature Prioritization**: Focused on core value (4 AI comparisons) first
+✅ **Safety Consciousness**: Paused for human testing before public launch
+✅ **Analytics**: Built cost tracking from day one for sustainability
 
-**Security & Authentication**
-- JWT-based authentication via Clerk
-- Defense in depth (middleware, API, database layers)
-- Environment-based configuration (no hardcoded secrets)
-- GDPR-compliant consent management
+### Professional Practices
 
-**AI/ML Engineering**
-- Multi-LLM integration (OpenAI, Anthropic, Google, XAI)
-- Prompt engineering with safety-first design
-- Cost optimization via complexity-based routing
-- Token tracking and usage analytics
-
-**SEO & Marketing**
-- Schema.org structured data for rich snippets
-- Dynamic sitemap generation from database
-- Automated slug creation with uniqueness validation
-- OpenGraph metadata for social sharing
-
-**DevOps & Deployment**
-- Vercel deployment with CI/CD
-- Environment variable management
-- Database migration strategy
-- Scheduled jobs via pg_cron
+✅ **Iterative Development**: 31 migrations and 134 commits show evolution
+✅ **Security-First**: RLS policies, proper auth, no hardcoded secrets
+✅ **Documentation**: Clear README, environment variable templates
+✅ **Responsible Development**: Paused when safety requirements became clear
 
 ---
 
-## License
+## Why Development Is Paused
 
-This is a portfolio project demonstrating production-ready SaaS development skills. The code is available for educational purposes and portfolio review.
+### The Challenge
 
-For commercial use or questions, please contact: [Your Email]
+AI-generated recipes sound appealing, but they come with significant responsibility:
+
+1. **Food Safety**: Recipes could contain unsafe ingredient combinations or cooking methods
+2. **Allergen Accuracy**: AI might miss cross-contamination risks or hidden allergens
+3. **Untested Instructions**: Cooking times, temperatures, and techniques need real-world validation
+4. **Liability**: Publishing untested recipes could harm users
+
+### The Solution Required
+
+Before commercial launch, each recipe would need:
+- Human chef review for technique accuracy
+- Kitchen testing to verify cooking times and temperatures
+- Allergen verification by qualified professionals
+- Taste testing to ensure quality
+
+### Why This Decision Matters
+
+This demonstrates professional judgment: knowing when to pause development based on real-world constraints, not just technical feasibility.
+
+**The app works perfectly from a technical standpoint.** But "working code" ≠ "ready for public use."
 
 ---
 
-## Contact
+## Future Enhancements
 
-**Developer**: [Your Name]
-**Portfolio**: [Your Portfolio URL]
-**LinkedIn**: [Your LinkedIn]
-**GitHub**: [@web3at50](https://github.com/web3at50)
-**Email**: [Your Email]
+If I were to resume development with proper testing infrastructure:
+
+### Near-Term
+- Enhance the recipe generation page which is the heart of the site.   
+- User rating system for tested recipes
+- Recipe modification suggestions
+
+
+---
+
+## Contact & Links
+
+**Live Demo**: [platewise.xyz](https://platewise.xyz) (demo only - see disclaimer)
+**GitHub**: [github.com/web3at50/recipe-app](https://github.com/web3at50/recipe-app)
+**Developer**: Syntorak
+**Email**: support@syntorak.com
+
+---
+
+## Technical Documentation
+
+For detailed technical implementation (SQL functions, RLS policies, API architecture), see [TECHNICAL.md](TECHNICAL.md).
 
 ---
 
@@ -573,4 +521,10 @@ For commercial use or questions, please contact: [Your Email]
 
 ---
 
-**Note**: This project is paused while evaluating UK allergen labeling regulations. The live demo remains available for portfolio review purposes.
+## License
+
+This is a portfolio demonstration project. Code available for review and educational purposes.
+
+---
+
+**⚠️ Final Reminder**: This application is a technical demonstration. Do not use AI-generated recipes for actual cooking without proper testing and verification. The developer assumes no responsibility for use of generated content.
