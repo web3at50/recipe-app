@@ -46,7 +46,12 @@
       "Bash(mkdir:*)",
       "Bash(move \"(dashboard)\\recipes\" \"(dashboard)\\my-recipes\")",
       "Bash(ls:*)",
-      "Bash(nul)"
+      "Bash(nul)",
+      "Bash(timeout /t 3)",
+      "Bash(exit 0)",
+      "Bash(git pull:*)",
+      "Bash(git rm:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []
