@@ -48,6 +48,8 @@ next-env.d.ts
 # IDEs
 .vscode/
 .idea/
+.claude/
+*.code-workspace
 *.swp
 *.swo
 *~
