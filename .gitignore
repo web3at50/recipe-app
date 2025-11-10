@@ -3,6 +3,14 @@ setup/
 Marketing/
 Site Pricing/
 
+# Documentation and planning directories
+Markdown Docs/
+Master Plan Oct 25/
+
+# Documentation files
+brand-design-tokens.md
+FAQ_EXAMPLES.md
+
 # Environment variables
 .env
 .env.local
