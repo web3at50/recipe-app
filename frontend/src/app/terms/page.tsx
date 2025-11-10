@@ -68,29 +68,31 @@ export default function TermsPage() {
       {/* Pricing */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Pricing and Payment</CardTitle>
+          <CardTitle>Demo Access and Purpose</CardTitle>
         </CardHeader>
         <CardContent className="prose prose-sm max-w-none">
-          <h3>Free Tier</h3>
+          <h3>Demo Access</h3>
           <p>
-            New users receive <strong>40 free AI-generated recipes</strong>. No credit
-            card required.
+            This is a <strong>free portfolio demonstration project</strong>. New users receive{' '}
+            <strong>12 free recipe generations</strong> (3 batches of 4, or 12 singles). No payment required.
           </p>
 
-          <h3>Lifetime Access</h3>
+          <h3>Purpose</h3>
           <p>
-            After 40 recipes, a one-time payment of <strong>£9.99</strong> grants
-            lifetime access to unlimited recipes. No subscriptions. No recurring fees.
+            PlateWise is a technical demonstration showcasing AI recipe generation technology,
+            meal planning features, and UK-specific culinary considerations. It demonstrates
+            full-stack development capabilities including Next.js, Supabase, AI integration,
+            and responsive design.
           </p>
 
-          <h3>Refund Policy</h3>
+          <h3>Safety Notice</h3>
           <p>
-            We offer a 14-day money-back guarantee. If you&apos;re not satisfied, contact us
-            at{' '}
+            AI-generated recipes have <strong>not been tested in real kitchens</strong> and should
+            not be used for actual cooking or relied upon for allergen safety. Development paused
+            pending implementation of testing protocols. For questions, contact{' '}
             <a href="mailto:support@platewise.xyz" className="text-primary hover:underline">
               support@platewise.xyz
-            </a>{' '}
-            for a full refund.
+            </a>.
           </p>
         </CardContent>
       </Card>

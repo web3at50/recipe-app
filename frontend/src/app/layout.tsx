@@ -36,10 +36,10 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL('https://platewise.xyz'),
   title: {
-    default: 'PlateWise - AI Recipe Manager | £9.99 Lifetime, No Subscription',
+    default: 'PlateWise - AI Recipe Manager | Free Demo Portfolio Project',
     template: '%s | PlateWise',
   },
-  description: 'UK\'s simplest AI recipe app. Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergen standards. 40 recipes free, £9.99 lifetime after. No subscription ever.',
+  description: 'UK\'s simplest AI recipe app. Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergen standards. 12 free recipe generations. Portfolio demonstration.',
   keywords: [
     'AI recipe generator UK',
     'British recipe app',
@@ -57,8 +57,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_GB',
     url: 'https://platewise.xyz',
-    title: 'PlateWise - AI Recipe Manager | £9.99 Lifetime',
-    description: 'UK\'s simplest AI recipe app. 40 recipes free, £9.99 lifetime. British measurements, UK allergens. No subscription.',
+    title: 'PlateWise - AI Recipe Manager | Free Demo',
+    description: 'UK\'s simplest AI recipe app. 12 free recipe generations. British measurements, UK allergens. Portfolio demonstration.',
     siteName: 'PlateWise',
     images: [
       {
@@ -72,8 +72,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PlateWise - AI Recipe Manager | £9.99 Lifetime',
-    description: 'Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergens. 40 free recipes.',
+    title: 'PlateWise - AI Recipe Manager | Free Demo',
+    description: 'Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergens. 12 free recipe generations. Portfolio demo.',
     images: ['https://platewise.xyz/twitter-image.png'],
   },
   robots: {

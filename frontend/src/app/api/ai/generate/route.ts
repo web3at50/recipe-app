@@ -30,16 +30,34 @@ export async function POST(request: Request) {
     // Load preferences from database (authenticated) or request body (playground)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let userPreferences: any = {};
+    let currentCreditsUsed = 0;
+    let supabase: Awaited<ReturnType<typeof createClient>> | null = null;
+
     if (userId) {
       // Authenticated user - fetch from database
-      const supabase = await createClient();
+      supabase = await createClient();
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('preferences')
+        .select('preferences, generation_credits_used')
         .eq('user_id', userId)
         .single();
 
       userPreferences = profile?.preferences || {};
+      currentCreditsUsed = profile?.generation_credits_used || 0;
+
+      // Check credit limit (12 credits for demo users)
+      const CREDIT_LIMIT = 12;
+      if (currentCreditsUsed >= CREDIT_LIMIT) {
+        return NextResponse.json(
+          {
+            error: 'Generation limit reached',
+            message: `You've reached the demo limit of ${CREDIT_LIMIT} recipe generations. This is a portfolio demonstration project.`,
+            creditsUsed: currentCreditsUsed,
+            creditLimit: CREDIT_LIMIT
+          },
+          { status: 403 }
+        );
+      }
 
       // Allow session-only overrides from request body (for temporary preference changes)
       if (body.preferences) {
@@ -349,9 +367,27 @@ export async function POST(request: Request) {
       console.error('Failed to log AI usage:', error);
     });
 
+    // Increment generation credits for authenticated users (non-blocking)
+    if (userId && supabase) {
+      const newCreditsUsed = currentCreditsUsed + 1;
+      supabase
+        .from('user_profiles')
+        .update({ generation_credits_used: newCreditsUsed })
+        .eq('user_id', userId)
+        .then(({ error }) => {
+          if (error) {
+            console.error('Failed to increment generation credits:', error);
+          } else {
+            console.log(`Credits incremented: ${newCreditsUsed}/12`);
+          }
+        });
+    }
+
     return NextResponse.json({
       recipe,
       allergen_warnings: allergenWarnings.length > 0 ? allergenWarnings : undefined,
+      creditsUsed: currentCreditsUsed + 1, // Return updated credit count
+      creditLimit: 12,
     });
   } catch (error) {
     console.error('Error in AI recipe generation:', error);

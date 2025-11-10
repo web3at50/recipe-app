@@ -34,13 +34,13 @@ export async function RecipeCTA() {
             </Link>
           ) : (
             <SignUpButton mode="modal">
-              <Button size="lg">Start Free - No Card Needed</Button>
+              <Button size="lg">Start Free Demo</Button>
             </SignUpButton>
           )}
         </div>
 
         <p className="text-sm text-muted-foreground">
-          40 recipes free • £9.99 lifetime after • No subscription ever
+          12 free recipe generations • No payment required • Portfolio demonstration
         </p>
       </CardContent>
     </Card>

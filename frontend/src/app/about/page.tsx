@@ -78,7 +78,7 @@ export default function AboutPage() {
             <li className="flex gap-3">
               <span className="text-primary mt-1">✓</span>
               <div>
-                <strong>No Subscription Model</strong> - £9.99 lifetime after 40 free recipes. No monthly fees ever.
+                <strong>Free Portfolio Demo</strong> - 12 free recipe generations. Technical demonstration project.
               </div>
             </li>
             <li className="flex gap-3">
@@ -121,13 +121,13 @@ export default function AboutPage() {
 
       {/* CTA */}
       <div className="text-center mt-12">
-        <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
+        <h2 className="text-2xl font-bold mb-4">Ready to Try the Demo?</h2>
         <p className="text-muted-foreground mb-6">
-          Try 40 recipes free. No card needed. £9.99 lifetime after.
+          12 free recipe generations. No payment required. Portfolio demonstration.
         </p>
         <Link href="/">
           <Button size="lg">
-            Start Cooking with PlateWise
+            Start Demo
           </Button>
         </Link>
       </div>
