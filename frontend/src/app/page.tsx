@@ -26,18 +26,12 @@ export default async function Home() {
         operatingSystem: 'Web Browser',
         offers: {
           '@type': 'Offer',
-          price: '9.99',
+          price: '0',
           priceCurrency: 'GBP',
-          priceValidUntil: '2026-12-31',
           availability: 'https://schema.org/InStock',
-          description: 'Lifetime access to PlateWise AI recipe manager',
+          description: 'Free technical demonstration - PlateWise AI recipe manager',
         },
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: '4.8',
-          reviewCount: '127',
-        },
-        description: 'AI-powered recipe manager and meal planner for UK cooks. Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergen standards.',
+        description: 'AI-powered recipe manager and meal planner for UK cooks. Technical demonstration project. Enter ingredients, get 4 personalised recipes in 30 seconds. British measurements, UK allergen standards.',
         featureList: [
           'AI recipe generation',
           'Meal planning',
@@ -53,18 +47,10 @@ export default async function Home() {
         mainEntity: [
           {
             '@type': 'Question',
-            name: 'Is it really free to start? Do I need a credit card?',
+            name: 'Is PlateWise free to use?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: "Yes, it's completely free to start! You get 10 batches of 4 recipes (40 total recipes) without entering any payment details. No credit card required. You only pay £9.99 if you want unlimited access after your free recipes run out.",
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'Is this a subscription or a one-time payment?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: "It's a one-time payment of £9.99 for lifetime access. No monthly fees, no annual renewals, no hidden costs. Pay once and own PlateWise forever.",
+              text: "Yes! PlateWise is a free technical demonstration project. You can sign up and receive 12 free recipe generations (3 batches of 4 or 12 batches of 1). No payment required.",
             },
           },
           {
@@ -111,29 +97,38 @@ export default async function Home() {
             />
           </div>
 
+          {/* Warning Notice */}
+          <div className="bg-amber-50 dark:bg-amber-950/20 border-2 border-amber-500 dark:border-amber-700 rounded-lg p-4 max-w-3xl mx-auto">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0">⚠️</span>
+              <div className="text-left">
+                <h3 className="font-bold text-amber-900 dark:text-amber-100 mb-1">Important Notice</h3>
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  This is a technical demonstration project. AI-generated recipes have not been tested in real kitchens and should not be used for actual cooking or relied upon for allergen safety. Development paused pending implementation of testing protocols.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Headline */}
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
               &ldquo;What&rsquo;s for Dinner?&rdquo; Solved in 30 Seconds—Without Wasting Food or Money
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              UK&rsquo;s simplest AI recipe app. Enter what you have, get 4 personalised recipes instantly. <span className="font-semibold text-foreground">No credit card required.</span>
+              UK&rsquo;s simplest AI recipe app. Enter what you have, get 4 personalised recipes instantly. <span className="font-semibold text-foreground">Free demo access.</span>
             </p>
           </div>
 
           {/* Trust Badges */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-green-600" />
-              <span>No credit card required</span>
-            </div>
-            <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-green-600" />
-              <span>40 recipes free</span>
+              <span>12 free recipe generations</span>
             </div>
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-green-600" />
-              <span>£9.99 lifetime after</span>
+              <span>No payment required</span>
             </div>
           </div>
 
@@ -141,7 +136,7 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
             <SignUpButton mode="modal">
               <Button size="lg" className="text-lg h-14 px-8">
-                Start Free - No Card Needed
+                Start Free Demo
               </Button>
             </SignUpButton>
 
@@ -153,7 +148,7 @@ export default async function Home() {
           </div>
 
           <p className="text-sm text-muted-foreground">
-            10 batches of 4 recipes <span className="font-medium">(40 total recipes)</span> free to try
+            3 batches of 4 recipes or 12 batches of 1 <span className="font-medium">(12 total generations)</span> free
           </p>
         </div>
       </section>
@@ -215,111 +210,6 @@ export default async function Home() {
                 </CardContent>
               </Card>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="text-3xl font-bold text-center mb-4">
-              £9.99 Once. Not £84/Year.
-            </h2>
-            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Other recipe apps charge subscriptions forever. PlateWise is one payment. Own it for life.
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              {/* Free Tier */}
-              <Card className="border-2">
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-4">
-                    <h3 className="text-2xl font-bold">Free Trial</h3>
-                    <div className="space-y-2">
-                      <p className="text-4xl font-bold">£0</p>
-                      <p className="text-sm text-muted-foreground">No credit card required</p>
-                    </div>
-                    <ul className="space-y-3 text-left">
-                      <li className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">10 batches of 4 recipes (40 total)</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">All 4 recipe styles</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">Meal planning & shopping lists</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">Dietary & allergen tracking</span>
-                      </li>
-                    </ul>
-                    <SignUpButton mode="modal">
-                      <Button className="w-full" size="lg">
-                        Start Free Trial
-                      </Button>
-                    </SignUpButton>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Lifetime Tier */}
-              <Card className="border-2 border-primary relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                    BEST VALUE
-                  </span>
-                </div>
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-4">
-                    <h3 className="text-2xl font-bold">Lifetime Access</h3>
-                    <div className="space-y-2">
-                      <p className="text-4xl font-bold">£9.99</p>
-                      <p className="text-sm text-muted-foreground">One-time payment</p>
-                    </div>
-                    <ul className="space-y-3 text-left">
-                      <li className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm font-semibold">Unlimited recipes forever</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">All features included</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">Future updates free</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">No subscription, no recurring fees</span>
-                      </li>
-                    </ul>
-                    <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                      <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                        Save £74/year vs subscription apps
-                      </p>
-                      <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                        ChefGPT costs £83.88/year. You pay £9.99 once.
-                      </p>
-                    </div>
-                    <SignUpButton mode="modal">
-                      <Button className="w-full" variant="default" size="lg">
-                        Try Free First
-                      </Button>
-                    </SignUpButton>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <p className="text-center text-sm text-muted-foreground mt-8">
-              Start with 40 free recipes. Upgrade to lifetime access when you&rsquo;re ready. No pressure.
-            </p>
           </div>
         </div>
       </section>
@@ -390,49 +280,27 @@ export default async function Home() {
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1">
                 <AccordionTrigger className="text-left">
-                  Is it really free to start? Do I need a credit card?
+                  Is PlateWise free to use?
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground">
-                    Yes, it&rsquo;s completely free to start! You get 10 batches of 4 recipes (40 total recipes) without entering any payment details. No credit card required. You only pay £9.99 if you want unlimited access after your free recipes run out.
+                    Yes! PlateWise is a free technical demonstration project. You can sign up and receive 12 free recipe generations (3 batches of 4 or 12 batches of 1). No payment required.
                   </p>
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-2">
                 <AccordionTrigger className="text-left">
-                  What happens after my 40 free recipes?
+                  Can I use these recipes for cooking?
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground">
-                    After you&rsquo;ve used your 40 free recipes, you&rsquo;ll be prompted to upgrade to lifetime access for £9.99. This is a one-time payment—not a subscription. Pay once, use forever. All your saved recipes, meal plans, and shopping lists stay accessible.
+                    No. This is a technical demonstration only. AI-generated recipes have not been tested in real kitchens and should not be used for actual cooking or relied upon for allergen safety. Development is paused pending implementation of testing protocols.
                   </p>
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-3">
-                <AccordionTrigger className="text-left">
-                  Is this a subscription or a one-time payment?
-                </AccordionTrigger>
-                <AccordionContent>
-                  <p className="text-muted-foreground">
-                    It&rsquo;s a <span className="font-semibold">one-time payment</span> of £9.99 for lifetime access. No monthly fees, no annual renewals, no hidden costs. Pay once and own PlateWise forever. Most recipe apps charge £6.99-£12.99 <em>per month</em>—that&rsquo;s £84-£155 per year. You pay £9.99 once.
-                  </p>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-4">
-                <AccordionTrigger className="text-left">
-                  Can I cancel anytime?
-                </AccordionTrigger>
-                <AccordionContent>
-                  <p className="text-muted-foreground">
-                    There&rsquo;s nothing to cancel! Since it&rsquo;s a one-time £9.99 payment (not a subscription), you own lifetime access from day one. No recurring charges means nothing to cancel. Your account and all your recipes stay active forever.
-                  </p>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-5">
                 <AccordionTrigger className="text-left">
                   How is PlateWise different from other recipe apps?
                 </AccordionTrigger>
@@ -449,13 +317,13 @@ export default async function Home() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-6">
+              <AccordionItem value="item-4">
                 <AccordionTrigger className="text-left">
-                  What if I don&rsquo;t like the recipes?
+                  What&rsquo;s the purpose of this demo?
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground">
-                    That&rsquo;s why we offer 40 free recipes to try before paying anything! If PlateWise doesn&rsquo;t work for you, you&rsquo;ve lost nothing (no credit card was required). The more details you provide (ingredients, allergies, preferences), the better your recipes will be. Most users find their favorite recipe style within the first 3-4 batches.
+                    PlateWise is a portfolio project showcasing AI recipe generation technology, meal planning features, and UK-specific culinary considerations. It demonstrates full-stack development capabilities including Next.js, Supabase, AI integration, and responsive design.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -469,22 +337,22 @@ export default async function Home() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center space-y-6">
             <h2 className="text-3xl md:text-4xl font-bold">
-              Ready to Solve &ldquo;What&rsquo;s for Dinner?&rdquo; Forever?
+              Ready to Explore AI Recipe Generation?
             </h2>
             <p className="text-lg opacity-90">
-              Join UK families saving time, money, and reducing food waste with PlateWise
+              Try this technical demonstration of UK-focused recipe AI technology
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
               <SignUpButton mode="modal">
                 <Button size="lg" variant="secondary" className="text-lg h-14 px-8">
-                  Start Free - No Card Required
+                  Start Free Demo
                 </Button>
               </SignUpButton>
             </div>
 
             <p className="text-sm opacity-75">
-              40 recipes free • £9.99 lifetime after • No subscription ever
+              12 free generations • No payment required • Portfolio demonstration
             </p>
           </div>
         </div>
