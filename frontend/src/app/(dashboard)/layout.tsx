@@ -52,7 +52,7 @@ export default async function DashboardLayout({
     <>
       <div className="flex h-full">
         {/* Desktop Sidebar - Hidden on mobile, visible on md+ */}
-        <aside className="hidden md:block w-64 border-r bg-muted/40 p-4 flex-shrink-0">
+        <aside className="hidden md:block w-48 border-r bg-muted/40 p-4 flex-shrink-0">
           <nav className="space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
