@@ -366,7 +366,7 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-screen-2xl">
+    <div className="mx-auto py-8 px-6 max-w-full">
       <Breadcrumb items={[
         { label: 'My Recipes', href: '/my-recipes' },
         { label: 'Create Recipe' }
