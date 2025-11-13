@@ -633,6 +633,9 @@ export default function GeneratePage() {
           <Card>
             <CardHeader>
               <CardTitle>Your Ingredients</CardTitle>
+              <CardDescription>
+                Enter your ingredients (max 2000 characters)
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Textarea
@@ -641,7 +644,11 @@ export default function GeneratePage() {
                 onChange={(e) => setIngredientsText(e.target.value)}
                 placeholder={"Chicken breast\nOnions\nGarlic\nRice\n..."}
                 className="min-h-[150px] font-mono"
+                maxLength={2000}
               />
+              <p className="text-xs text-muted-foreground mt-2">
+                {ingredientsText.length}/2000 characters
+              </p>
             </CardContent>
           </Card>
 
@@ -649,6 +656,9 @@ export default function GeneratePage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">What kind of dish? (Optional)</CardTitle>
+              <CardDescription>
+                Describe the dish you want (max 500 characters)
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Textarea
@@ -657,7 +667,11 @@ export default function GeneratePage() {
                 onChange={(e) => setDescriptionText(e.target.value)}
                 placeholder="E.g., Something creamy and comforting, Italian-style, not too spicy..."
                 className="min-h-[100px]"
+                maxLength={500}
               />
+              <p className="text-xs text-muted-foreground mt-2">
+                {descriptionText.length}/500 characters
+              </p>
             </CardContent>
           </Card>
 

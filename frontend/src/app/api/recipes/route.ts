@@ -4,6 +4,9 @@ import { createClient } from '@/lib/supabase/server';
 import type { RecipeFormData } from '@/types/recipe';
 import { detectAllergensInIngredients, UK_ALLERGENS } from '@/lib/allergen-detector';
 import { generateRecipeFAQs } from '@/lib/faq-generator';
+import { recipeCreationSchema } from '@/lib/validation/recipe-schemas';
+import { sanitizeRecipeInput, containsSuspiciousPatterns } from '@/lib/security/sanitization';
+import { rateLimitMiddleware, getRequestIP } from '@/lib/security/rate-limit';
 
 // GET /api/recipes - List all user's recipes (JSONB schema)
 export async function GET(request: Request) {
@@ -73,20 +76,57 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Apply rate limiting: 20 recipes per hour per user
+    const rateLimitResult = await rateLimitMiddleware(request, userId, {
+      maxRequests: 20,
+      windowSeconds: 3600, // 1 hour
+      identifier: 'recipe-create',
+    });
+
+    if (rateLimitResult) return rateLimitResult;
+
     const supabase = await createClient();
 
     const body: RecipeFormData = await request.json();
 
-    // Validate required fields
-    if (!body.name || !body.ingredients?.length || !body.instructions?.length) {
+    // Validate input with Zod schema
+    const validationResult = recipeCreationSchema.safeParse(body);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, ingredients, and instructions are required' },
+        {
+          error: 'Invalid input',
+          details: validationResult.error.issues.map((err) => ({
+            field: err.path.join('.'),
+            message: err.message,
+          })),
+        },
         { status: 400 }
       );
     }
 
+    // Check for suspicious XSS patterns (additional security layer)
+    const textToCheck = [
+      body.name,
+      body.description,
+      ...body.ingredients.map(i => `${i.item} ${i.notes || ''}`),
+      ...body.instructions.map(i => i.instruction),
+    ].join(' ');
+
+    if (containsSuspiciousPatterns(textToCheck)) {
+      return NextResponse.json(
+        {
+          error: 'Invalid input detected',
+          message: 'Your input contains potentially unsafe content. Please remove any HTML tags or special characters.',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize all user inputs to prevent XSS
+    const sanitizedBody = sanitizeRecipeInput(body as RecipeFormData & { [key: string]: unknown });
+
     // Add step numbers to instructions if not provided
-    const instructions = body.instructions.map((inst, index) => ({
+    const instructions = sanitizedBody.instructions.map((inst, index) => ({
       step: inst.step || index + 1,
       instruction: inst.instruction
     }));
@@ -94,7 +134,7 @@ export async function POST(request: Request) {
     // Auto-detect allergens from ingredients (server-side validation)
     const allAllergenIds = UK_ALLERGENS.map(a => a.id);
     const detectedMatches = detectAllergensInIngredients(
-      body.ingredients,
+      sanitizedBody.ingredients,
       allAllergenIds
     );
 
@@ -103,17 +143,27 @@ export async function POST(request: Request) {
 
     // Merge with provided allergens (if any)
     const finalAllergens = [
-      ...new Set([...(body.allergens || []), ...detectedAllergens])
+      ...new Set([...(sanitizedBody.allergens || []), ...detectedAllergens])
     ];
+
+    // Map difficulty values: beginner -> easy, intermediate -> medium, advanced -> hard
+    const difficultyMapping: Record<string, 'easy' | 'medium' | 'hard'> = {
+      beginner: 'easy',
+      intermediate: 'medium',
+      advanced: 'hard',
+    };
+    const mappedDifficulty = sanitizedBody.difficulty
+      ? difficultyMapping[sanitizedBody.difficulty as string]
+      : undefined;
 
     // Generate comprehensive FAQs for LLM optimization
     const generatedFAQs = generateRecipeFAQs({
-      name: body.name,
+      name: sanitizedBody.name,
       allergens: finalAllergens,
-      tags: body.tags,
-      prep_time: body.prep_time,
-      cook_time: body.cook_time,
-      difficulty: body.difficulty,
+      tags: sanitizedBody.tags,
+      prep_time: sanitizedBody.prep_time as number | undefined,
+      cook_time: sanitizedBody.cook_time as number | undefined,
+      difficulty: mappedDifficulty,
     });
 
     // Create recipe (everything in one insert!)
@@ -121,23 +171,23 @@ export async function POST(request: Request) {
       .from('recipes')
       .insert({
         user_id: userId,
-        name: body.name,
-        description: body.description || null,
-        cuisine: body.cuisine || null,
-        prep_time: body.prep_time || null,
-        cook_time: body.cook_time || null,
-        servings: body.servings,
-        difficulty: body.difficulty || null,
-        source: (body as { source?: string }).source || 'user_created', // Accept source from body or default
-        ai_model: (body as { ai_model?: string }).ai_model || null, // Store AI model if provided
-        ingredients: body.ingredients, // JSONB array
-        instructions: instructions, // JSONB array
-        tags: body.tags || [], // Simple array
+        name: sanitizedBody.name,
+        description: sanitizedBody.description || null,
+        cuisine: sanitizedBody.cuisine || null,
+        prep_time: (sanitizedBody.prep_time as number | undefined) || null,
+        cook_time: (sanitizedBody.cook_time as number | undefined) || null,
+        servings: sanitizedBody.servings as number,
+        difficulty: (sanitizedBody.difficulty as 'beginner' | 'intermediate' | 'advanced' | undefined) || null,
+        source: (sanitizedBody as { source?: string }).source || 'user_created', // Accept source from body or default
+        ai_model: (sanitizedBody as { ai_model?: string }).ai_model || null, // Store AI model if provided
+        ingredients: sanitizedBody.ingredients, // JSONB array (sanitized)
+        instructions: instructions, // JSONB array (sanitized)
+        tags: sanitizedBody.tags || [], // Simple array (sanitized)
         allergens: finalAllergens, // Auto-detected + provided allergens
         faqs: generatedFAQs, // FAQ for LLM optimization
-        nutrition: body.nutrition || null, // JSONB object
-        cost_per_serving: body.cost_per_serving || null,
-        image_url: body.image_url || null,
+        nutrition: (sanitizedBody.nutrition as { calories?: number; protein?: number; carbs?: number; fat?: number; fiber?: number } | undefined) || null, // JSONB object
+        cost_per_serving: (sanitizedBody.cost_per_serving as number | undefined) || null,
+        image_url: (sanitizedBody.image_url as string | undefined) || null,
       })
       .select()
       .single();

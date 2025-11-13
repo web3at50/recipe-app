@@ -6,6 +6,8 @@ import { generateText } from 'ai';
 import { createRecipeGenerationPrompt, parseRecipeFromAI } from '@/lib/ai/prompts';
 import { logAIUsage, generateRequestId, generateSessionId } from '@/lib/ai/usage-tracker';
 import { detectAllergensInText, detectAllergensInIngredients, groupMatchesByAllergen } from '@/lib/allergen-detector';
+import { recipeGenerationSchema } from '@/lib/validation/recipe-schemas';
+import { rateLimitMiddleware, getRequestIP } from '@/lib/security/rate-limit';
 
 export async function POST(request: Request) {
   // Start timing for performance tracking
@@ -22,10 +24,35 @@ export async function POST(request: Request) {
   let recipeGenerated = false;
 
   try {
+    // Get authenticated user for rate limiting
+    const { userId } = await auth();
+    const identifier = userId || getRequestIP(request);
+
+    // Apply rate limiting: 5 requests per minute per user/IP
+    const rateLimitResult = await rateLimitMiddleware(request, identifier, {
+      maxRequests: 5,
+      windowSeconds: 60,
+      identifier: 'ai-generate',
+    });
+
+    if (rateLimitResult) return rateLimitResult;
+
     const body = await request.json();
 
-    // Get authenticated user (optional - playground users won't have one)
-    const { userId } = await auth();
+    // Validate input with Zod schema
+    const validationResult = recipeGenerationSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid input',
+          details: validationResult.error.issues.map((err) => ({
+            field: err.path.join('.'),
+            message: err.message,
+          })),
+        },
+        { status: 400 }
+      );
+    }
 
     // Load preferences from database (authenticated) or request body (playground)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
