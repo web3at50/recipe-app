@@ -302,6 +302,28 @@ Most users access recipe apps on mobile while cooking. A mobile-first approach e
 - RLS policies in Supabase
 - Middleware route protection in Next.js
 
+### Security Implementation
+
+PlateWise implements comprehensive security measures following industry best practices:
+
+**Protection Against:**
+- ✅ SQL Injection (parameterized queries via Supabase)
+- ✅ Cross-Site Scripting / XSS (React escaping + CSP headers + input sanitization)
+- ✅ CSRF Attacks (Next.js built-in protection)
+- ✅ Clickjacking (X-Frame-Options headers)
+- ✅ Rate Limiting (5 req/min for AI, 20 req/hour for recipes)
+- ✅ Unauthorized Access (Row-Level Security + Clerk auth)
+
+**Security Features:**
+- Input validation at multiple layers (client, server, database)
+- Content Security Policy (CSP) headers
+- Rate limiting on all API endpoints
+- Input sanitization with XSS pattern detection
+- HTTPS enforced in production (TLS 1.3)
+- Regular dependency vulnerability scanning
+
+**For Details:** See [SECURITY.md](SECURITY.md) for comprehensive security documentation.
+
 ---
 
 ## Cost Tracking Implementation
@@ -439,6 +461,7 @@ AI costs can spiral quickly. Tracking lets me make data-driven decisions about w
 ✅ **Full-Stack Development**: Next.js frontend, API routes, database design
 ✅ **AI Integration**: Multiple provider SDKs with intelligent routing
 ✅ **Authentication**: Modern auth approach (Clerk + Supabase 2025 method)
+✅ **Security**: Comprehensive protection (input validation, XSS/SQL injection prevention, CSP, rate limiting)
 ✅ **Database Management**: PostgreSQL with migrations, RLS, and scheduled jobs
 ✅ **Deployment**: Production deployment on Vercel with custom domain
 ✅ **Type Safety**: TypeScript throughout for error prevention
@@ -454,8 +477,8 @@ AI costs can spiral quickly. Tracking lets me make data-driven decisions about w
 ### Professional Practices
 
 ✅ **Iterative Development**: 31 migrations and 134 commits show evolution
-✅ **Security-First**: RLS policies, proper auth, no hardcoded secrets
-✅ **Documentation**: Clear README, environment variable templates
+✅ **Security-First**: Multi-layered protection, input validation, rate limiting, comprehensive security audit
+✅ **Documentation**: Clear README, dedicated SECURITY.md, environment variable templates
 ✅ **Responsible Development**: Paused when safety requirements became clear
 
 ---
@@ -510,7 +533,9 @@ If I were to resume development with proper testing infrastructure:
 
 ## Technical Documentation
 
-For detailed technical implementation (SQL functions, RLS policies, API architecture), see [TECHNICAL.md](TECHNICAL.md).
+**[SECURITY.md](SECURITY.md)** - Comprehensive security documentation covering authentication, input validation, XSS/SQL injection protection, rate limiting, and security headers
+
+**[TECHNICAL.md](TECHNICAL.md)** - Detailed technical implementation (SQL functions, RLS policies, API architecture)
 
 ---
 
