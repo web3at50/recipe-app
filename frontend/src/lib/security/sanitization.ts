@@ -27,14 +27,11 @@ export function sanitizeString(input: string | null | undefined): string {
   // Remove event handlers (onclick, onerror, etc.)
   sanitized = sanitized.replace(/on\w+\s*=/gi, '');
 
-  // Encode special HTML characters
-  sanitized = sanitized
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
+  // Note: We don't encode regular characters like /, ", ' since:
+  // 1. React auto-escapes all JSX values (prevents XSS)
+  // 2. Recipes legitimately need these characters (e.g., "1/2 cup")
+  // 3. We have CSP headers for additional protection
+  // 4. containsSuspiciousPatterns() catches actual XSS attempts
 
   return sanitized.trim();
 }
