@@ -1,24 +1,40 @@
-import DOMPurify from 'isomorphic-dompurify';
-
 /**
  * Security-focused sanitization utilities to prevent XSS attacks
  *
- * Uses DOMPurify to sanitize user inputs before storing in database
+ * Uses regex-based sanitization that works in serverless environments
+ * Combined with React's built-in JSX escaping and CSP headers for defense-in-depth
  */
 
 /**
  * Sanitize a single string input
  * Removes potentially malicious HTML, scripts, and event handlers
+ *
+ * Note: This is a lightweight approach suitable for serverless environments.
+ * React automatically escapes all JSX values, providing additional XSS protection.
  */
 export function sanitizeString(input: string | null | undefined): string {
   if (!input) return '';
 
-  // DOMPurify configuration - very strict, removes all HTML
-  const sanitized = DOMPurify.sanitize(input, {
-    ALLOWED_TAGS: [], // No HTML tags allowed
-    ALLOWED_ATTR: [], // No attributes allowed
-    KEEP_CONTENT: true, // Keep text content
-  });
+  let sanitized = input;
+
+  // Remove HTML tags
+  sanitized = sanitized.replace(/<[^>]*>/g, '');
+
+  // Remove javascript: and data: protocols
+  sanitized = sanitized.replace(/javascript:/gi, '');
+  sanitized = sanitized.replace(/data:text\/html/gi, '');
+
+  // Remove event handlers (onclick, onerror, etc.)
+  sanitized = sanitized.replace(/on\w+\s*=/gi, '');
+
+  // Encode special HTML characters
+  sanitized = sanitized
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
 
   return sanitized.trim();
 }
